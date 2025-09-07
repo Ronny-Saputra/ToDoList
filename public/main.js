@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const splash = document.querySelector(".splash-container");
     splash.classList.add("fade-out"); 
     setTimeout(() => {
-        window.location.href = "../pages/login.html";
+        window.location.href = "pages/login.html";
     }, 3000);
 
     const app = firebase.app();

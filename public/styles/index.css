@@ -11,7 +11,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #ffffff;
+  background: #233a6a;
   font-family: Arial, sans-serif;
 }
 
@@ -29,7 +29,7 @@ html, body {
 .splash-container h1 {
   margin-top: 15px;
   font-size: 18px;
-  color: #233a6a;
+  color: #ffffff;
   font-weight: 600;
 }
 
