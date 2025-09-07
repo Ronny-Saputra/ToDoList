@@ -66,4 +66,16 @@ function emailSignup(event) {
     return false; // Prevent form submission
 }
 
+function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  }
+
+  if (isMobile()) {
+    console.log("Ini Mobile");
+    document.body.classList.add("mobile");
+  } else {
+    console.log("Ini Desktop");
+    document.body.classList.add("desktop");
+  }
+
 
