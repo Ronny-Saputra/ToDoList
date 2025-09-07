@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const splash = document.querySelector(".splash-container");
+    splash.classList.add("fade-out"); 
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 3000);
+
     const app = firebase.app();
     const db = firebase.firestore();
     console.log("Firebase App initialized:", app);
@@ -77,3 +83,4 @@ function isMobile() {
     console.log("Ini Desktop");
     document.body.classList.add("desktop");
   }
+

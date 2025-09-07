@@ -1,77 +1,17 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timy Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-      <script src="/__/firebase/12.2.1/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script src="/__/firebase/12.2.1/firebase-auth-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-database-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-firestore-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-functions-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-messaging-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-storage-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-analytics-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-remote-config-compat.js"></script>
-    <script src="/__/firebase/12.2.1/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script src="/__/firebase/init.js?useEmulator=true"></script>
-  <link rel="stylesheet" href="styles/index.css" />    
+  <title>Splash Screen</title>
+  <link rel="stylesheet" href="styles/index.css">
 </head>
 <body>
-  <div class="page-wrap">
-    <!-- Bagian atas -->
-    <div class="top-section">
-      <div class="greeting">Hello! I'm Timy</div>
-      <img src="assets/timy1.png" alt="Timy" class="avatar">
-    </div>
-
-    <!-- Bagian bawah biru dengan form -->
-    <div class="bottom-section">
-      <div class="login-card">
-        <div class="title">Login</div>
-
-        <form class="login-form" action="#" method="post" novalidate>
-          <div class="field">
-            <div class="field-icon"><i class="bi bi-envelope-fill"></i></div>
-            <input type="text" class="input" placeholder="Email / Username" required>
-          </div>
-
-          <div class="field">
-            <div class="field-icon"><i class="bi bi-lock-fill"></i></div>
-            <input type="password" class="input" placeholder="Password" required>
-          </div>
-
-          <div class="forgot-wrap">
-            <a href="#" class="forgot-link">Forgot Password?</a>
-          </div>
-
-          <button class="btn btn-primary btn-login" type="submit">Login</button>
-        </form>
-
-        <div class="or-divider">Or login with</div>
-
-        <div class="socials">
-          <button onclick="facebookLogin()" class="social-btn" aria-label="Facebook">
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968764.png" alt="fb">
-          </button>
-          <button onclick="googleLogin()" class="social-btn" aria-label="Google">
-            <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="google">
-          </button>
-        </div>
-        <div class="signup">
-          Don't have account? <a href="signup.html">Sign Up</a>
-        </div>
-      </div>
-    </div>
+  <div class="splash-container">
+    <img src="assets/timy1.png" alt="Logo">
+    <h1>Timy Time</h1>
   </div>
+
   <script src="main.js"></script>
 </body>
 </html>
