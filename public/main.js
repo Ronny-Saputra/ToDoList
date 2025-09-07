@@ -77,5 +77,3 @@ function isMobile() {
     console.log("Ini Desktop");
     document.body.classList.add("desktop");
   }
-
-

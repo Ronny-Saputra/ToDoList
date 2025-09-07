@@ -2,7 +2,7 @@
   --card-w: 360px;
   --primary-dark: #183351;
   --primary-dark-2: #244569;
-  --avatar-size: 250px;
+  --avatar-size: clamp(150px, 35vw, 250px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0 }
@@ -10,7 +10,7 @@
 body {
   margin: 0;
   padding: 0;
-  height: 100vh; 
+  min-height: 100vh; 
   display: flex;
   justify-content: center;  
   align-items: center;     
@@ -21,7 +21,7 @@ body {
 .page-wrap {
   width: 100%;
   max-width: 480px;
-  height: 100%;
+  min-height: 600px;
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -36,17 +36,15 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 20px 0 10px;
+  padding: 20px;
   background: #fff;
-  margin-top: 20px;
 }
 
 .greeting {
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
   font-weight: 600;
   color: #0f2440;
-  margin-bottom: 10px;
-  margin-top: -4%;
+  margin-top: 30px;
 }
 
 .avatar {
@@ -54,30 +52,30 @@ body {
   height: var(--avatar-size);
   object-fit: cover;
   border-radius: 50%;
-  margin-top: -40px; 
+  margin-top: -40px; /* tumpang tindih dengan bottom-section */
+  z-index: 2;
 }
 
 .bottom-section {
   flex: 2;  
   background: linear-gradient(180deg, #eaf4ff 0%, #CFE2F8 60%, #9AC1F0 100%);
-  border-radius: 40px 40px 0 0;
+  border-radius: 40px 40px 20px 20px;
   padding: 40px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  position: relative;  
-  height: 100vh; 
-  margin-top: -17vh;
+  position: relative;
+  margin-top: -100px;
+  z-index: 3;
 }
 
 .login-card { width: 100%; }
 
 .title {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 600;  
   color: #0f2440;
-  margin-top: -15px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .login-form {
@@ -93,26 +91,21 @@ body {
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #919ca8;
   font-size: 15px;
 }
 
 .input {
   width: 100%;
-  height: 36px;
+  height: 40px;
   padding: 0 10px 0 40px;
   border-radius: 8px;
   border: 1px solid transparent; 
   background: #fff;
-  font-size: 12px;
+  font-size: 14px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.05) inset;
   transition: all 0.25s ease; 
 }
-
 .input:focus {
   outline: none;
   border: 1px solid #2b4b78;   
@@ -130,9 +123,8 @@ body {
   color: #2b4b78; 
   text-decoration: none;
   position: relative;
-  transition: transform 0.25s ease, text-shadow 0.25s ease, color 0.25s ease;
+  transition: all 0.25s ease;
 }
-
 .forgot-link::after {
   content: "";
   position: absolute;
@@ -143,26 +135,21 @@ body {
   background: #2b4b78;
   transition: width 0.3s ease;
 }
-
 .forgot-link:hover {
   color: #0d1f3a;
-  transform: scale(1) translateY(-2px); 
+  transform: translateY(-2px); 
   text-shadow: 0 3px 8px rgba(0,0,0,0.25);
 }
-
-.forgot-link:hover::after {
-  width: 100%; 
-}
+.forgot-link:hover::after { width: 100%; }
 
 .btn-login {
   margin-top: 6px;
   background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-dark-2) 100%);
   border: none;
   color: #fff;
-  height: 40px;
-  font-size: small;
+  height: 44px;
+  font-size: 14px;
   border-radius: 10px;
-  font-weight: 400;
   cursor: pointer;            
   transition: all 0.3s ease;   
 }
@@ -226,10 +213,8 @@ body {
   color: #1e3d70;
   font-weight: 600;
   text-decoration: none;
-  display: inline-block;
-  position: relative;
   margin-left: 6px;  
-  transition: transform 0.25s ease, text-shadow 0.25s ease, color 0.25s ease;
+  transition: all 0.25s ease;
 }
 .signup a::after {
   content: "";
@@ -243,42 +228,22 @@ body {
 }
 .signup a:hover {
   color: #0f2440;
-  transform: scale(1.1);     
+  transform: scale(1.05);     
   text-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 .signup a:hover::after { width: 100%; }
 
-@media (min-width: 768px) {
-  .greeting { font-size: 22px }
-  .title { font-size: 20px }
-  .input { font-size: 14px; height: 44px }
-  .btn-login { font-size: 14px; height: 44px }
-  .avatar { width: 250px; height: 250px }
-}
-
-@media (min-width: 481px) and (max-width: 767px) {
-  .page-wrap { max-width: 90%; }
-  .avatar { width: 200px; height: 200px }
-  .title { font-size: 16px }
-}
-
+/* Responsiveness */
 @media (max-width: 480px) {
   .page-wrap {
     max-width: 100%;
+    min-height: 100vh;
     border-radius: 0;
     box-shadow: none;
   }
-  .login-card { padding: 10px; font-size: 14px }
-  .avatar { width: 250px; height: 250px }
-  .greeting { font-size: 1.5rem; margin-top: 8% }
-  .btn-login { height: 36px; font-size: 12px }
-
-
-  .title {
-    margin-top: -10px;
-  }
-  
-  .bottom-section {
-    margin-top: -10vh;
-  }
+  .login-card { padding: 10px }
+  .avatar { width: clamp(300px, 55vw, 400px);
+  height: clamp(300px, 55vw, 400px); margin-top: -40px; }
+  .btn-login { height: 40px; font-size: 13px }
+  .bottom-section { padding: 30px; margin-top: -100px; }
 }
