@@ -1,86 +1,61 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const splash = document.querySelector(".splash-container");
-    splash.classList.add("fade-out"); 
+  // BAGIAN INI HANYA AKAN BERJALAN JIKA ADA ELEMEN DENGAN CLASS .splash-container
+  const splash = document.querySelector(".splash-container");
+  if (splash) {
+    console.log("Splash screen found, starting fade out timer.");
+    splash.classList.add("fade-out");
     setTimeout(() => {
-        window.location.href = "pages/login.html";
+      window.location.href = "pages/login.html";
     }, 3000);
-
-    const app = firebase.app();
-    const db = firebase.firestore();
-    console.log("Firebase App initialized:", app);
-    console.log("Firestore DB instance:", db);
+  } else {
+    console.log("Not on splash screen page, skipping splash logic.");
+  }
 });
 
+// SEMUA FUNGSI DI BAWAH INI TETAP ADA UNTUK DIGUNAKAN DI HALAMAN LAIN
 function googleLogin() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-            const user = result.user;
-            console.log("User signed in:", user);
-            alert(`Welcome, ${user.displayName}`);
-        })
-        .catch((error) => {
-            console.error("Error during sign-in:", error);
-            alert(`Error: ${error.message}`);
-        });
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then(result => alert(`Welcome, ${result.user.displayName}`))
+    .catch(error => alert(`Error: ${error.message}`));
 }
+
 function facebookLogin() {
-    const provider = new firebase.auth.FacebookAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-            const user = result.user;
-            console.log("User signed in:", user);
-            alert(`Welcome, ${user.displayName}`);
-        })
-        .catch((error) => {
-            console.error("Error during sign-in:", error);
-            alert(`Error: ${error.message}`);
-        });
+  const provider = new firebase.auth.FacebookAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then(result => alert(`Welcome, ${result.user.displayName}`))
+    .catch(error => alert(`Error: ${error.message}`));
 }
 
 function emailLogin(event) {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("User signed in:", user);
-            alert(`Welcome, ${user.email}`);
-        })
-        .catch((error) => {
-            console.error("Error during sign-in:", error);
-            alert(`Error: ${error.message}`);
-        });
-    return false; // Prevent form submission
+  event.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(userCredential => alert(`Welcome, ${userCredential.user.email}`))
+    .catch(error => alert(`Error: ${error.message}`));
+  return false;
 }
 
 function emailSignup(event) {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("User signed up:", user);
-            alert(`Account created for ${user.email}`);
-        })
-        .catch((error) => {
-            console.error("Error during sign-up:", error);
-            alert(`Error: ${error.message}`);
-        });
-    return false; // Prevent form submission
+  event.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+
+  if (password !== confirmPassword) {
+    alert("Password dan konfirmasi tidak cocok.");
+    return false;
+  }
+
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      alert(`Akun berhasil dibuat untuk ${userCredential.user.email}. Silakan login.`);
+      window.location.href = "login.html";
+    })
+    .catch(error => {
+      console.error("Error during sign-up:", error);
+      alert(`Error: ${error.message}`);
+    });
+  return false;
 }
-
-function isMobile() {
-    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
-  }
-
-  if (isMobile()) {
-    console.log("Ini Mobile");
-    document.body.classList.add("mobile");
-  } else {
-    console.log("Ini Desktop");
-    document.body.classList.add("desktop");
-  }
-

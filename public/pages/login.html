@@ -38,19 +38,15 @@
       <div class="login-card">
         <div class="title">Login</div>
 
-        <form class="login-form" action="#" method="post" novalidate>
+        <form class="login-form" onsubmit="return emailLogin(event)">
           <div class="field">
             <div class="field-icon"><i class="bi bi-envelope-fill"></i></div>
-            <input type="text" class="input" placeholder="Email / Username" required>
+            <input type="text" id="email" class="input" placeholder="Email / Username" required>
           </div>
 
           <div class="field">
             <div class="field-icon"><i class="bi bi-lock-fill"></i></div>
-            <input type="password" class="input" placeholder="Password" required>
-          </div>
-
-          <div class="forgot-wrap">
-            <a href="#" class="forgot-link">Forgot Password?</a>
+            <input type="password" id="password" class="input" placeholder="Password" required>
           </div>
 
           <button class="btn btn-primary btn-login" type="submit">Login</button>
@@ -72,6 +68,6 @@
       </div>
     </div>
   </div>
-  <script src="main.js"></script>
+  <script src="../main.js"></script>
 </body>
 </html>
