@@ -144,5 +144,5 @@ body {
   .page-wrap { border-radius: 0; box-shadow: none; }
   .avatar { width: 150px; top: -120px; }
   .title { font-size: 18px; }
-  .bottom-section { padding: 20px; margin-top: 25%; }
+  .bottom-section { padding: 30px; margin-top: 25%; }
 }
