@@ -140,7 +140,6 @@ body {
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-/* Responsif */
 @media (max-width: 480px) {
   .page-wrap { border-radius: 0; box-shadow: none; }
   .avatar { width: 150px; top: -120px; }
