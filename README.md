@@ -1,5 +1,4 @@
 # Timy Time
-![Timy](assets/timy1.png)  
 
 Aplikasi *Timy Time* ini merupakan aplikasi ToDoList yang memungkinkan pengguna untuk mengelola tugas mereka dengan mudah. Pengguna dapat menambahkan, mengedit, menghapus, dan menandai tugas sebagai selesai. Aplikasi ini bertujuan untuk meningkatkan produktivitas dan membantu pengguna tetap terorganisir.
 
