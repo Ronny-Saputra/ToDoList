@@ -18,11 +18,8 @@ Aplikasi *Timy Time* ini merupakan aplikasi ToDoList yang memungkinkan pengguna 
 - **Backend**: Node.js
 - **Database**: Firebase
 
-## Instalasi
 
-Ikuti langkah-langkah berikut untuk menginstal aplikasi ini di mesin lokal Anda:
-
-1. **Clone repositori ini**:
+**Clone repositori ini**:
 
    ```bash
    git clone https://github.com/username/todo-list-app.git
