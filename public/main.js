@@ -11,6 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Firestore DB instance:", db);
 });
 
+document.querySelectorAll(".task-card").forEach(card => {
+      card.addEventListener("click", () => {
+        // hapus active dari semua card
+        document.querySelectorAll(".task-card").forEach(c => c.classList.remove("active"));
+        // kasih active ke card yang diklik
+        card.classList.add("active");
+      });
+    });
+
+
 function googleLogin() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -24,6 +34,7 @@ function googleLogin() {
             alert(`Error: ${error.message}`);
         });
 }
+
 function facebookLogin() {
     const provider = new firebase.auth.FacebookAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -77,10 +88,12 @@ function isMobile() {
   }
 
   if (isMobile()) {
-    console.log("Ini Mobile");
+    console.log("Mobile");
     document.body.classList.add("mobile");
   } else {
-    console.log("Ini Desktop");
+    console.log("Desktop");
     document.body.classList.add("desktop");
   }
 
+
+  
