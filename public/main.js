@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // SEMUA FUNGSI DI BAWAH INI TETAP ADA UNTUK DIGUNAKAN DI HALAMAN LAIN
+document.querySelectorAll(".task-card").forEach(card => {
+      card.addEventListener("click", () => {
+        // hapus active dari semua card
+        document.querySelectorAll(".task-card").forEach(c => c.classList.remove("active"));
+        // kasih active ke card yang diklik
+        card.classList.add("active");
+      });
+    });
+
+
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider)
@@ -59,3 +69,13 @@ function emailSignup(event) {
     });
   return false;
 }
+  if (isMobile()) {
+    console.log("Mobile");
+    document.body.classList.add("mobile");
+  } else {
+    console.log("Desktop");
+    document.body.classList.add("desktop");
+  }
+
+
+  

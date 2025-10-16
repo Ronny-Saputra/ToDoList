@@ -1,0 +1,937 @@
+/* PERBAIKAN: Hapus padding dan batasan agar full screen, dan implementasi scrollable content */
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: 'Lexend', sans-serif;
+    background-color: #f0f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* UBAH: Layout utama (body) mengambil 100% viewport */
+    min-height: 100vh;
+    height: 100vh; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; /* Mencegah scroll pada body/page */
+}
+
+/* Kunci utama agar container mengambil sisa tinggi dan bisa di-scroll */
+.container {
+    width: 100%;
+    /* MODIFIKASI: Hapus box-shadow agar terlihat menyatu dengan layar */
+    box-shadow: none; 
+    /* MODIFIKASI: Hapus border-radius agar rata dengan layar */
+    border-radius: 0; 
+    
+    /* UBAH: Gunakan Flexbox untuk mengatur top-section dan scrollable-content */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    
+    /* Hapus semua padding vertikal dan overflow dari container */
+    padding: 0; 
+    
+    height: 100%; 
+    min-height: 0; 
+    background-color: #fff;
+}
+
+/* ---------------------------------------------------- */
+/* BAGIAN BARU: Scrollable Content */
+/* ---------------------------------------------------- */
+.scrollable-content {
+    /* Gunakan flex-grow agar mengambil semua sisa ruang vertikal */
+    flex-grow: 1; 
+    /* AKTIFKAN SCROLLING HANYA UNTUK BAGIAN INI */
+    overflow-y: auto; 
+    
+    /* Tambahkan padding horizontal 24px di sini */
+    padding: 0 24px;
+    
+    /* PENTING: Tambahkan padding bawah di sini agar konten tidak tertutup navbar (90px) */
+    padding-bottom: 90px;
+    
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+/* Hilangkan scrollbar area konten */
+.scrollable-content::-webkit-scrollbar {
+    display: none;
+}
+.scrollable-content {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
+
+
+/* Wrapper untuk gradasi biru penuh di bagian atas (FIXED) */
+.top-task-section {
+    background: linear-gradient(to right, #dbe9ff, #bad7ff);
+    /* MODIFIKASI: Hapus bayangan agar tidak ada garis di bawah kalender */
+    box-shadow: none; 
+    
+    /* Tetap fixed pada posisi atas container */
+    position: sticky;
+    top: 0;
+    z-index: 50; /* Pastikan tetap di atas konten yang di-scroll */
+    
+    margin: 0; 
+    width: 100%; 
+    
+    /* MODIFIKASI UTAMA: Tambahkan border-radius di bagian bawah */
+    border-radius: 0 0 32px 32px; 
+    
+    /* MODIFIKASI: Mengurangi padding vertikal (Default/Desktop) */
+    padding-top: 15px; 
+    padding-bottom: 15px;
+    
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* MODIFIKASI: Mengurangi gap */
+}
+
+/* Header, Card Area: Padding horizontal 24px diatur di sini */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px; 
+}
+
+.date-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0; 
+}
+
+.today-text {
+    /* MODIFIKASI: Mengurangi ukuran font (Default/Desktop) */
+    font-size: 24px; 
+    color: #333;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    line-height: 1.2; 
+}
+
+.today-text i {
+    margin-left: 8px;
+    color: #ffc234; 
+    /* MODIFIKASI: Mengurangi ukuran ikon (Default/Desktop) */
+    font-size: 20px;
+}
+
+.date-text {
+    /* MODIFIKASI: Mengurangi ukuran font (Default/Desktop) */
+    font-size: 16px; 
+    font-weight: 500;
+    color: #333;
+    margin-top: 4px;
+    line-height: 1.2;
+}
+
+.header-icons {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.header-icons i {
+    font-size: 24px; 
+    color: #666;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+/* Date Cards Area (Scrollable Calendar) */
+.card-area {
+    background: transparent;
+    border-radius: 0; 
+    padding: 0 24px; 
+    display: flex; 
+    gap: 10px; /* MODIFIKASI: Mengurangi gap */
+    align-items: center;
+    overflow-x: scroll; 
+    white-space: nowrap; 
+    position: relative;
+    /* MODIFIKASI: Mengurangi tinggi (Default/Desktop) */
+    height: 90px; 
+    box-shadow: none; 
+}
+
+/* Hilangkan scrollbar area kartu */
+.card-area::-webkit-scrollbar {
+    display: none;
+}
+.card-area {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
+
+/* Date Card Styling (dilewatkan karena tidak terkait dengan layout) */
+.date-card {
+    background-color: white; 
+    /* MODIFIKASI: Mengurangi ukuran card */
+    min-width: 65px; 
+    height: 75px;
+    border-radius: 10px;
+    padding: 6px;
+    flex-shrink: 0; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+}
+.date-card .month-text { font-size: 10px; }
+.date-card .day-text { font-size: 12px; }
+.date-card .date-number { font-size: 20px; font-weight: 600; }
+/* Hover Effect */
+.date-card:hover {
+    background-color: #dbe9ff; 
+    border: 2px solid #3f67b5; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+.date-card:hover .month-text,
+.date-card:hover .day-text,
+.date-card:hover .date-number {
+    color: #3f67b5; 
+}
+.date-card:hover .dot-indicator {
+    background-color: #3f67b5; 
+}
+
+/* Active State */
+.date-card.active {
+    background-color: #3f67b5; 
+    color: white;
+    border: 2px solid #3f67b5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.date-card.active .month-text,
+.date-card.active .day-text,
+.date-card.active .date-number {
+    color: white; 
+}
+.date-card.active .dot-indicator {
+    background-color: white; 
+}
+
+
+/* MODIFIKASI: Reminder Header (Sekarang Sticky) */
+.reminder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* MODIFIKASI UTAMA UNTUK STICKY HEADER */
+    background-color: #fff; 
+    position: sticky;
+    /* Nilai top disesuaikan untuk Desktop */
+    top: 158px; 
+    z-index: 40; 
+    
+    padding: 0 24px; 
+    /* MODIFIKASI: Hapus garis dengan setting box-shadow ke none */
+    box-shadow: none; 
+    
+    margin-top: 15px;
+    margin-bottom: 10px; 
+}
+
+.section-title {
+    font-size: 20px; 
+    font-weight: 600;
+    color: #333;
+}
+
+.new-reminder-btn {
+    background-color: #3f67b5;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.new-reminder-btn:hover {
+    background-color: #5880d1;
+}
+
+.task-grid-main {
+    display: grid;
+    /* Default untuk desktop/lebar */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px;
+    padding: 0; 
+}
+
+/* Task Card Styling (tetap sama) */
+.task-card-item {
+    background-color: #eaf3ff; 
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+    height: 90px; 
+}
+
+.task-card-item:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.10);
+}
+
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #3f67b5;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.task-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.task-title-reminder {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.dot-indicator {
+    width: 6px;
+    height: 6px;
+    background-color: #ff5252; 
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.task-location-small {
+    font-size: 12px;
+    color: #666;
+}
+
+.task-time-box {
+    margin-left: auto; 
+    display: flex;
+    align-items: center;
+}
+
+.task-time-large {
+    font-size: 12px;
+    font-weight: 500;
+    color: #3f67b5;
+}
+
+.task-arrow {
+    font-size: 14px;
+    color: #a0a0a0;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+/* ---------------------------------------------------- */
+/* MODIFIKASI BOTTOM NAVIGATION BAR */
+/* ---------------------------------------------------- */
+.navbar {
+    position: fixed;             
+    bottom: 0px;               
+    left: 50%;                  
+    transform: translateX(-50%); 
+    width: 100%; 
+    max-width: none; 
+    height: 60px; 
+    background-color: #ffffff; 
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08); 
+    border-radius: 0; 
+}
+
+.navbar i {
+    font-size: 28px; 
+}
+
+.navbar .nav-item {
+    color: #a8b0c6; 
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; 
+    z-index: 10;
+    
+    transition: color 0.2s ease;
+}
+
+.navbar .nav-item.active {
+    color: #1e2a78; 
+    
+    background-color: transparent; 
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    transform: translateY(0); 
+    box-shadow: none;
+    border: none;
+}
+
+/* Khusus ikon di dalam nav-item aktif */
+.navbar .nav-item.active i {
+    color: #1e2a78; 
+    font-size: 28px;
+}
+.navbar .nav-item:not(.active) i {
+    font-size: 28px; 
+}
+
+
+/* ---------------------------------------------------- */
+/* NEW REMINDER DRAWER STYLES (SIDEBAR KANAN) */
+/* ---------------------------------------------------- */
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 2000;
+    display: flex;
+    justify-content: flex-end; 
+    
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.drawer-overlay.open {
+    visibility: visible;
+    opacity: 1;
+}
+
+.drawer-content {
+    width: 100%;
+    /* Atur max-width untuk tampilan desktop */
+    max-width: 450px; 
+    height: 100%; 
+    min-height: 100vh; 
+    background-color: #ffffff; 
+    border-radius: 0;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0; 
+}
+
+.drawer-overlay.open .drawer-content {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    background: #ffffff; 
+    padding: 20px 24px;
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    display: flex;
+    align-items: center;
+    position: relative; 
+}
+
+.drawer-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-left: 20px;
+}
+
+.close-drawer-btn {
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+}
+
+.reminder-form {
+    padding: 20px 24px 30px 24px; 
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+    overflow-y: auto; 
+    flex-grow: 1;
+}
+/* Hilangkan scrollbar form */
+.reminder-form::-webkit-scrollbar {
+    display: none;
+}
+.reminder-form {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-section label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333; 
+    margin-bottom: 5px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 15px 12px; 
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    box-shadow: none; 
+    transition: border-color 0.2s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #3f67b5;
+    box-shadow: 0 0 5px rgba(63, 103, 181, 0.3);
+}
+
+.time-section {
+    position: relative;
+    padding-bottom: 25px; 
+}
+
+.flow-timer-link {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 12px;
+    color: #3f67b5;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.priority-selector {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 12px; 
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    cursor: pointer;
+    box-shadow: none; 
+}
+
+.priority-selector span {
+    color: #333;
+}
+
+.priority-selector i {
+    color: #a8b0c6;
+    font-size: 14px;
+}
+
+.add-details-btn {
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    color: #3f67b5;
+    padding: 15px 12px; 
+    border-radius: 10px;
+    font-size: 16px; 
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    gap: 12px; 
+    margin-bottom: 0px; 
+    transition: background-color 0.2s;
+}
+
+.add-details-btn i {
+    color: #3f67b5;
+    font-size: 18px; 
+}
+
+.add-details-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.description-field {
+    min-height: 100px; 
+    resize: vertical;
+}
+
+/* Tombol Save (Sekarang ikut scroll) */
+.save-btn {
+    background-color: #1e2a78;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(30, 42, 120, 0.3);
+    transition: background-color 0.2s;
+    margin-top: 20px; 
+}
+
+.save-btn:hover {
+    background-color: #2b3b8d;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    /* MODIFIKASI: Pastikan tidak ada max-width di container */
+    .container {
+        max-width: 100%;
+        padding: 0; 
+        border-radius: 0; 
+        box-shadow: none;
+    }
+    .top-task-section {
+        margin: 0; 
+        width: 100%;
+        border-radius: 0 0 32px 32px; 
+        /* MODIFIKASI: Mengurangi padding vertikal untuk tampilan HP yang lebih ringkas */
+        padding-top: 10px; 
+        padding-bottom: 10px; 
+    }
+    
+    /* MODIFIKASI: Sesuaikan font size header di mobile */
+    .today-text {
+        font-size: 20px;
+    }
+    .today-text i {
+        font-size: 18px;
+    }
+    .date-text {
+        font-size: 14px;
+        margin-top: 2px;
+    }
+    .header-icons i {
+        font-size: 20px;
+    }
+    .header-icons i:last-child {
+        margin-left: 15px;
+    }
+    .card-area {
+        /* MODIFIKASI: Mengurangi tinggi kalender card area */
+        height: 80px;
+    }
+    /* MODIFIKASI: Mengurangi ukuran kotak tanggal di mobile */
+    .date-card {
+        min-width: 65px; 
+        height: 70px; /* Lebih kecil dari default 75px */
+    }
+    .date-card .date-number {
+        font-size: 18px; /* Mengurangi font agar pas */
+    }
+    
+    .reminder-header {
+        padding: 0 24px;
+        /* Nilai top disesuaikan dengan tinggi top-task-section yang baru (~130px) */
+        top: 130px; 
+    }
+    
+    /* MODIFIKASI UTAMA: List Tugas menjadi 1 kolom (Vertikal) */
+    .task-grid-main {
+        grid-template-columns: 1fr; 
+        /* MODIFIKASI: Tambah jarak antar task card */
+        gap: 15px; 
+        padding-top: 1px; /* Sedikit padding atas untuk memisahkan dari header */
+    }
+    
+    /* Hapus penyesuaian border radius dan margin negatif yang membuat card menyatu */
+    .task-card-item {
+        border-radius: 12px; /* Kembalikan radius penuh */
+        margin-bottom: 0; /* Hapus margin negatif */
+        /* Pastikan card item mobile mendapatkan gaya card-like penuh lagi */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border: none;
+        background-color: #eaf3ff; 
+    }
+    /* Hapus penyesuaian khusus untuk first dan last child */
+    .task-card-item:first-child,
+    .task-card-item:last-child {
+        border-radius: 12px;
+        margin-bottom: 0;
+    }
+
+    .scrollable-content {
+        padding: 0 24px;
+        padding-bottom: 90px;
+    }
+    
+    /* Navbar mobile */
+    .navbar {
+        width: 100%; 
+        border-radius: 0;
+        max-width: 100%;
+    }
+    
+    /* MODIFIKASI DRAWER MOBILE: Hapus batasan max-width agar full width */
+    .drawer-content {
+        max-width: 100%; /* MEMBUATNYA FULL WIDTH */
+        min-height: 100vh;
+    }
+    
+    .save-btn {
+        margin-top: 20px;
+        padding: 15px;
+    }
+    
+    /* CSS Dialog Mobile Adjustments */
+    .custom-dialog, .time-picker-dialog {
+        max-width: 90%;
+    }
+}
+
+@media (min-width: 769px) {
+    /* Aturan desktop: container dikelilingi background */
+    .container {
+        max-width: 100%; 
+        padding: 0; 
+    }
+    .top-task-section {
+        margin: 0; 
+        width: 100%;
+    }
+    .header, .card-area {
+        padding: 0 24px;
+    }
+    
+    .reminder-header {
+        padding: 0 24px; 
+    }
+    
+    .scrollable-content {
+        padding-bottom: 90px;
+    }
+    
+    .task-grid-main {
+        padding: 0; 
+    }
+
+    .task-grid-main {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+    
+    /* Tetapkan max-width untuk desktop agar tetap menjadi sidebar */
+    .drawer-content {
+        max-width: 450px; 
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .task-grid-main {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+
+
+/* ---------------------------------------------------- */
+/* === CUSTOM DIALOG STYLES (Alert/Confirm Replacement) === */
+/* ---------------------------------------------------- */
+
+.custom-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    /* INCREASE Z-INDEX TO BE ON TOP OF TIME PICKER (Z-INDEX 3000) */
+    z-index: 4000; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-dialog-overlay.open {
+    visibility: visible;
+    opacity: 1;
+}
+
+.custom-dialog {
+    background-color: #ffffff; 
+    border-radius: 12px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.custom-dialog-message {
+    padding: 30px 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e2a78; /* Dark blue color */
+}
+
+.custom-dialog-actions {
+    display: flex;
+    border-top: 1px solid #ddd;
+}
+
+.dialog-btn {
+    flex-grow: 1;
+    padding: 15px 10px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.2s;
+}
+
+/* Custom separator for the 'Add more' button */
+.custom-dialog-actions button:first-child:not(:last-child) {
+    border-right: 1px solid #ddd;
+}
+
+.dialog-btn.primary {
+    color: #1e2a78; /* Primary blue for main action */
+}
+
+.dialog-btn:hover {
+    background-color: #f0f4f9;
+}
+
+
+/* ---------------------------------------------------- */
+/* === TIME PICKER MODAL STYLES (Time Input) === */
+/* ---------------------------------------------------- */
+
+.time-picker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    /* KEEP TIME PICKER Z-INDEX AT 3000 */
+    z-index: 3000; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.time-picker-overlay.open {
+    visibility: visible;
+    opacity: 1;
+}
+
+.time-picker-dialog {
+    background-color: #ffffff; 
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.time-picker-dialog h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.time-inputs {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.time-inputs input[type="time"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    width: 40%;
+}
+
+.time-inputs span {
+    font-weight: 500;
+    color: #555;
+}
+
+.time-picker-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.time-picker-btn {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+#time-picker-cancel {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+#time-picker-save {
+    background-color: #1e2a78;
+    color: #fff;
+    border: none;
+}

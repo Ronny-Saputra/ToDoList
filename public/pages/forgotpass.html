@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forget Password</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="../styles/signup.css">
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="top-section"></div>
+    <div class="bottom-section">
+      <img src="../assets/timy2.png" alt="Clock" class="avatar">
+      
+      <a href="login.html" class="back"><i class="fa fa-arrow-left"></i> Back to login</a>
+      <h2 class="title">Forget Password</h2>
+
+      <form class="login-form" onsubmit="return forgetPasswordSubmit(event)">
+        <div class="field">
+          <i class="fa fa-envelope field-icon"></i>
+          <input type="text" id="email-username-forget" class="input" placeholder="Email / Username" required>
+        </div>
+        
+        <button type="submit" class="btn-login">Verify</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="custom-dialog-overlay" class="custom-dialog-overlay">
+    <div class="custom-dialog">
+        <div id="custom-dialog-message" class="custom-dialog-message"></div>
+        <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
+    </div>
+  </div>
+
+  <script src="../main.js"></script>
+</body>
+</html>

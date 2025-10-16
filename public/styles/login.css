@@ -173,7 +173,7 @@ body {
   top: 50%;
   width: 27%;
   height: 1px;
-  background: #000;
+  background: #1e3d70;
 }
 .or-divider::before { left: 6% }
 .or-divider::after { right: 6% }
@@ -242,6 +242,7 @@ body {
 .signup a:hover::after { 
   width: 100%;               
 }
+
 
 @media (max-width: 480px) {
   .page-wrap {
