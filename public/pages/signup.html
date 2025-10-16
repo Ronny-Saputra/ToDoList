@@ -13,29 +13,37 @@
     <div class="top-section"></div>
     <div class="bottom-section">
       <img src="../assets/timy2.png" alt="Clock" class="avatar">
-      <a href="../pages/login.html" class="back"><i class="fa fa-arrow-left"></i> Back to login</a>
+      <a href="login.html" class="back"><i class="fa fa-arrow-left"></i> Back to login</a>
       <h2 class="title">Sign Up</h2>
 
-      <form class="login-form">
+      <form class="login-form" onsubmit="return emailSignup(event)">
         <div class="field">
           <i class="fa fa-envelope field-icon"></i>
-          <input type="text" class="input" placeholder="Email / Username">
+          <input type="email" id="email" class="input" placeholder="Email Address" required>
         </div>
         <div class="field">
           <i class="fa fa-lock field-icon"></i>
-          <input type="password" class="input" placeholder="Password">
+          <input type="password" id="password" class="input" placeholder="Password" required>
         </div>
         <div class="field">
           <i class="fa fa-lock field-icon"></i>
-          <input type="password" class="input" placeholder="Confirm Password">
+          <input type="password" id="confirmPassword" class="input" placeholder="Confirm Password" required>
+        </div>
+        <div class="field">
+          <i class="fa fa-phone field-icon"></i>
+          <input type="tel" id="phone" class="input" placeholder="Phone">
         </div>
       
 
         <button type="submit" class="btn-login">Sign Up</button>
       </form>
     </div>
-
   </div>
+
+  <script src="/__/firebase/12.2.1/firebase-app-compat.js"></script>
+  <script src="/__/firebase/12.2.1/firebase-auth-compat.js"></script>
+  <script src="/__/firebase/init.js?useEmulator=true"></script>
+  <script src="../main.js"></script>
   
   <script src="main.js"></script>
 </body>
