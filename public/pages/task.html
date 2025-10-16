@@ -4,109 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../styles/task.css">
 </head>
-<body>
+<body id="task-page-body">
+    
     <div class="container">
-        <header class="header">
-            <div class="date-info">
-                <span class="today-text">Today</span>
-                <span class="date-text">February 14th</span>
-            </div>
-            <div class="header-icons">
-                <i class="fas fa-calendar-alt"></i>
-                <i class="fas fa-search"></i>
-            </div>
-        </header>
+        
+        <div class="top-task-section">
+            <header class="header">
+                <div class="date-info">
+                    <span class="today-text">Today <i class="fas fa-sun"></i></span>
+                    <span class="date-text" id="month-year-display">Januari 2025</span>
+                </div>
+                <div class="header-icons">
+                    <i class="fas fa-calendar-alt"></i>
+                    <i class="fas fa-search"></i>
+                </div>
+            </header>
 
-        <div class="card-area">
-            <div class="placeholder-card"></div>
-            <div class="placeholder-card"></div>
-            <div class="placeholder-card"></div>
-            <div class="placeholder-card"></div>
-            <div class="placeholder-card"></div>
-            <div class="placeholder-card"></div>
+            <div class="card-area" id="calendar-cards-container">
+                </div>
         </div>
-
-        <div class="add-task-btn">
-            <i class="fas fa-plus"></i>
+        
+        <div class="reminder-header">
+            <h3 class="section-title">My Reminder</h3>
+            <button class="new-reminder-btn">
+                <i class="fas fa-plus"></i> New Reminder
+            </button>
         </div>
+        
+        <div class="scrollable-content">
+            
+            <div class="task-grid-main" id="task-list-container">
+                </div>
+            
+        </div>
+    </div>
+    
+    <nav class="navbar">
+        <div class="nav-item">
+            <i class="fas fa-home"></i>
+        </div>
+        <div class="nav-item active">
+            <i class="fas fa-list-ul"></i>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i>
+        </div>
+    </nav>
+    
+    <div id="newReminderDrawer" class="drawer-overlay">
+        <div class="drawer-content">
+            <header class="drawer-header">
+                <i class="fas fa-arrow-left close-drawer-btn"></i>
+                <h2>New Reminder</h2>
+            </header>
+            
+            <form class="reminder-form" id="reminder-form">
+                <div class="form-section">
+                    <label>Activity</label>
+                    <input type="text" id="activity-input" placeholder="Activity Name" class="input-field">
+                </div>
 
-        <div class="task-section">
-            <h3 class="section-title">Special Event</h3>
-            <div class="task-grid">
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
+                <div class="form-section time-section">
+                    <label>Time</label>
+                    <input type="text" id="time-input" placeholder="Start - End Time" class="input-field" readonly>
+                    <a href="#" class="flow-timer-link">+ Add Flow Timer (30m)</a>
                 </div>
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
+
+                <div class="form-section">
+                    <label>Location</label>
+                    <input type="text" id="location-input" placeholder="Location Name" class="input-field">
                 </div>
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
+
+                <div class="form-section">
+                    <label>Priority</label>
+                    <div class="priority-selector">
+                        <span>None</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
+
+                <div class="form-section">
+                    <button type="button" class="add-details-btn">
+                        <i class="fas fa-plus"></i> Add Details
+                    </button>
+                    <input type="text" placeholder="Details / Description" class="input-field description-field">
+                </div>
+
+                <button type="submit" class="save-btn">Save</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="custom-dialog-overlay" class="custom-dialog-overlay">
+        <div class="custom-dialog">
+            <div id="custom-dialog-message" class="custom-dialog-message">Success Add New Reminder</div>
+            <div id="custom-dialog-actions" class="custom-dialog-actions">
+                </div>
+        </div>
+    </div>
+    
+    <div id="time-picker-overlay" class="time-picker-overlay">
+        <div class="time-picker-dialog">
+            <h3>Set Time Range</h3>
+            <div class="time-inputs">
+                <input type="time" id="start-time-input" value="10:00">
+                <span>to</span>
+                <input type="time" id="end-time-input" value="11:00">
             </div>
-        </div>
-
-        <div class="task-section">
-            <h3 class="section-title">Individual Task</h3>
-            <div class="task-grid">
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
-                </div>
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
-                </div>
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="task-section">
-            <h3 class="section-title">Group Task</h3>
-            <div class="task-grid">
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
-                </div>
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
-                </div>
-                <div class="task-card">
-                    <span class="task-title">Valentine Dinner</span>
-                    <span class="task-time">20.00</span>
-                    <span class="task-location">PIK</span>
-                </div>
+            <div class="time-picker-actions">
+                <button id="time-picker-cancel" class="time-picker-btn">Cancel</button>
+                <button id="time-picker-save" class="time-picker-btn primary">Save</button>
             </div>
         </div>
     </div>
-
-    <!-- Navbar dipindah ke luar container -->
-    <nav class="navbar">
-        <i class="fas fa-home"></i>
-        <div class="navbar-icon-active">
-            <i class="fas fa-list-ul"></i>
-        </div>
-        <i class="fas fa-user"></i>
-    </nav>
-
-    <script src="main.js"></script>
+    
+    <script src="../main.js"></script>
+    <script src="../task.js"></script> 
 </body>
 </html>
