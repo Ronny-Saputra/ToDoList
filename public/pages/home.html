@@ -35,11 +35,14 @@
           <span>T</span>
           <span>W</span>
           <span>T</span>
-          <span>F <i class="fa-solid fa-person-running small-icon"></i></span>
-          <span>S <i class="fa-solid fa-circle small-dot"></i></span>
-          <span>S <i class="fa-solid fa-circle small-dot"></i></span>
+          <span>F</span>
+          <span>S</span>
+          <span>S</span>
         </div>
-        <div class="progress-line"></div>
+        <div class="progress-line">
+          <div class="progress-fill" id="progress-fill"></div>
+          <i class="fa-solid fa-person-running runner-icon" id="runner-icon"></i>
+        </div>
       </div>
 
       <div class="message">Well Done, Keep Going!</div>
@@ -48,12 +51,37 @@
 
   <!-- Bottom Navigation -->
   <nav class="navbar">
-        <i class="fas fa-home"></i>
-        <div class="navbar-icon-active">
-            <i class="fas fa-list-ul"></i>
-        </div>
-        <i class="fas fa-user"></i>
-    </nav>
+    <div class="nav-item active">
+      <i class="fas fa-home"></i>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-list-ul"></i>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-user"></i>
+    </div>
+  </nav>
+    <!-- ✅ Firebase SDKs (must be before your JS files) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
+    <script>
+        // ✅ Initialize Firebase (use *your* project’s config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+            authDomain: "todolist-43.firebaseapp.com",
+            projectId: "todolist-43",
+            storageBucket: "todolist-43.firebasestorage.app",
+            messagingSenderId: "795548747542",
+            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+            measurementId: "G-67K7H7XXWW"
+        };
+
+    // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+  <script src="../main.js"></script>
 </body>
 </html>

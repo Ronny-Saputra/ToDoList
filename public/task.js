@@ -162,31 +162,49 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Membuat elemen task card baru
      */
-    function createTaskCard(title, time, location) {
-        const card = document.createElement('div');
-        card.classList.add('task-card-item');
-        card.innerHTML = `
-            <div class="task-checkbox"></div>
-            <div class="task-details">
-                <span class="task-title-reminder">${title}</span>
-                <div class="task-meta">
-                    <span class="dot-indicator"></span>
-                    <span class="task-location-small">${location}</span>
-                </div>
+    function createTaskCard(title, time, location, taskId) {
+    const card = document.createElement('div');
+    card.classList.add('task-card-item');
+    card.innerHTML = `
+        <div class="task-checkbox"></div>
+        <div class="task-details">
+            <span class="task-title-reminder">${title}</span>
+            <div class="task-meta">
+                <span class="dot-indicator"></span>
+                <span class="task-location-small">${location}</span>
             </div>
-            <div class="task-time-box">
-                <span class="task-time-large">${time}</span>
-            </div>
-            <i class="fas fa-chevron-right task-arrow"></i>
-        `;
-        
-        card.addEventListener("click", () => {
-            document.querySelectorAll(".task-card-item").forEach(c => c.classList.remove("active"));
-            card.classList.add("active");
-        });
-        
-        return card;
+        </div>
+        <div class="task-time-box">
+            <span class="task-time-large">${time}</span>
+        </div>
+        <i class="fas fa-chevron-right task-arrow"></i>
+    `;
+
+    // ✅ Handle "mark as done"
+    const checkbox = card.querySelector('.task-checkbox');
+    checkbox.addEventListener('click', async () => {
+        const user = firebase.auth().currentUser;
+        if (!user) return alert('Please log in first.');
+
+        const db = firebase.firestore();
+        try {
+        await db.collection("users").doc(user.uid)
+            .collection("tasks").doc(taskId)
+            .update({
+            done: true,
+            date: new Date().toISOString().split("T")[0]
+            });
+
+        checkbox.style.backgroundColor = "#3f67b5"; // visual feedback
+        alert("Task marked as done!");
+        } catch (err) {
+        console.error("Error marking task:", err);
+        }
+    });
+
+    return card;
     }
+
 
 
     // Handler untuk Submit Form Reminder

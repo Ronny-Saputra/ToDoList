@@ -122,6 +122,27 @@
         </div>
     </div>
     
+    <!-- ✅ Firebase SDKs (must be before your JS files) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // ✅ Initialize Firebase (use *your* project’s config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+            authDomain: "todolist-43.firebaseapp.com",
+            projectId: "todolist-43",
+            storageBucket: "todolist-43.firebasestorage.app",
+            messagingSenderId: "795548747542",
+            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+            measurementId: "G-67K7H7XXWW"
+        };
+
+    // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
     <script src="../main.js"></script>
     <script src="../task.js"></script> 
 </body>

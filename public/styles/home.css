@@ -106,6 +106,27 @@ body {
   position: relative;
 }
 
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(to right, orange, #ffdf9f);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+.runner-icon {
+  position: absolute;
+  top: -12px; /* posisi di atas garis */
+  left: 0%;
+  transform: translateX(-50%);
+  color: orange;
+  font-size: 20px;
+  transition: left 0.4s ease;
+}
+
 .message {
   margin-top: 10px;
   font-weight: bold;
@@ -117,34 +138,34 @@ body {
     bottom: 0px;               
     left: 50%;                  
     transform: translateX(-50%); 
-    width: 98%;                  
-    height: 55px;
-    background-color: #1e2a78;
+    width: 100%;
+    max-width: none;
+    height: 60px;
+    background-color: #ffffff;
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 20px;
-    color: #ffffff;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 0;
 }
 
 .navbar i {
-    font-size: 30px;
+    font-size: 28px;
 }
 
-.navbar-icon-hover {
-    transform: translateY(-5px); 
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.10); 
+.navbar .nav-item {
+    color: #a8b0c6;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+    transition: color 0.2s ease;
 }
 
-.navbar-icon-active {
-    color: #ffb004;
-}
-
-.home-icon {
-  background: orange;
-  border-radius: 50%;
-  padding: 8px;
-  color: white;
+.navbar .nav-item.active {
+    color: #1e2a78;
 }

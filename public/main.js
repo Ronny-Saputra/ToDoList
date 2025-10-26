@@ -69,6 +69,9 @@ function emailSignup(event) {
     });
   return false;
 }
+  function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
   if (isMobile()) {
     console.log("Mobile");
     document.body.classList.add("mobile");
@@ -77,5 +80,90 @@ function emailSignup(event) {
     document.body.classList.add("desktop");
   }
 
+// === PRODUCTIVE STREAK SYSTEM ===
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!window.location.pathname.includes("home.html")) return;
+  console.log("Loading streak progress...");
 
-  
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      console.log("User not logged in, skip streak update.");
+      return;
+    }
+
+    const db = firebase.firestore();
+    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+
+    try {
+      const snapshot = await tasksRef.where("done", "==", true).get();
+      const doneDates = snapshot.docs.map(doc => doc.data().date);
+      const streak = calculateStreak(doneDates);
+      updateStreakUI(streak);
+    } catch (err) {
+      console.error("Error loading streak:", err);
+    }
+  });
+});
+
+// Hitung streak (berapa hari berturut-turut user menyelesaikan task)
+function calculateStreak(dates) {
+  const today = new Date();
+  let streak = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const checkDate = new Date();
+    checkDate.setDate(today.getDate() - i);
+    const dateStr = checkDate.toISOString().split("T")[0];
+    if (dates.includes(dateStr)) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// Update tampilan bar dan ikon orang berjalan
+function updateStreakUI(streak) {
+  const progressFill = document.getElementById("progress-fill");
+  const runnerIcon = document.getElementById("runner-icon");
+  if (!progressFill || !runnerIcon) return;
+
+  const percent = Math.min((streak / 7) * 100, 100);
+  progressFill.style.width = `${percent}%`;
+  runnerIcon.style.left = `${percent}%`;
+
+  console.log(`Streak updated: ${streak} days`);
+}
+
+// === NAVBAR LOGIC ===
+document.addEventListener("DOMContentLoaded", () => {
+  const navbar = document.querySelector('.navbar');
+  if (!navbar) {
+    console.log('Navbar not found.');
+    return;
+  }
+
+  // Use event delegation so clicks on the icon or its parent .nav-item both work
+  navbar.addEventListener('click', (e) => {
+    // Prefer nav-item wrapper (new markup). If absent, fall back to the <i> element.
+    const navItem = e.target.closest('.nav-item');
+    let icon = null;
+    if (navItem) icon = navItem.querySelector('i');
+    else icon = e.target.closest('i');
+
+    if (!icon || !navbar.contains(icon)) return;
+
+    // Toggle active class on nav-item elements (if present)
+    const allItems = navbar.querySelectorAll('.nav-item');
+    if (allItems.length) {
+      allItems.forEach(item => item.classList.remove('active'));
+      const toActivate = icon.closest('.nav-item');
+      if (toActivate) toActivate.classList.add('active');
+    }
+
+    if (icon.classList.contains('fa-home')) window.location.href = '/pages/home.html';
+    else if (icon.classList.contains('fa-list-ul')) window.location.href = '/pages/task.html';
+    else if (icon.classList.contains('fa-user')) window.location.href = '/pages/profile.html';
+
+  });
+
+  console.log('Navbar delegation listener ready!');
+});
