@@ -1,0 +1,427 @@
+/* ==================================================== */
+/* STYLING DASAR & RESET */
+/* ==================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    /* Latar belakang putih polos */
+    background-color: #ffffff; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Container utama aplikasi (menampung semua elemen) */
+.container {
+    width: 100%;
+    height: 100vh;
+    min-height: 0; /* konsisten dengan task */
+    box-shadow: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 0;
+    background-color: #ffffff;
+}
+
+/* ==================================================== */
+/* HEADER PROFIL */
+/* ==================================================== */
+.profile-header {
+    /* Gradasi warna biru lembut */
+    background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
+    padding: 30px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align ke atas */
+    width: 100%;
+    border-radius: 0 0 32px 32px; /* lengkungan bawah */
+    flex-shrink: 0;
+}
+
+/* Bagian kiri header (avatar, username, streak, tombol edit) */
+.profile-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Avatar lingkaran dengan ikon user */
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b0c4de;
+    font-size: 80px; /* biar ikon user proporsional */
+    position: relative;
+
+    /* efek stroke lembut */
+    border: 2px solid rgba(106, 106, 106, 0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+
+/* Ikon kamera kecil di sudut bawah kanan avatar */
+.camera-icon {
+position: absolute;
+    bottom: -6px;
+    right: -6px;
+    background-color: #4a90e2;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+    font-size: 14px;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+/* Detail teks di samping avatar (username + streak) */
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+/* Nama pengguna */
+.username {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e2a78;
+    margin: 0;
+}
+
+/* Baris berisi ikon api dan angka streak */
+.streak {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+}
+
+/* Warna ikon api */
+.streak .fa-fire {
+    color: #f57c00;
+}
+
+/* Tombol Edit Profile */
+.edit-profile-btn {
+ background-color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+/* Tombol pengaturan (ikon gear di kanan header) */
+.settings-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* ==================================================== */
+/* KONTEN UTAMA */
+/* ==================================================== */
+.main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background-color: #f0f4f9; /* Warna abu muda sebagai latar konten */
+}
+
+/* ---------------------------------------------------- */
+/* TAB NAVIGASI (Daily / Weekly / Monthly) */
+/* ---------------------------------------------------- */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    background-color: #e0e9f3;
+    border-radius: 20px;
+    padding: 5px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Tombol tab */
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 18px;
+    font-weight: 600;
+    color: #556278;
+    cursor: pointer;
+    font-family: 'Lexend', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+/* Tab yang sedang aktif */
+.tab-btn.active {
+    background-color: #ffffff;
+    color: #1e2a78;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------------------------------------------------- */
+/* BAGIAN ISI UTAMA: Statistik + Ringkasan */
+/* ---------------------------------------------------- */
+.content-wrapper {
+    display: flex;
+    gap: 24px;
+}
+
+/* ---------------------------------------------------- */
+/* KARTU STATISTIK PRODUKTIVITAS */
+/* ---------------------------------------------------- */
+.stats-card {
+    flex-grow: 1;
+    background-color: #f1f6fc; /* Biru muda sangat lembut */
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* Header dalam kartu (judul + skor produktivitas) */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.card-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Skor produktivitas di kanan judul */
+.productivity-score {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Warna ikon api di skor produktivitas */
+.productivity-score .fa-fire {
+    color: #f57c00;
+}
+
+/* ---------------------------------------------------- */
+/* GRAFIK BATANG (Bar Chart) */
+/* ---------------------------------------------------- */
+.chart-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 150px;
+}
+
+/* Setiap batang + label hari */
+.bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    justify-content: flex-end;
+    width: 12%;
+}
+
+/* Batang grafik default */
+.bar {
+    width: 100%;
+    max-width: 30px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    transition: height 0.3s ease;
+}
+
+/* Batang hari aktif (highlighted) */
+.bar.highlight {
+    background-color: #f5a623; /* Oranye terang */
+}
+
+/* Label di bawah batang (huruf S, M, T, dst) */
+.label {
+    font-size: 12px;
+    color: #888;
+}
+
+/* ---------------------------------------------------- */
+/* RINGKASAN TUGAS (ASIDE) */
+/* ---------------------------------------------------- */
+.task-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 200px; /* Lebar tetap untuk sidebar kanan */
+    flex-shrink: 0;
+}
+
+/* Kotak untuk tiap kategori tugas */
+.summary-box {
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-weight: 600;
+}
+
+/* Teks label dalam summary */
+.summary-box span {
+    font-size: 13px;
+}
+
+/* Posisi ikon (kanan bawah) */
+.icon-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 20px;
+}
+
+/* Warna untuk completed task */
+.summary-box.completed {
+    background-color: #d6eaff;
+    color: #4a90e2;
+}
+
+/* Warna untuk missed task */
+.summary-box.missed {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+/* Warna ikon untuk missed task */
+.summary-box.missed .icon-wrapper {
+    color: #f57c00; /* Oranye */
+}
+
+/* Warna untuk deleted task */
+.summary-box.deleted {
+    background-color: #d6eaff;
+    color: #4a90e2;
+}
+
+/* ==================================================== */
+/* NAVBAR BAWAH */
+/* ==================================================== */
+.navbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 60px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 0;
+    flex-shrink: 0;
+}
+
+/* Ukuran ikon di navbar */
+.navbar i {
+    font-size: 28px;
+}
+
+/* Item di dalam navbar */
+.navbar .nav-item {
+    color: #a8b0c6;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+/* Item navbar yang aktif (halaman sekarang) */
+.navbar .nav-item.active {
+    color: #1e2a78;
+}
+
+/* ==================================================== */
+/* RESPONSIVE UNTUK MOBILE */
+/* ==================================================== */
+@media (max-width: 768px) {
+    /* Susun vertikal saat layar sempit */
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    /* Task summary diubah menjadi horizontal */
+    .task-summary {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .summary-box {
+        width: 32%;
+    }
+
+    /* Sesuaikan ukuran elemen header */
+    .profile-header {
+        border-radius: 0 0 24px 24px;
+    }
+
+    .edit-profile-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .profile-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .camera-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 8px;
+    }
+
+    .username {
+        font-size: 16px;
+    }
+}
