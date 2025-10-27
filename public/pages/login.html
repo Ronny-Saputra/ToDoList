@@ -22,7 +22,31 @@
       initialize the SDK after all desired features are loaded, set useEmulator to false
       to avoid connecting the SDK to running emulators.
     -->
-    <script src="/__/firebase/init.js?useEmulator=true"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+        authDomain: "todolist-43.firebaseapp.com",
+        projectId: "todolist-43",
+        storageBucket: "todolist-43.appspot.com",
+        messagingSenderId: "795548747542",
+        appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      // Redirect if already logged in
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) window.location.href = "../pages/home.html";
+      });
+    </script>
+
+    <script>
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        // Already logged in → go to home directly
+        window.location.href = "../pages/home.html";
+      }
+    });
+    </script>
   <link rel="stylesheet" href="../styles/login.css"/>    
 </head>
 <body>

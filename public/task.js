@@ -5,6 +5,81 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const taskListContainer = document.getElementById('task-list-container');
     const reminderForm = document.getElementById('reminder-form');
+
+        // ✅ Wait until Firebase Auth has loaded the current user
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                console.log("No user logged in, redirecting...");
+                window.location.href = "../pages/login.html";
+                return;
+            }
+
+            console.log("User logged in:", user.email);
+            const db = firebase.firestore();
+            const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+
+            // ✅ Fix B (Firestore task creation) will go inside here ↓
+            if (reminderForm && taskListContainer) {
+                reminderForm.addEventListener('submit', async function(event) {
+                    event.preventDefault(); 
+
+                    const activity = document.getElementById('activity-input').value.trim();
+                    const time = document.getElementById('time-input').value.trim();
+                    const location = document.getElementById('location-input').value.trim() || 'No Location'; 
+
+                    if (activity && time) {
+                        try {
+                            // ✅ Create Firestore document (not update)
+                            const docRef = await tasksRef.add({
+                                title: activity,
+                                time,
+                                location,
+                                done: false,
+                                date: new Date().toISOString().split("T")[0],
+                            });
+
+                            // ✅ Now we can safely create the UI card
+                            const newCard = createTaskCard(activity, time, location, docRef.id);
+                            taskListContainer.appendChild(newCard);
+
+                            reminderForm.reset(); 
+                            closeDrawer();
+                            
+                            window.showCustomDialog(
+                                "Success Add New Reminder",
+                                [
+                                    { 
+                                        text: 'Add more', 
+                                        action: () => {
+                                            newReminderDrawer.classList.add('open');
+                                            document.body.style.overflow = 'hidden';
+                                        },
+                                        isPrimary: false
+                                    },
+                                    { 
+                                        text: 'View', 
+                                        action: () => {},
+                                        isPrimary: true
+                                    }
+                                ]
+                            );
+                        } catch (err) {
+                            console.error("Error adding task:", err);
+                            window.showCustomDialog(
+                                "Failed to save task. Please try again.",
+                                [{ text: 'OK', action: () => {}, isPrimary: true }]
+                            );
+                        }
+                    } else {
+                        window.showCustomDialog(
+                            "Activity and Time are required!",
+                            [{ text: 'OK', action: () => {}, isPrimary: true }]
+                        );
+                    }
+                });
+            }
+        });
+
     
     // Time Picker elements
     const timeInput = document.getElementById('time-input');
@@ -203,57 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     return card;
-    }
-
-
-
-    // Handler untuk Submit Form Reminder
-    if (reminderForm && taskListContainer) {
-        reminderForm.addEventListener('submit', function(event) {
-            event.preventDefault(); 
-
-            const activity = document.getElementById('activity-input').value.trim();
-            const time = document.getElementById('time-input').value.trim();
-            const location = document.getElementById('location-input').value.trim() || 'No Location'; 
-
-            if (activity && time) {
-                const newCard = createTaskCard(activity, time, location);
-                taskListContainer.appendChild(newCard);
-
-                reminderForm.reset(); 
-                closeDrawer();
-                
-                // Show Success Dialog
-                window.showCustomDialog(
-                    "Success Add New Reminder",
-                    [
-                        { 
-                            text: 'Add more', 
-                            action: () => {
-                                // Re-open drawer
-                                newReminderDrawer.classList.add('open');
-                                document.body.style.overflow = 'hidden';
-                            },
-                            isPrimary: false
-                        },
-                        { 
-                            text: 'View', 
-                            action: () => {
-                                // Logic to scroll/highlight the new task (optional)
-                            },
-                            isPrimary: true
-                        }
-                    ]
-                );
-
-            } else {
-                // Show Error Dialog
-                window.showCustomDialog(
-                    "Activity and Time are required!",
-                    [{ text: 'OK', action: () => {}, isPrimary: true }]
-                );
-            }
-        });
     }
 
 

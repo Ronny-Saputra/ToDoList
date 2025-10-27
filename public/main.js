@@ -39,11 +39,24 @@ function facebookLogin() {
 
 function emailLogin(event) {
   event.preventDefault();
+
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
+
   firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(userCredential => alert(`Welcome, ${userCredential.user.email}`))
-    .catch(error => alert(`Error: ${error.message}`));
+    .then(userCredential => {
+      const user = userCredential.user;
+      alert(`Welcome, ${user.email}!`);
+      // ✅ Redirect to home after login
+      setTimeout(() => {
+        window.location.href = "../pages/home.html";
+      }, 500);
+    })
+    .catch(error => {
+      console.error("Login error:", error);
+      alert(`Error: ${error.message}`);
+    });
+
   return false;
 }
 
