@@ -3,60 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Full Year Auto-Generated Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../styles/calendar.css">
     <link rel="stylesheet" href="../styles/task.css">
 </head>
-<body id="task-page-body">
-    
-    <div class="container">
-        
-        <div class="top-task-section">
-            <header class="header">
-                <div class="date-info">
-                    <span class="today-text">Today <i class="fas fa-sun"></i></span>
-                    <span class="date-text" id="month-year-display">Januari 2025</span>
-                </div>
-                <div class="header-icons">
-                    <a href="calendar.html">
-                        <i class="fas fa-calendar-alt"></i>
-                    </a>
-                    <i class="fas fa-search"></i>
-                </div>
-            </header>
-
-            <div class="card-area" id="calendar-cards-container">
-                </div>
-        </div>
-        
-        <div class="reminder-header">
-            <h3 class="section-title">My Reminder</h3>
-            <button class="new-reminder-btn">
-                <i class="fas fa-plus"></i> New Reminder
+<body>
+    <div class="calendar-page-container">
+        <div class="calendar-wrapper">
+            
+            <!-- Back Button (Desktop & Mobile) -->
+            <button class="back-btn-calendar" onclick="window.location.href='task.html'">
+                <i class="fas fa-arrow-left"></i>
             </button>
-        </div>
-        
-        <div class="scrollable-content">
+
+            <!-- Mobile Navigation: Tetap Tampil di Mobile -->
+            <div class="month-navigation mobile-only">
+                <button class="nav-btn" id="prevMonthMobile">&#8249;</button>
+                <span class="month-year-title" id="monthYearTitle">December 2025</span>
+                <button class="nav-btn" id="nextMonthMobile">&#8250;</button>
+            </div>
+
+            <!-- Desktop Year Selector: Hanya tampil di Desktop -->
+            <div class="year-selector desktop-only">
+                <button class="year-btn prev-year" id="prevYear">&#8249;</button>
+                <span class="current-year" id="currentYear">2025</span>
+                <button class="year-btn next-year" id="nextYear">&#8250;</button>
+            </div>
             
-            <div class="task-grid-main" id="task-list-container">
+            <!-- Mobile Calendar Container -->
+            <div class="mobile-calendar-container mobile-only" id="mobileCalendarContainer">
+                <div class="swipe-wrapper" id="swipeWrapper">
                 </div>
-            
+            </div>
+
+            <!-- Desktop Month Grid -->
+            <div class="month-list-container desktop-only" id="monthListContainer">
+            </div>
+        </div>
+
+        <div class="calendar-footer">
+            <div class="add-reminder-box" id="add-reminder-btn">
+                Add Reminder
+            </div>
         </div>
     </div>
-    
-    <nav class="navbar">
-        <div class="nav-item">
-            <i class="fas fa-home"></i>
-        </div>
-        <div class="nav-item active">
-            <i class="fas fa-list-ul"></i>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-user"></i>
-        </div>
-    </nav>
-    
+
+    <!-- Drawer for New Reminder (same as task.html) -->
     <div id="newReminderDrawer" class="drawer-overlay">
         <div class="drawer-content">
             <header class="drawer-header">
@@ -101,14 +95,16 @@
         </div>
     </div>
     
+    <!-- Custom Dialog -->
     <div id="custom-dialog-overlay" class="custom-dialog-overlay">
         <div class="custom-dialog">
             <div id="custom-dialog-message" class="custom-dialog-message">Success Add New Reminder</div>
             <div id="custom-dialog-actions" class="custom-dialog-actions">
-                </div>
+            </div>
         </div>
     </div>
     
+    <!-- Time Picker -->
     <div id="time-picker-overlay" class="time-picker-overlay">
         <div class="time-picker-dialog">
             <h3>Set Time Range</h3>
@@ -123,14 +119,13 @@
             </div>
         </div>
     </div>
-    
-    <!-- ✅ Firebase SDKs (must be before your JS files) -->
+
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // ✅ Initialize Firebase (use *your* project’s config)
         const firebaseConfig = {
             apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
             authDomain: "todolist-43.firebaseapp.com",
@@ -140,20 +135,19 @@
             appId: "1:795548747542:web:deb1efc52ed1aa247af237",
             measurementId: "G-67K7H7XXWW"
         };
-
-    // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
     </script>
 
     <script>
-    firebase.auth().onAuthStateChanged(user => {
-    if (!user) {
-        window.location.href = "../pages/login.html";
-    }
-    });
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "../pages/login.html";
+            }
+        });
     </script>
 
-    <script src="../main.js"></script>
-    <script src="../task.js"></script> 
+    <script src="../task.js"></script>
+    <script src="../calendar.js"></script> 
+    <script src="../calendar-reminder.js"></script>
 </body>
 </html>
