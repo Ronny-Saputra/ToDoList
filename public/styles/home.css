@@ -71,6 +71,7 @@ body {
   display: inline-block;
   padding: 10px 20px;
   margin-top: 15px;
+  position: relative;
 }
 
 .days {
@@ -98,12 +99,13 @@ body {
 }
 
 .progress-line {
-  margin: 10px 0;
+  margin: 10px 0 6px 0;
   height: 4px;
-  background: linear-gradient(to right, orange, #ffdf9f);
+  background: #ddd; /* gray base line */
   border-radius: 2px;
   width: 100%;
   position: relative;
+  overflow: visible;
 }
 
 .progress-fill {
@@ -119,12 +121,29 @@ body {
 
 .runner-icon {
   position: absolute;
-  top: -12px; /* posisi di atas garis */
+  top: -12px; /* sits above line */
   left: 0%;
   transform: translateX(-50%);
-  color: orange;
-  font-size: 20px;
+  color: black;
+  font-size: 22px;
   transition: left 0.4s ease;
+}
+
+.dot-track {
+  display: flex;
+  justify-content: space-between;
+  width: 230px;
+  margin: 0 auto;
+  position: relative;
+  top: 2px; /* align slightly below line */
+}
+
+.dot-track .dot {
+  width: 6px;
+  height: 6px;
+  background-color: black;
+  border-radius: 50%;
+  opacity: 0.4; /* faded look for remaining days */
 }
 
 .message {

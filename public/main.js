@@ -109,42 +109,61 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const snapshot = await tasksRef.where("done", "==", true).get();
-      const doneDates = snapshot.docs.map(doc => doc.data().date);
-      const streak = calculateStreak(doneDates);
-      updateStreakUI(streak);
+
+      // --- ✅ Get unique completion dates
+      const doneDates = [...new Set(snapshot.docs.map(doc => doc.data().date))];
+
+      // --- ✅ Calculate unique productive days
+      const streakDays = doneDates.length;
+
+      // --- ✅ Calculate this week's progress
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Monday start
+
+      const daysCompletedThisWeek = doneDates.filter(dateStr => {
+        const d = new Date(dateStr);
+        return d >= startOfWeek && d <= today;
+      }).length;
+
+      // --- ✅ Update UI
+      updateStreakUI(daysCompletedThisWeek, streakDays);
+
     } catch (err) {
       console.error("Error loading streak:", err);
     }
   });
 });
 
-// Hitung streak (berapa hari berturut-turut user menyelesaikan task)
-function calculateStreak(dates) {
-  const today = new Date();
-  let streak = 0;
-
-  for (let i = 0; i < 7; i++) {
-    const checkDate = new Date();
-    checkDate.setDate(today.getDate() - i);
-    const dateStr = checkDate.toISOString().split("T")[0];
-    if (dates.includes(dateStr)) streak++;
-    else break;
-  }
-  return streak;
-}
-
-// Update tampilan bar dan ikon orang berjalan
-function updateStreakUI(streak) {
+// --- Update streak UI ---
+function updateStreakUI(daysCompletedThisWeek, totalProductiveDays) {
   const progressFill = document.getElementById("progress-fill");
   const runnerIcon = document.getElementById("runner-icon");
-  if (!progressFill || !runnerIcon) return;
+  const streakNumber = document.querySelector(".streak-number");
+  const dotTrack = document.getElementById("dot-track");
 
-  const percent = Math.min((streak / 7) * 100, 100);
+  if (!progressFill || !runnerIcon || !streakNumber || !dotTrack) return;
+
+  const percent = Math.min((daysCompletedThisWeek / 7) * 100, 100);
   progressFill.style.width = `${percent}%`;
   runnerIcon.style.left = `${percent}%`;
+  streakNumber.textContent = totalProductiveDays;
 
-  console.log(`Streak updated: ${streak} days`);
+  // ✅ Generate black dots (for all 7 days)
+  dotTrack.innerHTML = "";
+  for (let i = 0; i < 7; i++) {
+    const dot = document.createElement("div");
+    dot.classList.add("dot");
+
+    // Hide dots that are already "completed"
+    if (i < daysCompletedThisWeek) dot.style.opacity = "0";
+
+    dotTrack.appendChild(dot);
+  }
+
+  console.log(`Streak updated: ${daysCompletedThisWeek} days this week (${totalProductiveDays} total)`);
 }
+
 
 // === NAVBAR LOGIC ===
 document.addEventListener("DOMContentLoaded", () => {
