@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search & Filter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../styles/search.css"> 
+</head>
+<body>
+    <div class="search-page-container">
+        <header class="search-header">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search" class="search-input">
+                <i class="fas fa-times clear-search-btn" id="clearSearchBtn"></i>
+            </div>
+            
+            <div class="filter-pills-container">
+                <div class="filter-pill active" data-filter="all">
+                    <span>All</span>
+                </div>
+                <div class="filter-pill" data-filter="today"><span>Today</span></div>
+                <div class="filter-pill" data-filter="tomorrow"><span>Tomorrow</span></div>
+                <div class="filter-pill" data-filter="jan"><span>January</span></div>
+                <div class="filter-pill" data-filter="feb"><span>February</span></div>
+                <div class="filter-pill" data-filter="may"><span>May</span></div>
+                <div class="filter-pill" data-filter="apr"><span>April</span></div>
+                <div class="filter-pill" data-filter="jun"><span>June</span></div>
+                <div class="filter-pill" data-filter="jul"><span>July</span></div>
+                <div class="filter-pill" data-filter="aug"><span>August</span></div>
+                <div class="filter-pill" data-filter="sep"><span>September</span></div>
+                <div class="filter-pill" data-filter="oct"><span>October</span></div>
+                <div class="filter-pill" data-filter="nov"><span>November</span></div>
+                <div class="filter-pill" data-filter="dec"><span>December</span></div>
+            </div>
+        </header>
+
+        <main class="search-results-main">
+            <div class="empty-state">
+                <img src="../assets/timy4.png" alt="Timy Relaxing" class="timy-image">
+                <p>Start typing or select a filter to find your tasks.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="../search.js"></script>
+</body>
+</html>

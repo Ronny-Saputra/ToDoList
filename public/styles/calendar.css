@@ -253,6 +253,7 @@ body {
     min-height: 45px;
     aspect-ratio: 1; 
     display: flex;
+    flex-direction: column; /* Ubah ke kolom untuk menampung dot indicator */
     justify-content: center;
     align-items: center;
     border-radius: 12px;
@@ -263,6 +264,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
+    padding-bottom: 10px; /* Tambahkan padding bawah untuk dot */
 }
 
 .date-box:not(.outside-month):not(.empty):hover {
@@ -299,6 +301,25 @@ body {
     font-weight: 600;
     box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
 }
+
+/* ==================================================== */
+/* ✅ KODE PERBAIKAN: STYLING DOT INDICATOR DI KALENDER */
+/* ==================================================== */
+.dot-indicator-calendar {
+    position: absolute;
+    bottom: 5px; /* Sesuaikan posisi agar terlihat di bagian bawah */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #ffc234; /* Warna kuning/oranye untuk menandakan tugas */
+    border-radius: 50%;
+}
+/* Pastikan titik terlihat saat tanggal terpilih */
+.date-box.selected .dot-indicator-calendar {
+    background-color: white; 
+}
+
 
 /* ========== FOOTER ========== */
 .calendar-footer {
@@ -434,6 +455,7 @@ body {
         font-size: 0.9em;
         font-weight: 600; 
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding-bottom: 8px; /* Sesuaikan padding bawah mobile */
     }
 
     .date-box.outside-month {
@@ -455,6 +477,13 @@ body {
         border-radius: 10px;
         border: none; 
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Penyesuaian Dot Indicator Mobile */
+    .dot-indicator-calendar {
+        bottom: 3px; 
+        width: 5px;
+        height: 5px;
     }
 }
 
