@@ -13,32 +13,27 @@
     <div class="calendar-page-container">
         <div class="calendar-wrapper">
             
-            <!-- Back Button (Desktop & Mobile) -->
             <button class="back-btn-calendar" onclick="window.location.href='task.html'">
                 <i class="fas fa-arrow-left"></i>
             </button>
 
-            <!-- Mobile Navigation: Tetap Tampil di Mobile -->
             <div class="month-navigation mobile-only">
                 <button class="nav-btn" id="prevMonthMobile">&#8249;</button>
                 <span class="month-year-title" id="monthYearTitle">December 2025</span>
                 <button class="nav-btn" id="nextMonthMobile">&#8250;</button>
             </div>
 
-            <!-- Desktop Year Selector: Hanya tampil di Desktop -->
             <div class="year-selector desktop-only">
                 <button class="year-btn prev-year" id="prevYear">&#8249;</button>
                 <span class="current-year" id="currentYear">2025</span>
                 <button class="year-btn next-year" id="nextYear">&#8250;</button>
             </div>
             
-            <!-- Mobile Calendar Container -->
             <div class="mobile-calendar-container mobile-only" id="mobileCalendarContainer">
                 <div class="swipe-wrapper" id="swipeWrapper">
                 </div>
             </div>
 
-            <!-- Desktop Month Grid -->
             <div class="month-list-container desktop-only" id="monthListContainer">
             </div>
         </div>
@@ -50,7 +45,6 @@
         </div>
     </div>
 
-    <!-- Drawer for New Reminder (same as task.html) -->
     <div id="newReminderDrawer" class="drawer-overlay">
         <div class="drawer-content">
             <header class="drawer-header">
@@ -95,7 +89,6 @@
         </div>
     </div>
     
-    <!-- Custom Dialog -->
     <div id="custom-dialog-overlay" class="custom-dialog-overlay">
         <div class="custom-dialog">
             <div id="custom-dialog-message" class="custom-dialog-message">Success Add New Reminder</div>
@@ -104,7 +97,6 @@
         </div>
     </div>
     
-    <!-- Time Picker -->
     <div id="time-picker-overlay" class="time-picker-overlay">
         <div class="time-picker-dialog">
             <h3>Set Time Range</h3>
@@ -120,7 +112,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -146,8 +137,7 @@
         });
     </script>
 
-    <script src="../task.js"></script>
-    <script src="../calendar.js"></script> 
-    <script src="../calendar-reminder.js"></script>
+    <script src="../calendar.js"></script>
+    <script src="../task.js"></script> 
 </body>
 </html>
