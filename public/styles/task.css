@@ -199,23 +199,23 @@ body {
 /* Hover Effect */
 .date-card:hover {
     background-color: #dbe9ff; 
-    border: 2px solid #3f67b5; 
+    border: 2px solid #1e3a8a; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 .date-card:hover .month-text,
 .date-card:hover .day-text,
 .date-card:hover .date-number {
-    color: #3f67b5; 
+    color: #1e3a8a ; 
 }
 .date-card:hover .dot-indicator {
-    background-color: #3f67b5; 
+    background-color: #1e3a8a; 
 }
 
 /* Active State */
 .date-card.active {
-    background-color: #3f67b5; 
+    background-color: #1e3a8a; 
     color: white;
-    border: 2px solid #3f67b5;
+    border: 2px solid #1e3a8a;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .date-card.active .month-text,
@@ -256,7 +256,7 @@ body {
 }
 
 .new-reminder-btn {
-    background-color: #3f67b5;
+    background-color: #1e3a8a;
     color: #fff;
     border: none;
     padding: 8px 15px;
@@ -271,7 +271,7 @@ body {
 }
 
 .new-reminder-btn:hover {
-    background-color: #5880d1;
+    background-color: navy;
 }
 
 .task-grid-main {
@@ -292,13 +292,69 @@ body {
     gap: 10px;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.2s ease;
+    transition: all 0.3s ease; /* Diperbarui untuk transisi tinggi */
     height: 90px; 
+    position: relative; /* DIPERLUKAN UNTUK POSITIONING TOMBOL */
 }
 
 .task-card-item:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.10);
 }
+
+/* ==================================================== */
+/* === STYLES BARU UNTUK TOMBOL AKSI === */
+/* ==================================================== */
+.task-card-item.active {
+    min-height: 140px; 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    height: auto; 
+    /* Tambah padding bawah untuk memberi ruang tombol */
+    padding-bottom: 70px; 
+}
+
+.task-actions {
+    display: none; /* Default: Sembunyikan */
+    position: absolute;
+    bottom: 10px;
+    left: 15px; 
+    right: 15px; 
+    height: 50px;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.task-card-item.active .task-actions {
+    display: flex;
+}
+
+.action-btn {
+    flex-grow: 1;
+    background-color: #d6eaff; /* Warna biru muda */
+    color: #1e3a8a; /* Warna teks/ikon biru tua */
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px;
+    transition: all 0.2s ease;
+    text-decoration: none; /* Untuk memastikan jika menggunakan <a> */
+}
+
+.action-btn i {
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.action-btn:hover {
+    background-color: #bad7ff;
+}
+/* ==================================================== */
 
 .task-checkbox {
     width: 20px;
@@ -329,7 +385,7 @@ body {
 .dot-indicator {
     width: 6px;
     height: 6px;
-    background-color: #ff5252; 
+    background-color: navy; 
     border-radius: 50%;
     flex-shrink: 0;
 }

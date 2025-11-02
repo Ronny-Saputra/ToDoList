@@ -13,14 +13,38 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // SEMUA FUNGSI DI BAWAH INI TETAP ADA UNTUK DIGUNAKAN DI HALAMAN LAIN
-document.querySelectorAll(".task-card").forEach(card => {
-      card.addEventListener("click", () => {
-        // hapus active dari semua card
-        document.querySelectorAll(".task-card").forEach(c => c.classList.remove("active"));
-        // kasih active ke card yang diklik
-        card.classList.add("active");
-      });
-    });
+
+// ✅ PERBAIKAN AKHIR: EVENT DELEGATION UNTUK TASK CARD (.task-card-item)
+document.body.addEventListener("click", (e) => {
+  // Temukan elemen terdekat dengan kelas .task-card-item
+  const clickedCard = e.target.closest(".task-card-item");
+  // Temukan elemen terdekat dengan kelas .action-btn (tombol Flow Timer/Edit/Delete)
+  const isActionButton = e.target.closest(".action-btn");
+  // Temukan elemen terdekat dengan kelas .task-checkbox (bulatan checklist)
+  const isCheckbox = e.target.closest(".task-checkbox");
+
+
+  if (clickedCard) {
+    // JANGAN lakukan toggle jika yang diklik adalah Checkbox atau Tombol Aksi
+    if (isActionButton || isCheckbox) {
+        return; 
+    }
+      
+    // Cek apakah card ini sudah aktif
+    const isAlreadyActive = clickedCard.classList.contains("active");
+
+    // Hapus 'active' dari SEMUA card
+    document.querySelectorAll(".task-card-item").forEach(c => c.classList.remove("active"));
+
+    // Jika card belum aktif, aktifkan card yang diklik
+    if (!isAlreadyActive) {
+      clickedCard.classList.add("active");
+    }
+  } else {
+    // Jika mengklik di luar area task card, nonaktifkan semua task card
+    document.querySelectorAll(".task-card-item").forEach(c => c.classList.remove("active"));
+  }
+});
 
 
 function googleLogin() {
