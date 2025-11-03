@@ -250,8 +250,9 @@ body {
 .date-box {
     background-color: var(--date-box-bg);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); 
-    min-height: 45px;
-    aspect-ratio: 1; 
+    min-height: 60px;
+    width: 100%;
+
     display: flex;
     flex-direction: column; /* Ubah ke kolom untuk menampung dot indicator */
     justify-content: center;
@@ -264,7 +265,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
-    padding-bottom: 10px; /* Tambahkan padding bawah untuk dot */
+    padding-bottom: 25px; /* Tambahkan padding bawah untuk dot */
 }
 
 .date-box:not(.outside-month):not(.empty):hover {
@@ -273,6 +274,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
+/* Kotak tanggal dari bulan lain (Desktop View Only) */
 .date-box.outside-month {
     opacity: 0.35;
     color: #7a8a9a;
@@ -281,11 +283,13 @@ body {
     font-weight: 400;
 }
 
+/* ✅ KOTAK KOSONG (Dipakai untuk menyembunyikan tanggal luar di mobile) */
 .date-box.empty {
-    background-color: transparent;
-    box-shadow: none;
-    cursor: default;
-    pointer-events: none;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    cursor: default !important;
+    pointer-events: none !important;
+    border: none !important;
 }
 
 .date-box.today {
@@ -303,7 +307,7 @@ body {
 }
 
 /* ==================================================== */
-/* ✅ KODE PERBAIKAN: STYLING DOT INDICATOR DI KALENDER */
+/* STYLING DOT INDICATOR DI KALENDER */
 /* ==================================================== */
 .dot-indicator-calendar {
     position: absolute;
@@ -312,7 +316,7 @@ body {
     transform: translateX(-50%);
     width: 6px;
     height: 6px;
-    background-color: #ffc234; /* Warna kuning/oranye untuk menandakan tugas */
+    background-color: navy; /* Warna kuning/oranye untuk menandakan tugas */
     border-radius: 50%;
 }
 /* Pastikan titik terlihat saat tanggal terpilih */
@@ -396,37 +400,46 @@ body {
     /* 3. Swipe Wrapper (Penting untuk menghilangkan overflow) */
     .swipe-wrapper {
         display: flex;
-        height: 100%;
+        height: 80%;
         transition: transform 0.3s ease;
         will-change: transform;
-        width: 100%; /* Pastikan ini 100% dari parent */
+        width: 100%; 
     }
-
 
     /* 4. Navigasi Bulan - Tampilkan di Mobile */
     .month-navigation {
-        display: flex; /* Show on mobile */
+        display: flex; 
         padding: 15px 20px 0 20px; 
     }
 
-    /* 5. Month Swipe Block - Menghapus padding horizontal yang menyebabkan overflow */
+    /* 5. Month Swipe Block */
     .swipe-month {
         min-width: 100%;
         flex-shrink: 0;
-        /* Hapus padding horizontal di sini. Padding akan diterapkan di dalam elemennya. */
         padding: 15px 0 20px 0; 
         display: flex;
         flex-direction: column;
         flex-grow: 1;
+    }
+    
+    /* ✅ Wrapper Biru Muda */
+    .calendar-card-mobile {
+        border: #eaf3ff solid 1.5px; 
+        margin: 0 20px; 
+        padding: 0 0 20px 0; 
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        flex-grow: 1; 
     }
 
     /* 6. Calendar Block - Menambahkan padding horizontal di sini */
     .month-calendar {
         background-color: transparent;
         box-shadow: none;
-        padding: 0 15px; /* <--- Padding horizontal ditambahkan di sini */
+        padding: 0 15px; 
         flex-grow: 1; 
         height: auto; 
+        border: none;
     }
 
     .month-title {
@@ -439,6 +452,7 @@ body {
         margin-bottom: 12px;
         border-bottom: none;
         font-weight: 600; 
+        padding: 15px 0 10px 0;
     }
 
     /* 8. Kotak Tanggal (Date Boxes) */
@@ -449,31 +463,38 @@ body {
     }
 
     .date-box {
-        min-height: auto; 
-        aspect-ratio: 1 / 1; 
+        min-height: 50px; 
         border-radius: 8px; 
         font-size: 0.9em;
         font-weight: 600; 
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        padding-bottom: 8px; /* Sesuaikan padding bawah mobile */
+        padding-bottom: 25px;
     }
 
     .date-box.outside-month {
-        background-color: rgba(255, 255, 255, 0.7); 
-        opacity: 1; 
-        color: #999; 
-        font-weight: 500;
+        /* Hapus styling ini agar tidak bentrok dengan .empty */
+        background-color: transparent; 
+        opacity: 0; 
+    }
+    
+    .date-box.empty {
+        /* Pastikan gaya ini menang di mobile */
+        background-color: transparent !important;
     }
 
     /* 9. Footer (Add Reminder) */
     .calendar-footer {
-        background-color: #f0f4f9; 
-        padding: 10px;
+        /* Sesuaikan dengan warna card */
+        padding: 10px 0 20px 0;
         flex-shrink: 0;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        margin: 0 0; 
     }
 
     .add-reminder-box {
-        height: 45px; 
+        width: calc(100% - 20%); 
+        height: 40px; 
         border-radius: 10px;
         border: none; 
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -485,16 +506,24 @@ body {
         width: 5px;
         height: 5px;
     }
+
+        .nav-btn {
+        margin-top: 40px;
+    }
+
+    .month-year-title {
+        margin-top: 40px;
+    }
 }
 
 /* Mobile Small (penyesuaian untuk layar sangat kecil) */
 @media (max-width: 480px) {
     .nav-btn {
-        margin-top: 100px;
+        margin-top: 70px;
     }
 
     .month-year-title {
-        margin-top: 100px;
+        margin-top: 70px;
     }
 
     .month-navigation {
@@ -505,12 +534,16 @@ body {
         padding: 10px 0 15px 0; 
     }
     
+    .calendar-card-mobile {
+        margin: 0 15px;
+    }
+    
     .month-calendar {
-        padding: 0 20px; 
+        padding: 0 10px; 
     }
 
     .dates {
-        gap: 6px; 
+        gap: 8px; 
     }
 
     .date-box {
@@ -518,6 +551,11 @@ body {
         border-radius: 6px; 
     }
 
+    .calendar-footer {
+        padding: 10px 0 15px 0;
+        margin: 0 12px;
+    }
+    
     .add-reminder-box {
         height: 40px;
         font-size: 0.8em;

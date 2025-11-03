@@ -11,22 +11,27 @@
 <body>
     <div class="search-page-container">
         <header class="search-header">
-            <div class="search-input-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Search" class="search-input">
-                <i class="fas fa-times clear-search-btn" id="clearSearchBtn"></i>
+            
+            <div class="top-search-bar-row"> 
+                <a href="task.html" class="back-to-task-btn" aria-label="Back to tasks">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Search" class="search-input">
+                    <i class="fas fa-times clear-search-btn" id="clearSearchBtn"></i>
+                </div>
             </div>
             
             <div class="filter-pills-container">
                 <div class="filter-pill active" data-filter="all">
                     <span>All</span>
                 </div>
-                <div class="filter-pill" data-filter="today"><span>Today</span></div>
-                <div class="filter-pill" data-filter="tomorrow"><span>Tomorrow</span></div>
                 <div class="filter-pill" data-filter="jan"><span>January</span></div>
                 <div class="filter-pill" data-filter="feb"><span>February</span></div>
-                <div class="filter-pill" data-filter="may"><span>May</span></div>
+                <div class="filter-pill" data-filter="mar"><span>March</span></div>
                 <div class="filter-pill" data-filter="apr"><span>April</span></div>
+                <div class="filter-pill" data-filter="may"><span>May</span></div>
                 <div class="filter-pill" data-filter="jun"><span>June</span></div>
                 <div class="filter-pill" data-filter="jul"><span>July</span></div>
                 <div class="filter-pill" data-filter="aug"><span>August</span></div>
@@ -37,14 +42,36 @@
             </div>
         </header>
 
-        <main class="search-results-main">
-            <div class="empty-state">
+        <main class="search-results-main" id="searchResultsMain">
+            <div class="task-grid-main" id="taskListContainer">
+                </div>
+            <div class="empty-state" id="emptyState">
                 <img src="../assets/timy4.png" alt="Timy Relaxing" class="timy-image">
                 <p>Start typing or select a filter to find your tasks.</p>
             </div>
         </main>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+            authDomain: "todolist-43.firebaseapp.com",
+            projectId: "todolist-43",
+            storageBucket: "todolist-43.appspot.com",
+            messagingSenderId: "795548747542",
+            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+            measurementId: "G-67K7H7XXWW"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="../main.js"></script>
+    <script src="../task.js"></script> 
     <script src="../search.js"></script>
 </body>
 </html>

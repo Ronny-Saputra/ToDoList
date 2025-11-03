@@ -21,5 +21,5 @@ Aplikasi *Timy Time* ini merupakan aplikasi ToDoList yang memungkinkan pengguna 
 ## **Clone repositori ini**:
 
    ```bash
-   git clone https://github.com/username/todo-list-app.git
-   cd todo-list-app
+   git clone https://github.com/Ronny-Saputra/ToDoList
+   cd ToDoList
