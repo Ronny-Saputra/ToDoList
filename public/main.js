@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // SEMUA FUNGSI DI BAWAH INI TETAP ADA UNTUK DIGUNAKAN DI HALAMAN LAIN
 
-// ✅ PERBAIKAN AKHIR: EVENT DELEGATION UNTUK TASK CARD (.task-card-item)
+// ✅ PERBAIKAN: EVENT DELEGATION UNTUK TASK CARD (.task-card-item) DIKEMBALIKAN
 document.body.addEventListener("click", (e) => {
   // Temukan elemen terdekat dengan kelas .task-card-item
   const clickedCard = e.target.closest(".task-card-item");

@@ -27,44 +27,47 @@ document.addEventListener('DOMContentLoaded', function() {
     const todayMonth = today.getMonth();
     const todayDate = today.getDate();
     
-    // Default selectedDate ke hari ini
     let selectedDate = { year: todayYear, month: todayMonth, day: todayDate }; 
-    let allTasksData = []; // Menyimpan semua tugas dari Firebase
-    let datesWithTasks = new Set(); // Menyimpan tanggal (YYYY-MM-DD) yang memiliki tugas
-
+    let allTasksData = []; 
+    let datesWithTasks = new Set(); 
+    
+    // Ambil elemen drawer
+    const newReminderDrawer = document.getElementById('newReminderDrawer');
+    const addReminderBtn = document.getElementById('add-reminder-btn');
+    const reminderForm = newReminderDrawer ? newReminderDrawer.querySelector('#reminder-form') : null;
+    
+    // Buat container task list untuk drawer
+    const taskListForDrawer = document.createElement('div'); 
+    taskListForDrawer.id = 'taskListForDrawer';
+    taskListForDrawer.classList.add('scrollable-content'); 
+    taskListForDrawer.style.padding = '0 24px';
+    taskListForDrawer.style.flexGrow = '1';
+    taskListForDrawer.style.display = 'none'; 
+    const drawerContent = document.querySelector('.drawer-content');
+    if (drawerContent && reminderForm) {
+        drawerContent.insertBefore(taskListForDrawer, reminderForm); 
+    }
+    
     // --- UTILITY: Format Date ke string YYYY-MM-DD ---
     function formatDate(year, month, day) {
-        // month adalah 0-indexed, jadi harus ditambah 1
         const m = String(month + 1).padStart(2, '0');
         const d = String(day).padStart(2, '0');
         return `${year}-${m}-${d}`;
     }
     
-    // --- UTILITY: Format Date object ke string YYYY-MM-DD (Tambahan) ---
-    function formatDateObject(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    // --- FUNGSI BARU: SCROLL DESKTOP KE BULAN AKTIF ---
-    /**
-     * Scroll the desktop month list vertically to the current month.
-     */
-    function setupDesktopScroll() {
-        if (!monthListContainer) return;
-        
-        // Cari elemen bulan saat ini menggunakan atribut data-month
-        const currentMonthDiv = monthListContainer.querySelector(`.month-calendar[data-year="${currentYear}"][data-month="${todayMonth}"]`);
-
-        if (currentMonthDiv) {
-            // Gunakan scrollIntoView untuk membawa elemen ke tampilan,
-            // memposisikan bagian atas elemen di bagian atas kontainer.
-            currentMonthDiv.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start' 
-            });
+    // --- FUNGSI BARU: RELOAD CALENDAR VIEW ---
+    async function reloadCalendarView() {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            await loadTasksAndRenderCalendar(user); 
+            // Setelah reload, pastikan daftar tugas di drawer diperbarui
+            if (selectedDate) {
+                const dateString = formatDate(selectedDate.year, selectedDate.month, selectedDate.day);
+                // Hanya perbarui drawer jika sedang terbuka
+                if (newReminderDrawer.classList.contains('open') && window.TaskApp.reminderForm.style.display === 'none') {
+                    populateTaskDrawer(dateString); 
+                }
+            }
         }
     }
 
@@ -82,21 +85,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 ...doc.data() 
             }));
             
-            // Populate Set of dates with tasks
+            // ✅ SINKRONKAN DATA TUGAS KE GLOBAL TaskApp
+            if (window.TaskApp) {
+                window.TaskApp.tasksData = allTasksData;
+            }
+
             datesWithTasks = new Set(allTasksData.map(t => t.date));
             
-            // Re-render calendar based on view mode (Desktop/Mobile)
             if (isMobile()) {
                 renderMobileCalendar();
             } else {
                 updateYearDisplay();
-                // ✅ Panggil fungsi scroll desktop setelah rendering
                 setupDesktopScroll(); 
             }
             
-            // Perbarui visual tanggal yang sedang aktif setelah reload
             if (selectedDate) {
-                 // Cari dan tambahkan kelas 'selected' ke tanggal yang aktif
                  const activeBox = document.querySelector(`.date-box[data-year="${selectedDate.year}"][data-month="${selectedDate.month}"][data-day="${selectedDate.day}"]`);
                  if(activeBox) {
                     document.querySelectorAll('.date-box.selected').forEach(el => el.classList.remove('selected'));
@@ -104,16 +107,13 @@ document.addEventListener('DOMContentLoaded', function() {
                  }
             }
 
-
         } catch (err) {
             console.error("Error loading tasks for calendar:", err);
         }
     }
 
-
     /**
      * Get calendar dates for a month
-     * FIX: Add empty: true property to outside month dates.
      */
     function getCalendarDates(year, monthIndex) {
         const dates = [];
@@ -124,14 +124,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add dates from previous month
         for (let i = firstDayOfWeek; i > 0; i--) {
-            // MARK as empty: true
             dates.push({ day: daysInPrevMonth - i + 1, outside: true, empty: true });
         }
 
         // Add dates from current month
         const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
         for (let i = 1; i <= daysInMonth; i++) {
-            // MARK as empty: false
             dates.push({ day: i, outside: false, empty: false });
         }
 
@@ -139,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalSlotsNeeded = Math.ceil(dates.length / 7) * 7;
         let nextDay = 1;
         while (dates.length < totalSlotsNeeded) {
-            // MARK as empty: true
             dates.push({ day: nextDay, outside: true, empty: true });
             nextDay++;
         }
@@ -149,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Create month calendar HTML
-     * FIX: Render empty div if data.empty is true.
      */
     function createMonthCalendarHTML(year, monthIndex, includeTitleForDesktop = true) {
         let html = '';
@@ -189,8 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                year === todayYear && 
                                monthIndex === todayMonth && 
                                data.day === todayDate;
-            // FIX: Tambahkan kelas 'selected' jika hari ini belum dipilih (agar tetap disorot)
-            const todayClass = isTodayDate ? ' today selected' : ''; 
+            const todayClass = isTodayDate ? ' today' : ''; 
             
             const isSelected = selectedDate && 
                               !data.outside &&
@@ -258,7 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const monthDiv = document.createElement('div');
             monthDiv.classList.add('swipe-month');
             
-            // FIX: Tambahkan wrapper untuk kotak biru muda
             const calendarCardMobile = document.createElement('div');
             calendarCardMobile.classList.add('calendar-card-mobile'); 
 
@@ -268,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calendarDiv.setAttribute('data-month', month);
             calendarDiv.innerHTML = createMonthCalendarHTML(currentYear, month, false);
             
-            // Susun: calendarDiv -> calendarCardMobile -> monthDiv
             calendarCardMobile.appendChild(calendarDiv);
             monthDiv.appendChild(calendarCardMobile);
             swipeWrapper.appendChild(monthDiv); 
@@ -308,117 +301,25 @@ document.addEventListener('DOMContentLoaded', function() {
         monthYearTitle.textContent = date.toLocaleDateString(ENGLISH_LOCALE, { month: 'long', year: 'numeric' });
     }
     
-    
-    // --- DRAWER & DIALOG LOGIC ---
-    const addReminderBtn = document.getElementById('add-reminder-btn');
-    const newReminderDrawer = document.getElementById('newReminderDrawer');
-    const closeDrawerBtn = document.querySelector('.close-drawer-btn');
-    const reminderForm = document.getElementById('reminder-form');
-    
-    // TEMBAKAN PERBAIKAN: Dapatkan elemen drawer header title
-    const drawerHeaderTitle = newReminderDrawer ? newReminderDrawer.querySelector('.drawer-header h2') : null; 
-    
-    // TEMBAKAN PERBAIKAN: Buat container baru untuk daftar tugas
-    const taskListForDrawer = document.createElement('div'); 
-    taskListForDrawer.id = 'taskListForDrawer';
-    taskListForDrawer.classList.add('scrollable-content'); 
-    taskListForDrawer.style.padding = '0 24px';
-    taskListForDrawer.style.flexGrow = '1';
-    taskListForDrawer.style.display = 'none'; 
-    
-    // Sisipkan container daftar tugas baru di bawah header dan sebelum form
-    const drawerContent = document.querySelector('.drawer-content');
-    if (drawerContent && reminderForm) {
-        const existingTaskList = drawerContent.querySelector('#taskListForDrawer');
-        if (existingTaskList) existingTaskList.remove();
-        drawerContent.insertBefore(taskListForDrawer, reminderForm); 
-    }
-    
-    // FUNGSI UNTUK MEMBUKA DRAWER
-    const openDrawer = () => {
-        if (newReminderDrawer) {
-            newReminderDrawer.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-    
-    // FUNGSI UNTUK MENUTUP DRAWER (MODIFIKASI: Reset tampilan)
-    const closeDrawer = () => {
-        if (newReminderDrawer) {
-            newReminderDrawer.classList.remove('open');
-            document.body.style.overflow = '';
-            
-            // Reset ke tampilan "New Reminder"
-            if (drawerHeaderTitle) drawerHeaderTitle.textContent = 'New Reminder';
-            if (reminderForm) reminderForm.style.display = 'flex'; 
-            if (taskListForDrawer) {
-                taskListForDrawer.innerHTML = ''; 
-                taskListForDrawer.style.display = 'none'; 
-            }
-        }
-    }
-
-    // FUNGSI BARU: Membuat elemen Task Card untuk ditampilkan di Drawer
-    function createTaskCardForDrawer(task) {
-        const card = document.createElement('div');
-        card.classList.add('task-card-item'); 
-        card.style.backgroundColor = task.done ? '#d6eaff' : '#eaf3ff'; 
-        card.style.height = 'auto'; 
-        card.style.marginBottom = '10px';
-        card.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.05)'; 
-        card.style.padding = '15px'; 
-
-        card.innerHTML = `
-            <div class="task-checkbox" 
-                 style="background-color: ${task.done ? '#3f67b5' : 'transparent'}; 
-                 border-color: ${task.done ? '#3f67b5' : '#a8b0c6'};">
-            </div>
-            <div class="task-details">
-                <span class="task-title-reminder" style="color: ${task.done ? '#777' : '#333'}; text-decoration: ${task.done ? 'line-through' : 'none'};">
-                    ${task.title}
-                </span>
-                <div class="task-meta">
-                    <span class="dot-indicator"></span>
-                    <span class="task-location-small">${task.location || 'No Location'}</span>
-                </div>
-            </div>
-            <div class="task-time-box">
-                <span class="task-time-large">${task.time}</span>
-            </div>
-            <i class="fas fa-chevron-right task-arrow"></i>
-        `;
+    function setupDesktopScroll() {
+        if (!monthListContainer) return;
         
-         const checkbox = card.querySelector('.task-checkbox');
-         checkbox.addEventListener('click', async () => {
-            const user = firebase.auth().currentUser;
-            if (!user) return alert('Please log in first.');
+        const currentMonthDiv = monthListContainer.querySelector(`.month-calendar[data-year="${currentYear}"][data-month="${todayMonth}"]`);
 
-            const db = firebase.firestore();
-            try {
-                const taskInState = allTasksData.find(t => t.id === task.id);
-                const currentDoneStatus = taskInState ? taskInState.done : false;
-                const newDoneStatus = !currentDoneStatus; 
-                
-                await db.collection("users").doc(user.uid)
-                    .collection("tasks").doc(task.id)
-                    .update({
-                        done: newDoneStatus,
-                        date: newDoneStatus ? formatDateObject(new Date()) : taskInState.date 
-                    });
-
-                await loadTasksAndRenderCalendar(user); 
-                populateTaskDrawer(task.date); 
-                
-            } catch (err) {
-                console.error("Error updating task status:", err);
-            }
-        });
-
-        return card;
+        if (currentMonthDiv) {
+            currentMonthDiv.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start' 
+            });
+        }
     }
-    
-    // FUNGSI BARU: Mengisi Drawer dengan Daftar Tugas
+
+
+    // --- FUNGSI BARU: Mengisi Drawer dengan Daftar Tugas (Diperbarui) ---
     function populateTaskDrawer(dateString) {
+        const drawerHeaderTitle = window.TaskApp.drawerHeaderTitle; 
+        const reminderForm = window.TaskApp.reminderForm;
+        
         if (!drawerHeaderTitle || !reminderForm || !taskListForDrawer) return;
 
         const tasksForDate = allTasksData.filter(task => task.date === dateString);
@@ -431,6 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         drawerHeaderTitle.textContent = `Tasks on ${dayName}, ${formattedDate}`;
         
+        // Sembunyikan form dan tampilkan daftar tugas
         reminderForm.style.display = 'none';
         
         taskListForDrawer.style.display = 'flex'; 
@@ -445,13 +347,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>`;
         } else {
             tasksForDate.forEach(task => {
-                taskListForDrawer.appendChild(createTaskCardForDrawer(task));
+                // Panggil fungsi reusable dari task.js
+                const card = window.TaskApp.createTaskCard(task, reloadCalendarView);
+                taskListForDrawer.appendChild(card);
             });
         }
     }
 
 
-    // FUNGSI KLIK KOTAK TANGGAL (MODIFIKASI)
+    // --- FUNGSI KLIK KOTAK TANGGAL (Diperbarui) ---
     function dateBoxClickHandler() {
         const box = this;
         const year = parseInt(box.getAttribute('data-year'));
@@ -459,18 +363,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const day = parseInt(box.getAttribute('data-day'));
         const dateString = formatDate(year, month, day); 
         
-        // 1. Atur status 'selected'
         document.querySelectorAll('.date-box.selected').forEach(el => {
             el.classList.remove('selected');
         });
         box.classList.add('selected');
         
-        // 2. Simpan tanggal yang dipilih ke state global
         selectedDate = { year, month, day };
         
-        // 3. Panggil fungsi baru untuk menampilkan daftar tugas & buka drawer
         populateTaskDrawer(dateString); 
-        openDrawer();
+        window.TaskApp.openDrawer(); // Ganti dengan fungsi global dari task.js
     }
 
 
@@ -645,19 +546,15 @@ document.addEventListener('DOMContentLoaded', function() {
         init(user);
     });
 
-    // --- DRAWER & DIALOG LOGIC LANJUTAN ---
+    // --- DRAWER & DIALOG LOGIC LANJUTAN (Menggunakan Fungsi Global) ---
     
-    const timeInput = document.getElementById('time-input');
-    const timePickerOverlay = document.getElementById('time-picker-overlay');
-    const startTimeInput = document.getElementById('start-time-input');
-    const endTimeInput = document.getElementById('end-time-input');
-    const timePickerCancelBtn = document.getElementById('time-picker-cancel');
-    const timePickerSaveBtn = document.getElementById('time-picker-save');
-    
-    const dialogOverlay = document.getElementById('custom-dialog-overlay');
-    const dialogMessage = document.getElementById('custom-dialog-message');
-    const dialogActions = document.getElementById('custom-dialog-actions');
-
+    const timeInput = window.TaskApp.timeInput;
+    const timePickerOverlay = window.TaskApp.timePickerOverlay;
+    const startTimeInput = window.TaskApp.startTimeInput;
+    const endTimeInput = window.TaskApp.endTimeInput;
+    const timePickerCancelBtn = window.TaskApp.timePickerCancelBtn;
+    const timePickerSaveBtn = window.TaskApp.timePickerSaveBtn;
+    const dateInputEdit = window.TaskApp.dateInputEdit;
 
     if (addReminderBtn) {
         addReminderBtn.addEventListener('click', () => {
@@ -666,60 +563,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector(`.date-box[data-year="${todayYear}"][data-month="${todayMonth}"][data-day="${todayDate}"]`)?.classList.add('selected');
             }
             
-            if (drawerHeaderTitle) drawerHeaderTitle.textContent = 'New Reminder';
+            // Reset ke mode New Reminder
+            window.TaskApp.editingTaskId = null;
+            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
+            
+            // PASTIKAN INI MENAMPILKAN FORM DAN MENYEMBUNYIKAN TASK LIST
             if (taskListForDrawer) taskListForDrawer.style.display = 'none';
             if (reminderForm) reminderForm.style.display = 'flex';
             
-            openDrawer();
+            if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
+            
+            // Set tanggal default di form edit
+            if (dateInputEdit) dateInputEdit.value = formatDate(selectedDate.year, selectedDate.month, selectedDate.day);
+
+            window.TaskApp.openDrawer();
         });
     }
 
-    if (closeDrawerBtn) {
-        closeDrawerBtn.addEventListener('click', closeDrawer);
+    if (window.TaskApp.closeDrawerBtn) {
+        window.TaskApp.closeDrawerBtn.addEventListener('click', window.TaskApp.closeDrawer);
     }
 
     if (newReminderDrawer) {
         newReminderDrawer.addEventListener('click', (event) => {
             if (event.target === newReminderDrawer) {
-                closeDrawer();
+                window.TaskApp.closeDrawer();
             }
         });
-    }
-
-    window.showCustomDialog = function(message, buttons) {
-        if (!dialogOverlay || !dialogMessage || !dialogActions) {
-            console.error("Custom dialog elements not found in the DOM.");
-            alert(message);
-            return;
-        }
-
-        dialogMessage.textContent = message;
-        dialogActions.innerHTML = '';
-        
-        buttons.forEach((btn, index) => {
-            const buttonElement = document.createElement('button');
-            buttonElement.textContent = btn.text;
-            buttonElement.classList.add('dialog-btn');
-            
-            if (btn.isPrimary) {
-                buttonElement.classList.add('primary');
-            }
-            
-            buttonElement.addEventListener('click', () => {
-                dialogOverlay.classList.remove('open');
-                if (btn.action) {
-                    btn.action();
-                }
-            });
-            
-            if (index === 0 && buttons.length > 1) {
-                buttonElement.style.borderRight = '1px solid #ddd';
-            }
-            
-            dialogActions.appendChild(buttonElement);
-        });
-        
-        dialogOverlay.classList.add('open');
     }
 
     if (timeInput) {
@@ -763,64 +633,76 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
+    
+    // --- FORM SUBMIT HANDLER (MENGGUNAKAN LOGIC task.js) ---
     firebase.auth().onAuthStateChanged(user => {
         if (!user) return;
 
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-
         if (reminderForm) {
-            reminderForm.addEventListener('submit', async function(event) {
+            reminderForm.onsubmit = async function(event) {
                 event.preventDefault();
 
                 const activity = document.getElementById('activity-input').value.trim();
                 const time = document.getElementById('time-input').value.trim();
                 const location = document.getElementById('location-input').value.trim() || 'No Location';
+                const dateString = dateInputEdit.value; 
 
-                if (activity && time) {
+                if (activity && time && dateString) {
                     try {
-                        const dateString = formatDate(selectedDate.year, selectedDate.month, selectedDate.day);
+                        const db = firebase.firestore();
+                        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+                        const isEditing = window.TaskApp.editingTaskId;
                         
-                        await tasksRef.add({
-                            title: activity,
-                            time,
-                            location,
-                            done: false,
-                            date: dateString,
-                        });
+                        const taskData = { title: activity, time, location, date: dateString };
 
-                        reminderForm.reset();
-                        closeDrawer();
+                        if (isEditing) {
+                            await tasksRef.doc(isEditing).update(taskData);
+                        } else {
+                            taskData.done = false;
+                            await tasksRef.add(taskData);
+                        }
                         
-                        await loadTasksAndRenderCalendar(user);
+                        reminderForm.reset();
+                        window.TaskApp.closeDrawer();
+                        
+                        await reloadCalendarView();
 
                         window.showCustomDialog(
-                            "Success Add New Reminder",
+                            isEditing ? "Success Update Reminder" : "Success Add New Reminder",
                             [
                                 { 
-                                    text: 'Add new task more', 
+                                    text: 'Add more', 
                                     action: () => {
-                                        if (drawerHeaderTitle) drawerHeaderTitle.textContent = 'New Reminder';
-                                        if (taskListForDrawer) taskListForDrawer.style.display = 'none';
-                                        if (reminderForm) reminderForm.style.display = 'flex';
+                                        window.TaskApp.editingTaskId = null;
+                                        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
+                                        if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
                                         
-                                        newReminderDrawer.classList.add('open');
-                                        document.body.style.overflow = 'hidden';
+                                        // PASTIKAN INI MENAMPILKAN FORM DAN MENYEMBUNYIKAN TASK LIST
+                                        if (reminderForm) reminderForm.style.display = 'flex';
+                                        if (taskListForDrawer) taskListForDrawer.style.display = 'none';
+                                        
+                                        window.TaskApp.openDrawer();
                                     },
                                     isPrimary: false
                                 },
                                 { 
                                     text: 'View', 
                                     action: () => {
-                                        window.location.href = 'task.html'; 
+                                        const parts = dateString.split('-');
+                                        selectedDate = { year: parseInt(parts[0]), month: parseInt(parts[1]) - 1, day: parseInt(parts[2]) };
+                                        
+                                        currentYear = selectedDate.year;
+                                        currentMonthIndex = selectedDate.month;
+                                        loadTasksAndRenderCalendar(user);
+                                        populateTaskDrawer(dateString);
+                                        window.TaskApp.openDrawer();
                                     },
                                     isPrimary: true
                                 }
                             ]
                         );
                     } catch (err) {
-                        console.error("Error adding task:", err);
+                        console.error("Error adding/updating task:", err);
                         window.showCustomDialog(
                             "Failed to save task. Please try again.",
                             [{ text: 'OK', action: () => {}, isPrimary: true }]
@@ -828,11 +710,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     window.showCustomDialog(
-                        "Activity and Time are required!",
+                        "Activity, Time, and Date are required!",
                         [{ text: 'OK', action: () => {}, isPrimary: true }]
                     );
                 }
-            });
+                return false;
+            };
         }
     });
 });
