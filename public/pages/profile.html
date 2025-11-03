@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <!-- External CSS -->
-    <link rel="stylesheet" href="../styles/profile.css"> 
+    <link rel="stylesheet" href="../styles/profile.css">
+    <!-- CSS navbar terpisah -->
+    <link rel="stylesheet" href="../styles/navbar.css">
 </head>
 <body>
 
@@ -20,32 +22,31 @@
         <!-- ================== HEADER PROFIL ================== -->
         <header class="profile-header">
 
-            <!-- ===== KIRI: AVATAR + USERNAME + STREAK + TOMBOL EDIT ===== -->
+            <!-- ===== KIRI: AVATAR + DETAIL (username, streak, edit) ===== -->
             <div class="profile-left">
 
                 <!-- Avatar pengguna -->
                 <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                    <!-- Ikon kamera di atas avatar -->
+                    <img src="../assets/avatar.png" alt="User Avatar">
                     <span class="camera-icon">
-                        <i class="fas fa-camera"></i>
+                        <img src="../assets/mdi_camera.png" alt="Camera">
                     </span>
                 </div>
 
-                <!-- Detail profil: username dan streak -->
+                <!-- Detail profil: username + streak di samping, lalu tombol edit di bawah -->
                 <div class="profile-details">
-                    <span class="username">Username</span>
-                    <div class="streak">
-                        <i class="fas fa-fire"></i>
-                        <span>130</span>
+                    <div class="user-streak-wrapper">
+                        <div class="username">Username</div>
+                        <div class="streak">
+                            <i class="fas fa-fire"></i>
+                            <span>130</span>
+                        </div>
                     </div>
-                    </div>
-            <!-- Tombol Edit Profile di bawah -->
-            <button class="edit-profile-btn">Edit Profile</button>
-        </div>
-    </div>
-    
-            <!-- ===== KANAN: TOMBOL PENGATURAN ===== -->
+                    <button class="edit-profile-btn">Edit Profile</button>
+                </div>
+            </div>
+
+            <!-- ===== KANAN: TOMBOL PENGATURAN (gear) ===== -->
             <button class="settings-btn">
                 <i class="fas fa-cog"></i>
             </button>
@@ -56,120 +57,89 @@
         <!-- ================== KONTEN UTAMA ================== -->
         <main class="main-content">
 
-            <!-- ===== TAB NAVIGASI (Daily, Weekly, Monthly) ===== -->
-            <div class="tabs">
-                <button class="tab-btn active">Daily</button>
-                <button class="tab-btn">Weekly</button>
-                <button class="tab-btn">Monthly</button>
-            </div>
-
-            <!-- ===== WRAPPER UTAMA UNTUK STATISTIK DAN RINGKASAN ===== -->
+            <!-- ===== WRAPPER UTAMA UNTUK SEMUA KONTEN ===== -->
             <div class="content-wrapper">
 
-                <!-- ===== BAGIAN STATISTIK / PRODUKTIVITAS ===== -->
-                <section class="stats-card">
-
-                    <!-- Judul dan skor produktivitas -->
-                    <div class="card-header">
-                        <h3>Daily Average Productivity</h3>
-                        <div class="productivity-score">
-                            <i class="fas fa-fire"></i>
-                            <span>5</span>
-                        </div>
+                <!-- ===== WRAPPER UNTUK TAB DAN STATISTIK ===== -->
+                <div class="stats-section">
+                    <!-- ===== TAB NAVIGASI (Daily, Weekly, Monthly) ===== -->
+                    <div class="tabs">
+                        <button class="tab-btn active">Daily</button>
+                        <button class="tab-btn">Weekly</button>
+                        <button class="tab-btn">Monthly</button>
                     </div>
 
-                    <!-- Grafik batang (bar chart) -->
-                    <div class="chart-container">
-                        <!-- Tiap hari diwakili oleh satu batang -->
-                        <div class="bar-wrapper">
-                            <div class="bar" style="height: 30%;"></div>
-                            <span class="label">S</span>
+                    <!-- ===== BAGIAN STATISTIK / PRODUKTIVITAS ===== -->
+                    <section class="stats-card">
+                        <div class="card-header">
+                            <h3>Daily Average Productivity</h3>
+                            <div class="productivity-score">
+                                <i class="fas fa-fire"></i>
+                                <span>5</span>
+                            </div>
                         </div>
-                        <div class="bar-wrapper">
-                            <div class="bar" style="height: 50%;"></div>
-                            <span class="label">M</span>
-                        </div>
-                        <div class="bar-wrapper">
-                            <div class="bar highlight" style="height: 70%;"></div>
-                            <span class="label">T</span>
-                        </div>
-                        <div class="bar-wrapper">
-                            <div class="bar" style="height: 20%;"></div>
-                            <span class="label">W</span>
-                        </div>
-                        <div class="bar-wrapper">
-                            <div class="bar" style="height: 40%;"></div>
-                            <span class="label">T</span>
-                        </div>
-                        <div class="bar-wrapper">
-                            <div class="bar" style="height: 15%;"></div>
-                            <span class="label">F</span>
-                        </div>
-                        <div class="bar-wrapper">
-                            <div class="bar" style="height: 10%;"></div>
-                            <span class="label">S</span>
-                        </div>
-                    </div>
-                </section>
-                <!-- ===== /BAGIAN STATISTIK ===== -->
 
-                
-                <!-- ===== BAGIAN RINGKASAN TUGAS (ASIDE) ===== -->
+                        <div class="chart-container">
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 30%;"></div>
+                                <span class="label">S</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 50%;"></div>
+                                <span class="label">M</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar highlight" style="height: 70%;"></div>
+                                <span class="label">T</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 20%;"></div>
+                                <span class="label">W</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 40%;"></div>
+                                <span class="label">T</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 15%;"></div>
+                                <span class="label">F</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 10%;"></div>
+                                <span class="label">S</span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ===== BAGIAN RINGKASAN TUGAS ===== -->
                 <aside class="task-summary">
-
-                    <!-- Tugas selesai -->
                     <div class="summary-box completed">
-                        <span>Completed Tasks (1)</span>
+                        <span>Completed Tasks (9)</span>
                         <div class="icon-wrapper">
                             <i class="fas fa-check"></i>
                         </div>
                     </div>
-
-                    <!-- Tugas terlewat -->
                     <div class="summary-box missed">
                         <span>Missed Tasks (10)</span>
                         <div class="icon-wrapper">
                             <i class="fas fa-exclamation"></i>
                         </div>
                     </div>
-
-                    <!-- Tugas terhapus -->
                     <div class="summary-box deleted">
                         <span>Deleted Tasks (2)</span>
                         <div class="icon-wrapper">
                             <i class="fas fa-times"></i>
                         </div>
                     </div>
-
                 </aside>
-                <!-- ===== /RINGKASAN TUGAS ===== -->
-
             </div>
         </main>
-        <!-- ================== /KONTEN UTAMA ================== -->
-
     </div>
-    <!-- ================== /CONTAINER UTAMA ================== -->
     
-    
-    <!-- ================== NAVBAR BAWAH ================== -->
-    <nav class="navbar">
-        <!-- Tombol Home -->
-        <div class="nav-item">
-            <i class="fas fa-home"></i>
-        </div>
-
-        <!-- Tombol Daftar Tugas -->
-        <div class="nav-item">
-            <i class="fas fa-list-ul"></i>
-        </div>
-
-        <!-- Tombol Profil (aktif) -->
-        <div class="nav-item active">
-            <i class="fas fa-user"></i>
-        </div>
-    </nav>
-    <!-- ================== /NAVBAR BAWAH ================== -->
-    
+    <!-- Script navbar -->
+    <script src="../navbar.js"></script>
+    <!-- Script profile -->
+    <script src="../profile.js"></script>
 </body>
 </html>

@@ -359,65 +359,6 @@ body {
 }
 
 /* ---------------------------------------------------- */
-/* MODIFIKASI BOTTOM NAVIGATION BAR */
-/* ---------------------------------------------------- */
-.navbar {
-    position: fixed;             
-    bottom: 0px;               
-    left: 50%;                  
-    transform: translateX(-50%); 
-    width: 100%; 
-    max-width: none; 
-    height: 60px; 
-    background-color: #ffffff; 
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 1000;
-    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08); 
-    border-radius: 0; 
-}
-
-.navbar i {
-    font-size: 28px; 
-}
-
-.navbar .nav-item {
-    color: #a8b0c6; 
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative; 
-    z-index: 10;
-    
-    transition: color 0.2s ease;
-}
-
-.navbar .nav-item.active {
-    color: #1e2a78; 
-    
-    background-color: transparent; 
-    width: auto;
-    height: auto;
-    border-radius: 0;
-    transform: translateY(0); 
-    box-shadow: none;
-    border: none;
-}
-
-/* Khusus ikon di dalam nav-item aktif */
-.navbar .nav-item.active i {
-    color: #1e2a78; 
-    font-size: 28px;
-}
-.navbar .nav-item:not(.active) i {
-    font-size: 28px; 
-}
-
-
-/* ---------------------------------------------------- */
 /* NEW REMINDER DRAWER STYLES (SIDEBAR KANAN) */
 /* ---------------------------------------------------- */
 

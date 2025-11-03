@@ -9,22 +9,15 @@
 
 body {
     font-family: 'Lexend', sans-serif;
-    /* Latar belakang putih polos */
     background-color: #ffffff; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
 }
 
-/* Container utama aplikasi (menampung semua elemen) */
 .container {
     width: 100%;
-    height: 100vh;
-    min-height: 0; /* konsisten dengan task */
+    min-height: 100vh;
     box-shadow: none;
     border-radius: 0;
     display: flex;
@@ -38,115 +31,115 @@ body {
 /* HEADER PROFIL */
 /* ==================================================== */
 .profile-header {
-    /* Gradasi warna biru lembut */
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 30px 24px;
+    padding: 30px 40px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Align ke atas */
+    align-items: flex-start;
     width: 100%;
-    border-radius: 0 0 32px 32px; /* lengkungan bawah */
+    border-radius: 0 0 32px 32px;
     flex-shrink: 0;
 }
 
-/* Bagian kiri header (avatar, username, streak, tombol edit) */
 .profile-left {
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-left: 40px;
 }
 
-/* Avatar lingkaran dengan ikon user */
 .profile-avatar {
     width: 120px;
     height: 120px;
     flex-shrink: 0;
-
     border-radius: 50%;
-    background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #b0c4de;
-    font-size: 80px; /* biar ikon user proporsional */
     position: relative;
-
-    /* efek stroke lembut */
     border: 2px solid rgba(106, 106, 106, 0);
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
 
-/* Ikon kamera kecil di sudut bawah kanan avatar */
 .camera-icon {
-position: absolute;
-    bottom: -6px;
-    right: -6px;
-    background-color: #4a90e2;
-    width: 28px;
-    height: 28px;
+    position: absolute;
+    bottom: 2px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff !important;
-    font-size: 14px;
-    border: 3px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-/* Detail teks di samping avatar (username + streak) */
+.camera-icon img {
+    width: 100%;
+    height: 100%;
+}
+
 .profile-details {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     justify-content: flex-start;
 }
 
-/* Nama pengguna */
-.username {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e2a78;
-    margin: 0;
+.user-streak-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: 12px;
 }
 
-/* Baris berisi ikon api dan angka streak */
+.username {
+    font-size: 28px;
+    font-weight: 400;
+    color: #1e2a78;
+    font-family: 'Lexend', sans-serif;
+    font-style: normal;
+    line-height: normal;
+}
+
 .streak {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
     font-weight: 600;
 }
 
-/* Warna ikon api */
 .streak .fa-fire {
     color: #f57c00;
 }
 
-/* Tombol Edit Profile */
 .edit-profile-btn {
- background-color: #ffffff;
+    background-color: #ffffff;
     border: none;
-    border-radius: 20px;
-    padding: 8px 16px;
+    border-radius: 25px;
+    padding: 6px 9px;
     font-family: 'Lexend', sans-serif;
     font-weight: 600;
-    font-size: 13px;
     color: #333;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    align-self: flex-start;
-    margin-top: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-left: 10px;
+    font-size: 14px;
 }
 
-/* Tombol pengaturan (ikon gear di kanan header) */
 .settings-btn {
     background: none;
     border: none;
     font-size: 24px;
     color: #333;
     cursor: pointer;
+    margin-right: 40px;
 }
 
 /* ==================================================== */
@@ -154,9 +147,34 @@ position: absolute;
 /* ==================================================== */
 .main-content {
     flex-grow: 1;
-    overflow-y: auto;
     padding: 24px;
-    background-color: #f0f4f9; /* Warna abu muda sebagai latar konten */
+    padding-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ---------------------------------------------------- */
+/* WRAPPER UTAMA UNTUK SEMUA KONTEN */
+/* ---------------------------------------------------- */
+.content-wrapper {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* ---------------------------------------------------- */
+/* WRAPPER UNTUK TAB DAN STATISTIK */
+/* ---------------------------------------------------- */
+.stats-section {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 950px;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ---------------------------------------------------- */
@@ -166,79 +184,91 @@ position: absolute;
     display: flex;
     justify-content: center;
     margin-bottom: 24px;
-    background-color: #e0e9f3;
-    border-radius: 20px;
-    padding: 5px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: #2c3e7a;
+    border-radius: 16px;
+    padding: 0;
+    width: 100%;
+    gap: 0;
 }
 
-/* Tombol tab */
 .tab-btn {
     background: none;
     border: none;
-    padding: 10px 25px;
-    border-radius: 18px;
+    padding: 12px 40px;
+    border-radius: 0;
     font-weight: 600;
-    color: #556278;
+    color: #ffffff;
     cursor: pointer;
     font-family: 'Lexend', sans-serif;
-    font-size: 14px;
+    font-size: 24px;
     transition: all 0.3s ease;
+    flex: 1;
+    position: relative;
 }
 
-/* Tab yang sedang aktif */
+.tab-btn:first-child {
+    border-radius: 20px 0 0 20px;
+}
+
+.tab-btn:last-child {
+    border-radius: 0 20px 20px 0;
+}
+
 .tab-btn.active {
     background-color: #ffffff;
-    color: #1e2a78;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* ---------------------------------------------------- */
-/* BAGIAN ISI UTAMA: Statistik + Ringkasan */
-/* ---------------------------------------------------- */
-.content-wrapper {
-    display: flex;
-    gap: 24px;
+    color: #2c3e7a;
+    box-shadow: none;
+    border-radius: 16px;
 }
 
 /* ---------------------------------------------------- */
 /* KARTU STATISTIK PRODUKTIVITAS */
 /* ---------------------------------------------------- */
 .stats-card {
-    flex-grow: 1;
-    background-color: #f1f6fc; /* Biru muda sangat lembut */
-    border-radius: 15px;
-    padding: 20px;
+    width: 100%;
+    background: linear-gradient(180deg, #E5EFFB 0%, #9AC1F0 100%);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.25);
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Header dalam kartu (judul + skor produktivitas) */
 .card-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+    flex-direction: column;
+    align-items: flex-start;     /* Rata kiri */
+    gap: 8px;
+    margin-bottom: 40px;
+    width: 100%;
 }
 
 .card-header h3 {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: #1e2a78;
+    margin: 0;
+    text-align: left;            /* Pastikan rata kiri */
 }
 
-/* Skor produktivitas di kanan judul */
 .productivity-score {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 18px;
+    gap: 8px;
+    font-size: 20px;
     font-weight: bold;
+    color: #1e2a78;
 }
 
-/* Warna ikon api di skor produktivitas */
 .productivity-score .fa-fire {
     color: #f57c00;
+    font-size: 32px;
+}
+
+.productivity-score .score-value {
+    font-size: 24px;
+    font-weight: 800;
 }
 
 /* ---------------------------------------------------- */
@@ -248,10 +278,22 @@ position: absolute;
     display: flex;
     justify-content: space-around;
     align-items: flex-end;
-    height: 150px;
+    height: 380px;
+    flex-grow: 1;
 }
 
-/* Setiap batang + label hari */
+/* Gap khusus untuk weekly chart */
+.chart-container.chart-weekly {
+    gap: 30px;
+    justify-content: center;
+}
+
+/* Gap khusus untuk monthly chart */
+.chart-container.chart-monthly {
+    gap: 15px;
+    justify-content: center;
+}
+
 .bar-wrapper {
     display: flex;
     flex-direction: column;
@@ -262,24 +304,21 @@ position: absolute;
     width: 12%;
 }
 
-/* Batang grafik default */
 .bar {
     width: 100%;
-    max-width: 30px;
+    max-width: 80px;
     background-color: #ffffff;
-    border-radius: 5px;
+    border-radius: 16px;
     transition: height 0.3s ease;
 }
 
-/* Batang hari aktif (highlighted) */
 .bar.highlight {
-    background-color: #f5a623; /* Oranye terang */
+    background-color: #f5a623;
 }
 
-/* Label di bawah batang (huruf S, M, T, dst) */
 .label {
     font-size: 12px;
-    color: #888;
+    color: #14142A;
 }
 
 /* ---------------------------------------------------- */
@@ -288,120 +327,143 @@ position: absolute;
 .task-summary {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    width: 200px; /* Lebar tetap untuk sidebar kanan */
-    flex-shrink: 0;
+    gap: 40px;
+    flex: 0 0 auto;
+    width: 200px;
+    margin-left: 40px;
 }
 
-/* Kotak untuk tiap kategori tugas */
 .summary-box {
-    padding: 15px;
-    border-radius: 10px;
+    width: 100%;
+    height: 180px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #9AC1F0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    justify-content: space-between;
     font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0.3s ease;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
 }
 
-/* Teks label dalam summary */
+.summary-box:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
 .summary-box span {
-    font-size: 13px;
+    font-size: 14px;
+    color: #FFF;
 }
 
-/* Posisi ikon (kanan bawah) */
 .icon-wrapper {
     display: flex;
     justify-content: flex-end;
-    font-size: 20px;
+    align-items: flex-end;
+    font-size: 24px;
 }
 
-/* Warna untuk completed task */
-.summary-box.completed {
-    background-color: #d6eaff;
+.summary-box.completed .icon-wrapper {
     color: #4a90e2;
 }
 
-/* Warna untuk missed task */
 .summary-box.missed {
-    background-color: #34495e;
+    background: #283F6D;
+}
+
+.summary-box.missed span {
     color: #ffffff;
 }
 
-/* Warna ikon untuk missed task */
 .summary-box.missed .icon-wrapper {
-    color: #f57c00; /* Oranye */
+    color: #f57c00;
 }
 
-/* Warna untuk deleted task */
-.summary-box.deleted {
-    background-color: #d6eaff;
+.summary-box.deleted .icon-wrapper {
     color: #4a90e2;
-}
-
-/* ==================================================== */
-/* NAVBAR BAWAH */
-/* ==================================================== */
-.navbar {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 60px;
-    background-color: #ffffff;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 1000;
-    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);
-    border-radius: 0;
-    flex-shrink: 0;
-}
-
-/* Ukuran ikon di navbar */
-.navbar i {
-    font-size: 28px;
-}
-
-/* Item di dalam navbar */
-.navbar .nav-item {
-    color: #a8b0c6;
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-}
-
-/* Item navbar yang aktif (halaman sekarang) */
-.navbar .nav-item.active {
-    color: #1e2a78;
 }
 
 /* ==================================================== */
 /* RESPONSIVE UNTUK MOBILE */
 /* ==================================================== */
-@media (max-width: 768px) {
-    /* Susun vertikal saat layar sempit */
+@media (max-width: 1024px) {
     .content-wrapper {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    /* Task summary diubah menjadi horizontal */
+    .stats-section {
+        max-width: 100%;
+    }
+
     .task-summary {
-        width: 100%;
         flex-direction: row;
         justify-content: space-between;
+        width: 95%;
+        margin-left: 0;
+        margin-top: 24px;
     }
 
     .summary-box {
         width: 32%;
     }
+}
 
-    /* Sesuaikan ukuran elemen header */
+@media (max-width: 768px) {
+    .content-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .stats-section {
+        max-width: 100%;
+    }
+
+    .stats-card {
+        min-height: 450px;
+    }
+
+    .chart-container {
+        height: 280px;
+    }
+
+    .task-summary {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .summary-box {
+        width: 32%;
+        height: 140px;
+        padding: 12px;
+    }
+
+    .summary-box span {
+        font-size: 11px;
+    }
+
+    .icon-wrapper {
+        font-size: 18px;
+    }
+
     .profile-header {
         border-radius: 0 0 24px 24px;
+    }
+
+    .profile-left {
+        margin-left: 0;
+    }
+
+    .settings-btn {
+        margin-right: 0;
     }
 
     .edit-profile-btn {
@@ -424,4 +486,44 @@ position: absolute;
     .username {
         font-size: 16px;
     }
+}
+
+/* ==================================================== */
+/* TAMBAHAN UNTUK ANIMASI TAB */
+/* ==================================================== */
+
+/* 1. Definisikan animasi keyframes */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(10px); /* Efek geser ke bawah sedikit */
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px); /* Mulai dari posisi geser */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 2. Buat kelas untuk menerapkan animasi ke .stats-card */
+.stats-card.fade-out {
+    /* Terapkan animasi fadeOut selama 0.2 detik, 
+      dan 'forwards' berarti tetap di state akhir (opacity: 0) 
+    */
+    animation: fadeOut 0.2s ease-out forwards;
+}
+
+.stats-card.fade-in {
+    /* Terapkan animasi fadeIn selama 0.3 detik */
+    animation: fadeIn 0.3s ease-in;
 }

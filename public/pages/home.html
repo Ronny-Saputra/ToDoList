@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timy - Time Assistant</title>
   <link rel="stylesheet" href="../styles/home.css">
+  <!-- CSS navbar terpisah -->
+  <link rel="stylesheet" href="../styles/navbar.css">
   <!-- Font Awesome untuk ikon -->
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -49,19 +51,7 @@
       <div class="message">Well Done, Keep Going!</div>
     </div>
   </div>
-
-  <!-- Bottom Navigation -->
-  <nav class="navbar">
-    <div class="nav-item active">
-      <i class="fas fa-home"></i>
-    </div>
-    <div class="nav-item">
-      <i class="fas fa-list-ul"></i>
-    </div>
-    <div class="nav-item">
-      <i class="fas fa-user"></i>
-    </div>
-  </nav>
+  
     <!-- ✅ Firebase SDKs (must be before your JS files) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -84,5 +74,7 @@
     </script>
 
   <script src="../main.js"></script>
+  <!-- Script navbar (akan insert navbar otomatis) -->
+  <script src="../navbar.js"></script>
 </body>
 </html>

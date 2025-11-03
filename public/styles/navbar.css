@@ -1,0 +1,51 @@
+/* navbar.css - Gaya umum untuk navbar di semua page */
+
+/* Navbar container */
+.navbar {
+    position: fixed;             
+    bottom: 0px;               
+    left: 50%;                  
+    transform: translateX(-50%); 
+    width: 100%;
+    max-width: none;
+    height: 60px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.25);
+    border-radius: 24px 24px 0 0;
+}
+
+/* Ikon di navbar */
+.navbar i {
+    font-size: 28px;
+}
+
+/* Item navigasi */
+.navbar .nav-item {
+    color: #a8b0c6;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+    transition: color 0.2s ease;
+}
+
+/* Item aktif */
+.navbar .nav-item.active {
+    color: #1e2a78;
+}
+
+/* Responsive untuk mobile (dari task.css dan profile.css) */
+@media (max-width: 768px) {
+    .navbar {
+        width: 100%; 
+        border-radius: 0;
+        max-width: 100%;
+    }
+}
