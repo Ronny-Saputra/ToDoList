@@ -11,7 +11,6 @@
 
     <!-- External CSS -->
     <link rel="stylesheet" href="../styles/profile.css">
-    <!-- CSS navbar terpisah -->
     <link rel="stylesheet" href="../styles/navbar.css">
 </head>
 <body>
@@ -22,10 +21,8 @@
         <!-- ================== HEADER PROFIL ================== -->
         <header class="profile-header">
 
-            <!-- ===== KIRI: AVATAR + DETAIL (username, streak, edit) ===== -->
+            <!-- ===== KIRI: AVATAR + DETAIL ===== -->
             <div class="profile-left">
-
-                <!-- Avatar pengguna -->
                 <div class="profile-avatar">
                     <img src="../assets/avatar.png" alt="User Avatar">
                     <span class="camera-icon">
@@ -33,7 +30,6 @@
                     </span>
                 </div>
 
-                <!-- Detail profil: username + streak di samping, lalu tombol edit di bawah -->
                 <div class="profile-details">
                     <div class="user-streak-wrapper">
                         <div class="username">Username</div>
@@ -46,30 +42,24 @@
                 </div>
             </div>
 
-            <!-- ===== KANAN: TOMBOL PENGATURAN (gear) ===== -->
+            <!-- ===== KANAN: SETTINGS ===== -->
             <button class="settings-btn">
                 <i class="fas fa-cog"></i>
             </button>
         </header>
-        <!-- ================== /HEADER PROFIL ================== -->
-
         
         <!-- ================== KONTEN UTAMA ================== -->
         <main class="main-content">
-
-            <!-- ===== WRAPPER UTAMA UNTUK SEMUA KONTEN ===== -->
             <div class="content-wrapper">
 
-                <!-- ===== WRAPPER UNTUK TAB DAN STATISTIK ===== -->
+                <!-- ===== STATISTIK ===== -->
                 <div class="stats-section">
-                    <!-- ===== TAB NAVIGASI (Daily, Weekly, Monthly) ===== -->
                     <div class="tabs">
                         <button class="tab-btn active">Daily</button>
                         <button class="tab-btn">Weekly</button>
                         <button class="tab-btn">Monthly</button>
                     </div>
 
-                    <!-- ===== BAGIAN STATISTIK / PRODUKTIVITAS ===== -->
                     <section class="stats-card">
                         <div class="card-header">
                             <h3>Daily Average Productivity</h3>
@@ -112,34 +102,85 @@
                     </section>
                 </div>
 
-                <!-- ===== BAGIAN RINGKASAN TUGAS ===== -->
+                 <!-- ===== RINGKASAN TUGAS ===== -->
                 <aside class="task-summary">
                     <div class="summary-box completed">
                         <span>Completed Tasks (9)</span>
                         <div class="icon-wrapper">
-                            <i class="fas fa-check"></i>
+                            <i class="far fa-circle-check"></i>   <!-- regular -->
+
                         </div>
                     </div>
                     <div class="summary-box missed">
                         <span>Missed Tasks (10)</span>
                         <div class="icon-wrapper">
-                            <i class="fas fa-exclamation"></i>
+                            <i class="far fa-circle-check"></i>
+
                         </div>
                     </div>
                     <div class="summary-box deleted">
                         <span>Deleted Tasks (2)</span>
                         <div class="icon-wrapper">
-                            <i class="fas fa-times"></i>
+                            <i class="far fa-circle-xmark"></i>
                         </div>
                     </div>
                 </aside>
+
             </div>
         </main>
     </div>
-    
-    <!-- Script navbar -->
+
+    <!-- ================== MODAL PILIHAN KAMERA / UPLOAD ================== -->
+    <div id="cameraChoiceModal" class="camera-modal">
+        <div class="modal-content" style="max-width: 350px; padding: 24px;">
+            <div class="modal-header" style="background: none; padding: 0 0 16px; color: #1e2a78; justify-content: center;">
+                <h3>Ganti Foto Profil</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <button id="openCameraBtn" class="btn-choice">
+                    <i class="fas fa-camera"></i> Ambil Foto
+                </button>
+                <button id="uploadPhotoBtn" class="btn-choice">
+                    <i class="fas fa-image"></i> Upload dari Galeri
+                </button>
+                <button id="closeChoiceModal" class="btn-choice" style="background: #eee; color: #555;">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== MODAL KAMERA ================== -->
+    <div id="cameraModal" class="camera-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ganti Foto Profil</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+            <div id="captureControls" class="controls">
+                <button id="switchCameraBtn" class="btn-secondary"><i class="fas fa-sync-alt"></i> Ganti ke Belakang</button>
+                <button id="captureBtn" class="btn-primary">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+
+            <div id="previewControls" class="controls" style="display:none;">
+                <img id="preview" alt="Preview">
+                <div class="btn-group">
+                    <button id="setPhoto" class="btn-success">Set Foto</button>
+                    <button id="retake" class="btn-secondary">Ambil Ulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
     <script src="../navbar.js"></script>
-    <!-- Script profile -->
     <script src="../profile.js"></script>
 </body>
 </html>
