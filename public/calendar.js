@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevMonthMobile = document.getElementById('prevMonthMobile');
     const nextMonthMobile = document.getElementById('nextMonthMobile');
     
+    // Tombol Add Reminder di Footer
+    const addReminderBtn = document.getElementById('add-reminder-btn'); // <-- Variabel lokal yang benar
+
     const isCalendarPage = mobileCalendarContainer || monthListContainer;
     if (!isCalendarPage) return;
 
@@ -35,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Ambil elemen drawer
     const newReminderDrawer = document.getElementById('newReminderDrawer');
-    const addReminderBtn = document.getElementById('add-reminder-btn');
     const reminderForm = newReminderDrawer ? newReminderDrawer.querySelector('#reminder-form') : null;
     
     // Buat container task list untuk drawer
@@ -569,8 +571,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const flowTimerSaveBtn = window.TaskApp.flowTimerSaveBtn;
 
 
-    if (window.TaskApp.addReminderBtn) {
-        window.TaskApp.addReminderBtn.addEventListener('click', () => {
+    // ✅ PERBAIKAN: Tombol Add Reminder di Footer Calendar
+    // Menggunakan variabel lokal `addReminderBtn` yang sudah diambil.
+    if (addReminderBtn) {
+        addReminderBtn.addEventListener('click', () => {
             if (!selectedDate) {
                 selectedDate = { year: todayYear, month: todayMonth, day: todayDate };
                 document.querySelector(`.date-box[data-year="${todayYear}"][data-month="${todayMonth}"][data-day="${todayDate}"]`)?.classList.add('selected');

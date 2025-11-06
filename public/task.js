@@ -1,4 +1,4 @@
-// File: public/task.js
+// File: public/task.js (Kode Final)
 
 document.addEventListener('DOMContentLoaded', function() {
     // === EXPOSE GLOBAL STATE & FUNCTIONS ===
@@ -326,6 +326,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- FUNGSI BANTUAN HALAMAN TASK ---
     function findAndActivateDateCard(dateString) {
+        // Hapus hash dari URL setelah digunakan
+        if (window.location.hash.startsWith('#date=')) {
+            history.replaceState(null, null, ' ');
+        }
+        
         const card = calendarContainer.querySelector(`[data-date-string="${dateString}"]`);
         
         if (card) {
@@ -333,12 +338,14 @@ document.addEventListener('DOMContentLoaded', function() {
             card.classList.add('active');
             
             const dateParts = dateString.split('-');
+            // Perhatikan: Bulan di Date() dimulai dari 0 (Januari = 0)
             const newActiveDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
             newActiveDate.setHours(0, 0, 0, 0);
             activeDate = newActiveDate;
 
             updateMonthYearDisplay(monthYearDisplay, activeDate);
             
+            // Gulir ke kartu yang ditemukan
             const scrollPos = card.offsetLeft - (calendarContainer.offsetWidth / 2) + (card.offsetWidth / 2);
             calendarContainer.scrollTo({
                 left: scrollPos,
@@ -797,7 +804,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+        // Panggil loadTasksAndRenderCalendar dan tunggu hingga selesai
+        loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365)
+            .then(() => {
+                // Logic baru: Periksa jika ada hash URL untuk pindah tanggal
+                const hash = window.location.hash;
+                if (hash.startsWith('#date=')) {
+                    const dateString = hash.substring(6); // Ambil nilai YYYY-MM-DD
+                    if (dateString) {
+                         // Panggil fungsi yang diekspos untuk mengaktifkan kartu tanggal
+                         window.findAndActivateDateCard(dateString);
+                    }
+                }
+            });
 
         if (window.TaskApp.reminderForm && taskListContainer) {
             window.TaskApp.reminderForm.onsubmit = null; 
