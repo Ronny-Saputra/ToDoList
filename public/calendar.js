@@ -1,3 +1,5 @@
+// File: public/calendar.js
+
 document.addEventListener('DOMContentLoaded', function() {
     // Desktop elements
     const monthListContainer = document.getElementById('monthListContainer');
@@ -548,6 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- DRAWER & DIALOG LOGIC LANJUTAN (Menggunakan Fungsi Global) ---
     
+    // Ambil elemen yang telah diexpose di task.js
     const timeInput = window.TaskApp.timeInput;
     const timePickerOverlay = window.TaskApp.timePickerOverlay;
     const startTimeInput = window.TaskApp.startTimeInput;
@@ -556,8 +559,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const timePickerSaveBtn = window.TaskApp.timePickerSaveBtn;
     const dateInputEdit = window.TaskApp.dateInputEdit;
 
-    if (addReminderBtn) {
-        addReminderBtn.addEventListener('click', () => {
+    // NEW: FLOW TIMER PICKER ELEMENTS (Diambil dari window.TaskApp)
+    const flowTimerLink = window.TaskApp.flowTimerLink;
+    const flowTimerPickerOverlay = window.TaskApp.flowTimerPickerOverlay;
+    const flowTimerHoursInput = window.TaskApp.flowTimerHoursInput;
+    const flowTimerMinutesInput = window.TaskApp.flowTimerMinutesInput;
+    const flowTimerSecondsInput = window.TaskApp.flowTimerSecondsInput;
+    const flowTimerCancelBtn = window.TaskApp.flowTimerCancelBtn;
+    const flowTimerSaveBtn = window.TaskApp.flowTimerSaveBtn;
+
+
+    if (window.TaskApp.addReminderBtn) {
+        window.TaskApp.addReminderBtn.addEventListener('click', () => {
             if (!selectedDate) {
                 selectedDate = { year: todayYear, month: todayMonth, day: todayDate };
                 document.querySelector(`.date-box[data-year="${todayYear}"][data-month="${todayMonth}"][data-day="${todayDate}"]`)?.classList.add('selected');
@@ -568,6 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
             
             // PASTIKAN INI MENAMPILKAN FORM DAN MENYEMBUNYIKAN TASK LIST
+            const taskListForDrawer = document.getElementById('taskListForDrawer');
             if (taskListForDrawer) taskListForDrawer.style.display = 'none';
             if (reminderForm) reminderForm.style.display = 'flex';
             
@@ -633,6 +647,72 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // ====================================================
+    // NEW: FLOW TIMER DURATION LOGIC
+    // ====================================================
+
+    if (flowTimerLink) {
+        flowTimerLink.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            if (flowTimerPickerOverlay) {
+                // Tampilkan overlay flow timer
+                flowTimerPickerOverlay.classList.add('open');
+            }
+            // Reset input time range
+            if (timeInput) timeInput.value = '';
+        });
+    }
+
+    if (flowTimerPickerOverlay) {
+        // Logika penutupan
+        flowTimerCancelBtn?.addEventListener('click', () => {
+            flowTimerPickerOverlay.classList.remove('open');
+        });
+
+        flowTimerPickerOverlay.addEventListener('click', (event) => {
+            if (event.target === flowTimerPickerOverlay) {
+                flowTimerPickerOverlay.classList.remove('open');
+            }
+        });
+
+        // Logika simpan durasi
+        flowTimerSaveBtn?.addEventListener('click', () => {
+            const hours = parseInt(flowTimerHoursInput.value) || 0;
+            const minutes = parseInt(flowTimerMinutesInput.value) || 0;
+            const seconds = parseInt(flowTimerSecondsInput.value) || 0;
+
+            if (hours === 0 && minutes === 0 && seconds === 0) {
+                 window.showCustomDialog(
+                    "Duration cannot be zero.",
+                    [{ text: 'OK', action: () => {}, isPrimary: true }]
+                );
+                return;
+            }
+
+            // Hitung waktu selesai berdasarkan durasi dari waktu saat ini
+            const now = new Date();
+            const startHours = String(now.getHours()).padStart(2, '0');
+            const startMinutes = String(now.getMinutes()).padStart(2, '0');
+            
+            // Hitung waktu akhir
+            now.setHours(now.getHours() + hours);
+            now.setMinutes(now.getMinutes() + minutes);
+            now.setSeconds(now.getSeconds() + seconds);
+
+            const endHours = String(now.getHours()).padStart(2, '0');
+            const endMinutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const timeRange = `${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+
+            // Update time input field
+            timeInput.value = timeRange;
+            
+            // Tutup overlay
+            flowTimerPickerOverlay.classList.remove('open');
+        });
+    }
+
     
     // --- FORM SUBMIT HANDLER (MENGGUNAKAN LOGIC task.js) ---
     firebase.auth().onAuthStateChanged(user => {

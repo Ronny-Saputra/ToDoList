@@ -17,7 +17,7 @@
     <!-- Header -->
     <div class="header">
       <div class="character">
-        <img src="../assets/timy2.png" alt="Timy">
+        <img src="../assets/timy2.png" alt="Timy" onerror="this.style.display='none'">
         <div class="speech-bubble">
           Hi! I'm Timy,<br>
           Your Personal Time Assistant
@@ -28,8 +28,8 @@
     <!-- Streak Section -->
     <div class="streak">
       <div class="flame"><i class="fa-solid fa-fire"></i></div>
-      <div class="streak-number"></div>
-      <div>Productive Streak</div>
+      <div class="streak-number">130</div>
+      <div class="streak-title">Productive Streak</div>
 
       <div class="progress-box">
         <div class="days">
@@ -43,8 +43,16 @@
         </div>
         <div class="progress-line">
           <div class="progress-fill" id="progress-fill"></div>
-          <div class="dot-track" id="dot-track"></div>
           <i class="fa-solid fa-person-running runner-icon" id="runner-icon"></i>
+          <div class="dot-track" id="dot-track">
+            <div class="dot completed"></div>
+            <div class="dot completed"></div>
+            <div class="dot completed"></div>
+            <div class="dot completed"></div>
+            <div class="dot completed"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
         </div>
       </div>
 
@@ -52,29 +60,29 @@
     </div>
   </div>
   
-    <!-- ✅ Firebase SDKs (must be before your JS files) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- Firebase SDKs (must be before your JS files) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <script>
-        // ✅ Initialize Firebase (use *your* project’s config)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
-            authDomain: "todolist-43.firebaseapp.com",
-            projectId: "todolist-43",
-            storageBucket: "todolist-43.appspot.com",
-            messagingSenderId: "795548747542",
-            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
-            measurementId: "G-67K7H7XXWW"
-        };
+  <script>
+    // Initialize Firebase (use *your* project's config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+      authDomain: "todolist-43.firebaseapp.com",
+      projectId: "todolist-43",
+      storageBucket: "todolist-43.appspot.com",
+      messagingSenderId: "795548747542",
+      appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+      measurementId: "G-67K7H7XXWW"
+    };
 
     // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-    </script>
+    firebase.initializeApp(firebaseConfig);
+  </script>
 
   <script src="../main.js"></script>
   <!-- Script navbar (akan insert navbar otomatis) -->
   <script src="../navbar.js"></script>
 </body>
-</html>
+</htm

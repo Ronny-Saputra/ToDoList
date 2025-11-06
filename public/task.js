@@ -1,3 +1,5 @@
+// File: public/task.js
+
 document.addEventListener('DOMContentLoaded', function() {
     // === EXPOSE GLOBAL STATE & FUNCTIONS ===
     window.TaskApp = window.TaskApp || {};
@@ -26,6 +28,15 @@ document.addEventListener('DOMContentLoaded', function() {
     window.TaskApp.dialogMessage = document.getElementById('custom-dialog-message');
     window.TaskApp.dialogActions = document.getElementById('custom-dialog-actions');
     window.TaskApp.saveBtn = document.querySelector('.save-btn');
+    
+    // NEW: FLOW TIMER PICKER ELEMENTS
+    window.TaskApp.flowTimerLink = document.querySelector('.flow-timer-link');
+    window.TaskApp.flowTimerPickerOverlay = document.getElementById('flow-timer-picker-overlay');
+    window.TaskApp.flowTimerHoursInput = document.getElementById('flow-timer-hours-input');
+    window.TaskApp.flowTimerMinutesInput = document.getElementById('flow-timer-minutes-input');
+    window.TaskApp.flowTimerSecondsInput = document.getElementById('flow-timer-seconds-input');
+    window.TaskApp.flowTimerCancelBtn = document.getElementById('flow-timer-cancel');
+    window.TaskApp.flowTimerSaveBtn = document.getElementById('flow-timer-save');
     
     let activeDate = new Date();
     activeDate.setHours(0, 0, 0, 0); 
@@ -189,6 +200,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             </div>
             `;
+            
+        // Handle Tombol Flow Timer (NEW)
+        const flowTimerBtn = card.querySelector('.flow-timer-btn');
+        flowTimerBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            
+            // Dapatkan durasi dari task.time (Start - End Time, e.g., "10:00 - 11:30")
+            const timeRange = taskObject.time; 
+            let durationInSeconds = 1800; // Default 30 menit (30 * 60)
+            
+            if (timeRange && timeRange.includes(' - ')) {
+                try {
+                    const [startTimeStr, endTimeStr] = timeRange.split(' - ');
+                    
+                    // Gunakan tanggal dummy yang sama untuk menghitung selisih waktu
+                    const dummyDate = '2000/01/01 '; 
+                    const startTime = new Date(dummyDate + startTimeStr);
+                    let endTime = new Date(dummyDate + endTimeStr);
+                    
+                    // Jika waktu berakhir lebih kecil, asumsikan itu hari berikutnya (untuk kasus lewat tengah malam)
+                    if (endTime.getTime() < startTime.getTime()) {
+                         endTime = new Date(endTime.getTime() + 24 * 60 * 60 * 1000); // Tambah 24 jam
+                    }
+                    
+                    const diffMs = endTime.getTime() - startTime.getTime();
+                    durationInSeconds = Math.floor(diffMs / 1000); 
+                    
+                } catch (error) {
+                    console.error("Error calculating duration from time range:", error);
+                    // Tetap gunakan default jika perhitungan gagal
+                }
+            }
+            
+            // Arahkan ke halaman flowtimer dengan parameter
+            const encodedActivity = encodeURIComponent(taskObject.title);
+            window.location.href = `flowtimer.html?activity=${encodedActivity}&duration=${durationInSeconds}`;
+        });
         
         // Handle Tombol Edit
         const editBtn = card.querySelector('.edit-btn');
@@ -558,6 +606,78 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ====================================================
+    // NEW: FLOW TIMER DURATION LOGIC
+    // ====================================================
+    const flowTimerLink = window.TaskApp.flowTimerLink;
+    const flowTimerPickerOverlay = window.TaskApp.flowTimerPickerOverlay;
+    const flowTimerHoursInput = window.TaskApp.flowTimerHoursInput;
+    const flowTimerMinutesInput = window.TaskApp.flowTimerMinutesInput;
+    const flowTimerSecondsInput = window.TaskApp.flowTimerSecondsInput;
+    const flowTimerCancelBtn = window.TaskApp.flowTimerCancelBtn;
+    const flowTimerSaveBtn = window.TaskApp.flowTimerSaveBtn;
+
+    if (flowTimerLink) {
+        flowTimerLink.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            if (flowTimerPickerOverlay) {
+                // Tampilkan overlay flow timer
+                flowTimerPickerOverlay.classList.add('open');
+            }
+            // Reset input time range
+            if (timeInput) timeInput.value = '';
+        });
+    }
+
+    if (flowTimerPickerOverlay) {
+        // Logika penutupan
+        flowTimerCancelBtn?.addEventListener('click', () => {
+            flowTimerPickerOverlay.classList.remove('open');
+        });
+
+        flowTimerPickerOverlay.addEventListener('click', (event) => {
+            if (event.target === flowTimerPickerOverlay) {
+                flowTimerPickerOverlay.classList.remove('open');
+            }
+        });
+
+        // Logika simpan durasi
+        flowTimerSaveBtn?.addEventListener('click', () => {
+            const hours = parseInt(flowTimerHoursInput.value) || 0;
+            const minutes = parseInt(flowTimerMinutesInput.value) || 0;
+            const seconds = parseInt(flowTimerSecondsInput.value) || 0;
+
+            if (hours === 0 && minutes === 0 && seconds === 0) {
+                 window.showCustomDialog(
+                    "Duration cannot be zero.",
+                    [{ text: 'OK', action: () => {}, isPrimary: true }]
+                );
+                return;
+            }
+
+            // Hitung waktu selesai berdasarkan durasi dari waktu saat ini
+            const now = new Date();
+            const startHours = String(now.getHours()).padStart(2, '0');
+            const startMinutes = String(now.getMinutes()).padStart(2, '0');
+            
+            // Hitung waktu akhir
+            now.setHours(now.getHours() + hours);
+            now.setMinutes(now.getMinutes() + minutes);
+            now.setSeconds(now.getSeconds() + seconds);
+
+            const endHours = String(now.getHours()).padStart(2, '0');
+            const endMinutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const timeRange = `${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+
+            // Update time input field
+            window.TaskApp.timeInput.value = timeRange;
+            
+            // Tutup overlay
+            flowTimerPickerOverlay.classList.remove('open');
+        });
+    }
+    
     // --- MODIFIKASI: Form Submit Handler (Handle Edit/Update) ---
     const taskPageFormSubmitHandler = async function(event, user) {
         event.preventDefault(); 

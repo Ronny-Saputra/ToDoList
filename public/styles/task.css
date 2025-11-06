@@ -932,3 +932,42 @@ body {
     color: #fff;
     border: none;
 }
+
+/* NEW: Style for the flow timer duration inputs */
+.time-inputs.flow-duration-inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; 
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.time-inputs.flow-duration-inputs input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    width: 25%; /* Untuk 3 kolom (Hours, Minutes, Seconds) */
+    -moz-appearance: textfield; 
+}
+
+.time-inputs.flow-duration-inputs input[type="number"]::-webkit-outer-spin-button,
+.time-inputs.flow-duration-inputs input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.time-inputs.flow-duration-inputs span {
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Penyesuaian pada mobile untuk layout 3 kolom */
+@media (max-width: 400px) {
+    .time-inputs.flow-duration-inputs input[type="number"] {
+        width: 30%; /* Sedikit lebih lebar */
+    }
+}
