@@ -12,7 +12,19 @@ body {
     background-color: #ffffff; 
     margin: 0;
     padding: 0;
-    overflow: auto;
+    overflow: hidden;
+}
+
+/* Sembunyikan scrollbar tapi tetap bisa scroll */
+body::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
+    display: none;
+}
+
+body,
+.main-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .container {
@@ -39,6 +51,9 @@ body {
     width: 100%;
     border-radius: 0 0 32px 32px;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .profile-left {
@@ -170,6 +185,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: auto;
+    height: calc(100vh - 220px);
 }
 
 /* ---------------------------------------------------- */
@@ -363,6 +380,10 @@ body {
     margin-left: 40px;
 }
 
+.task-summary .icon-wrapper i {
+  color: #ffffff; /* putih */
+}
+
 .summary-box {
     width: 100%;
     height: 104px;
@@ -417,10 +438,6 @@ body {
 
 .summary-box.deleted .icon-wrapper {
     color: #4a90e2;
-}
-
-.task-summary .icon-wrapper i {
-  color: #ffffff; /* putih */
 }
 
 /* ==================================================== */
@@ -547,6 +564,7 @@ body {
     .main-content {
         padding: 15px 10px;
         padding-bottom: 80px;
+        height: calc(100vh - 140px);
     }
 
     .content-wrapper {
@@ -656,6 +674,10 @@ body {
     .edit-profile-btn {
         font-size: 10px;
         padding: 3px 6px;
+    }
+
+    .main-content {
+        height: calc(100vh - 120px);
     }
 
     .stats-card {
@@ -859,7 +881,7 @@ body {
 }
 
 .btn-secondary { 
-    background: rgba(44, 62, 122, 0.8); 
+    background: #2c3e7a; 
     color: white;
     display: flex;
     align-items: center;
@@ -867,7 +889,7 @@ body {
 }
 
 .btn-secondary:hover {
-    background: rgba(44, 62, 122, 1);
+    background: #1e2a78;
 }
 
 .btn-group {
