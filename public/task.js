@@ -1,4 +1,4 @@
-// File: public/task.js (Kode Final)
+// File: public/task.js (Kode Final - Fixed Edit in Search)
 
 document.addEventListener('DOMContentLoaded', function() {
     // === EXPOSE GLOBAL STATE & FUNCTIONS ===
@@ -11,14 +11,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskListContainer = document.getElementById('task-list-container');
     const ENGLISH_LOCALE = 'en-US';
     
-    // EXPOSE DRAWER ELEMENTS GLOBALLY (dapat digunakan oleh calendar.js)
+    // EXPOSE DRAWER ELEMENTS GLOBALLY (dapat digunakan oleh calendar.js dan search.js)
     window.TaskApp.newReminderDrawer = document.getElementById('newReminderDrawer');
     window.TaskApp.closeDrawerBtn = document.querySelector('.close-drawer-btn');
     window.TaskApp.newReminderBtn = document.querySelector('.new-reminder-btn');
     window.TaskApp.drawerHeaderTitle = document.querySelector('.drawer-header h2');
     window.TaskApp.reminderForm = document.getElementById('reminder-form');
+    
+    // INISIALISASI SEMUA INPUT DRAWER KE GLOBAL
+    // ✅ Memastikan semua input diakses dengan aman
+    window.TaskApp.activityInput = document.getElementById('activity-input'); 
     window.TaskApp.dateInputEdit = document.getElementById('date-input-edit');
     window.TaskApp.timeInput = document.getElementById('time-input');
+    window.TaskApp.locationInput = document.getElementById('location-input');
+    
     window.TaskApp.timePickerOverlay = document.getElementById('time-picker-overlay');
     window.TaskApp.startTimeInput = document.getElementById('start-time-input');
     window.TaskApp.endTimeInput = document.getElementById('end-time-input');
@@ -83,25 +89,24 @@ document.addEventListener('DOMContentLoaded', function() {
     window.TaskApp.openDrawerForEdit = function(task) {
         window.TaskApp.editingTaskId = task.id;
         
-        // Isi form dengan data tugas
-        document.getElementById('activity-input').value = task.title || '';
-        document.getElementById('time-input').value = task.time || ''; 
-        document.getElementById('location-input').value = task.location || '';
-        window.TaskApp.dateInputEdit.value = task.date; 
+        // Gunakan referensi global yang aman
+        if (window.TaskApp.activityInput) window.TaskApp.activityInput.value = task.title || '';
+        if (window.TaskApp.timeInput) window.TaskApp.timeInput.value = task.time || ''; 
+        if (window.TaskApp.locationInput) window.TaskApp.locationInput.value = task.location || '';
+        if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = task.date; 
         
         // Perbarui judul drawer dan teks tombol
         if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'Edit Reminder';
-        window.TaskApp.saveBtn.textContent = 'Update';
+        if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Update';
         
-        // ====== PERBAIKAN INTI: Pastikan list disembunyikan dan form ditampilkan ======
+        // Pastikan list disembunyikan dan form ditampilkan
         const taskListForDrawer = document.getElementById('taskListForDrawer');
         if (taskListForDrawer) taskListForDrawer.style.display = 'none';
         
         if (window.TaskApp.reminderForm) {
-            window.TaskApp.reminderForm.style.display = 'flex'; // Form harus terlihat untuk diedit
+            window.TaskApp.reminderForm.style.display = 'flex';
         }
-        // =============================================================================
-
+        
         // Buka drawer
         window.TaskApp.openDrawer();
     }
@@ -466,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
             todayCard.classList.add('active');
 
             // 3. Gulir ke kartu hari ini (berpusat)
-            const scrollPos = todayCard.offsetLeft - (container.offsetWidth / 2) + (todayCard.offsetWidth / 2);
+            const scrollPos = todayCard.offsetLeft - (container.offsetWidth / 2) + (container.offsetWidth / 2);
             container.scrollTo({
                 left: scrollPos,
                 behavior: 'smooth'
@@ -573,6 +578,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (timeInput) {
         timeInput.addEventListener('click', () => {
+            if (!timePickerOverlay || !startTimeInput || !endTimeInput) return;
+
             timePickerOverlay.classList.add('open');
             const currentValue = timeInput.value.split(' - ');
             if (currentValue.length === 2) {
@@ -581,11 +588,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        timePickerCancelBtn.addEventListener('click', () => {
-            timePickerOverlay.classList.remove('open');
+        if (timePickerCancelBtn) timePickerCancelBtn.addEventListener('click', () => {
+            if (timePickerOverlay) timePickerOverlay.classList.remove('open');
         });
 
-        timePickerSaveBtn.addEventListener('click', () => {
+        if (timePickerSaveBtn) timePickerSaveBtn.addEventListener('click', () => {
+            if (!startTimeInput || !endTimeInput || !timeInput || !timePickerOverlay) return;
+
             const start = startTimeInput.value;
             const end = endTimeInput.value;
 
@@ -606,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        timePickerOverlay.addEventListener('click', (event) => {
+        if (timePickerOverlay) timePickerOverlay.addEventListener('click', (event) => {
             if (event.target === timePickerOverlay) {
                 timePickerOverlay.classList.remove('open');
             }
@@ -638,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (flowTimerPickerOverlay) {
         // Logika penutupan
-        flowTimerCancelBtn?.addEventListener('click', () => {
+        if (flowTimerCancelBtn) flowTimerCancelBtn.addEventListener('click', () => {
             flowTimerPickerOverlay.classList.remove('open');
         });
 
@@ -649,7 +658,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Logika simpan durasi
-        flowTimerSaveBtn?.addEventListener('click', () => {
+        if (flowTimerSaveBtn) flowTimerSaveBtn.addEventListener('click', () => {
+            if (!flowTimerHoursInput || !flowTimerMinutesInput || !flowTimerSecondsInput) return;
+
             const hours = parseInt(flowTimerHoursInput.value) || 0;
             const minutes = parseInt(flowTimerMinutesInput.value) || 0;
             const seconds = parseInt(flowTimerSecondsInput.value) || 0;
@@ -678,7 +689,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const timeRange = `${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
 
             // Update time input field
-            window.TaskApp.timeInput.value = timeRange;
+            if (window.TaskApp.timeInput) window.TaskApp.timeInput.value = timeRange;
             
             // Tutup overlay
             flowTimerPickerOverlay.classList.remove('open');
@@ -691,10 +702,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const db = firebase.firestore();
         const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
         
-        const activity = document.getElementById('activity-input').value.trim();
-        const time = document.getElementById('time-input').value.trim(); 
-        const location = document.getElementById('location-input').value.trim() || 'No Location'; 
-        const dateToUse = window.TaskApp.dateInputEdit.value;
+        // Mengambil nilai input dengan aman
+        const activity = window.TaskApp.activityInput ? window.TaskApp.activityInput.value.trim() : '';
+        const time = window.TaskApp.timeInput ? window.TaskApp.timeInput.value.trim() : ''; 
+        const location = window.TaskApp.locationInput ? window.TaskApp.locationInput.value.trim() || 'No Location' : 'No Location'; 
+        const dateToUse = window.TaskApp.dateInputEdit ? window.TaskApp.dateInputEdit.value : '';
 
         if (activity && time && dateToUse) {
             try {
@@ -708,27 +720,95 @@ document.addEventListener('DOMContentLoaded', function() {
                 const isEditing = window.TaskApp.editingTaskId;
 
                 if (isEditing) {
+                    // ✅ PASTIKAN UPDATE BERJALAN DENGAN ID YANG BENAR
+                    console.log('=== EDIT MODE ===');
+                    console.log('Editing Task ID:', isEditing);
+                    console.log('Task data to update:', taskData);
+                    console.log('User UID:', user.uid);
+                    console.log('Firebase path:', `users/${user.uid}/tasks/${isEditing}`);
+                    
+                    // Cek apakah task ada sebelum update
+                    const taskDoc = await tasksRef.doc(isEditing).get();
+                    console.log('Task exists before update:', taskDoc.exists);
+                    if (taskDoc.exists) {
+                        console.log('Current task data:', taskDoc.data());
+                    }
+                    
                     await tasksRef.doc(isEditing).update(taskData);
+                    console.log('✅ Task updated successfully in Firebase');
+                    
+                    // Verifikasi update
+                    const updatedDoc = await tasksRef.doc(isEditing).get();
+                    console.log('Updated task data:', updatedDoc.data());
                 } else {
+                    console.log('=== ADD MODE ===');
                     taskData.done = false;
-                    await tasksRef.add(taskData);
+                    const docRef = await tasksRef.add(taskData);
+                    console.log('✅ Task added with ID:', docRef.id);
                 }
 
-                window.TaskApp.reminderForm.reset(); 
-                window.TaskApp.closeDrawer();
+                if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset(); 
                 
-                await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+                // ✅ PERBAIKAN: Deteksi halaman dengan lebih akurat
+                const currentPath = window.location.pathname;
+                const isTaskOrCalendar = currentPath.includes("task.html") || currentPath.includes("calendar.html");
+                const isSearchPage = currentPath.includes("search.html");
 
-                window.showCustomDialog(
-                    isEditing ? "Success Update Reminder" : "Success Add New Reminder",
-                    [
+                console.log('=== RELOAD PAGE DATA ===');
+                console.log('Current path:', currentPath);
+                console.log('Is task/calendar page:', isTaskOrCalendar);
+                console.log('Is search page:', isSearchPage);
+
+                // ✅ RELOAD DATA TUGAS SETELAH EDIT/TAMBAH (MEKANISME YANG SAMA)
+                if (isTaskOrCalendar) {
+                    console.log('Reloading task/calendar page...');
+                    await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+                    displayTasksForActiveDate(activeDate);
+                    console.log('✅ Task/calendar page reloaded');
+                } else if (isSearchPage) {
+                    console.log('Checking SearchApp availability...');
+                    console.log('window.SearchApp:', window.SearchApp);
+                    
+                    if (window.SearchApp?.reloadTasks) {
+                        // ✅ Panggil fungsi reload yang sama seperti loadTasksAndRenderCalendar
+                        console.log('🔄 Calling SearchApp.reloadTasks...');
+                        await window.SearchApp.reloadTasks(user);
+                        console.log('✅ Search page reloaded successfully');
+                    } else {
+                        console.error('❌ SearchApp.reloadTasks not found!');
+                        console.log('Available on window:', Object.keys(window).filter(k => k.includes('Search') || k.includes('Task')));
+                    }
+                } else {
+                    console.warn('⚠️ Unknown page, no reload performed');
+                }
+                
+                // Tentukan opsi dialog
+                let dialogButtons;
+
+                if (isEditing) {
+                    // ✅ Jika editing, hanya OK untuk menutup dialog dan drawer.
+                    dialogButtons = [
+                        { 
+                            text: 'OK', 
+                            action: () => {
+                                window.TaskApp.closeDrawer();
+                            }, 
+                            isPrimary: true 
+                        }
+                    ];
+                } else {
+                    // Jika menambahkan: opsi "Add More" dan "View"
+                    dialogButtons = [
                         { 
                             text: 'Add more', 
                             action: () => {
                                 window.TaskApp.editingTaskId = null;
                                 if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
-                                window.TaskApp.saveBtn.textContent = 'Save';
-                                window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+                                if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
+                                
+                                // Reset tanggal default di form edit
+                                if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+
                                 window.TaskApp.openDrawer();
                             }, 
                             isPrimary: false 
@@ -736,15 +816,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         { 
                             text: 'View', 
                             action: () => {
-                                if (window.location.pathname.includes("task.html")) {
-                                    window.findAndActivateDateCard(dateToUse); 
-                                } else {
-                                    window.location.reload(); 
-                                }
+                                // Tutup drawer, list sudah ter-update
+                                window.TaskApp.closeDrawer();
                             }, 
                             isPrimary: true 
                         }
-                    ]
+                    ];
+                }
+                
+                window.showCustomDialog(
+                    isEditing ? "Success Update Reminder" : "Success Add New Reminder",
+                    dialogButtons
                 );
             } catch (err) {
                 console.error(`Error ${isEditing ? 'updating' : 'adding'} task:`, err);
@@ -804,21 +886,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Panggil loadTasksAndRenderCalendar dan tunggu hingga selesai
-        loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365)
-            .then(() => {
-                // Logic baru: Periksa jika ada hash URL untuk pindah tanggal
-                const hash = window.location.hash;
-                if (hash.startsWith('#date=')) {
-                    const dateString = hash.substring(6); // Ambil nilai YYYY-MM-DD
-                    if (dateString) {
-                         // Panggil fungsi yang diekspos untuk mengaktifkan kartu tanggal
-                         window.findAndActivateDateCard(dateString);
+        // Hanya panggil loadTasksAndRenderCalendar jika di halaman task.html/calendar.html
+        if (window.location.pathname.includes("task.html") || window.location.pathname.includes("calendar.html")) {
+            loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365)
+                .then(() => {
+                    const hash = window.location.hash;
+                    if (hash.startsWith('#date=')) {
+                        const dateString = hash.substring(6); 
+                        if (dateString) {
+                            window.findAndActivateDateCard(dateString);
+                        }
                     }
-                }
-            });
-
-        if (window.TaskApp.reminderForm && taskListContainer) {
+                });
+        }
+        
+        // PENTING: Lampirkan submit handler hanya jika form ada (di task.html, calendar.html, search.html)
+        if (window.TaskApp.reminderForm) {
             window.TaskApp.reminderForm.onsubmit = null; 
             window.TaskApp.reminderForm.addEventListener('submit', (event) => taskPageFormSubmitHandler(event, user));
         }

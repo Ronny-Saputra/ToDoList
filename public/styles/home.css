@@ -7,7 +7,7 @@
 html, body {
   height: 100%;
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden; /* Mencegah scrolling pada body */
 }
 
 body {
@@ -19,150 +19,153 @@ body {
 }
 
 .container {
+  /* Container utama mengambil seluruh viewport */
   height: 100vh;
   width: 100%;
-  max-width: 100%;
+
   background-color: #fff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-y: auto;
+  overflow-y: auto; /* Memungkinkan konten di dalamnya (header + streak) untuk di-scroll */
 }
 
+/* === HEADER: Menggunakan height: 100vh sesuai permintaan === */
 .header {
   width: 100%;
-  background: linear-gradient(to bottom, #a8d0f5 0%, #d9ebff 50%, #ffffff 100%);
-  padding: 5vh 20px 8vh;
+  height: 100vh; /* <-- PERUBAHAN EKSPLISIT SESUAI PERMINTAAN USER */
+  background-image: url('../assets/bghome.png');
+  background-size: 100% 100%; 
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  padding: 1vh 20px 2vh; 
   position: relative;
   flex-shrink: 0;
+  border-radius: 0 0 32px 32px;
+  margin-top: 0;
 }
 
 .character {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: flex;
   position: relative;
-  max-width: 600px;
   margin: 0 auto;
 }
 
 .character img {
-  width: clamp(200px, 40vw, 280px);
+  width: clamp(380px, 30vw, 380px); 
   height: auto;
   display: block;
-  margin-top: 2vh;
+  /* Kunci: Menaikkan posisi karakter agar berada di tengah area biru */
+  margin-top: -18vh;
+  position: relative;
 }
 
 .speech-bubble {
   position: absolute;
-  top: 3vh;
-  left: calc(50% + clamp(100px, 20vw, 140px));
+  top: 5vh;
+  left: calc(53% + clamp(60px, 12vw, 100px));
   background: white;
   border: 2px solid #e0e0e0;
-  border-radius: 16px;
-  padding: clamp(12px, 2vw, 16px) clamp(16px, 3vw, 20px);
-  font-size: clamp(13px, 2.5vw, 16px);
+  border-radius: 12px;
+  padding: clamp(6px, 1.2vw, 10px) clamp(8px, 1.5vw, 12px);
+  font-size: clamp(10px, 1.8vw, 14px);
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.2;
   text-align: left;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
   z-index: 10;
 }
 
-.speech-bubble::before {
-  content: '';
-  position: absolute;
-  left: -18px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 10px 18px 10px 0;
-  border-color: transparent white transparent transparent;
+/* --- NEW STYLES: Sembunyikan Judul Mobile secara default --- */
+.header-title-mobile {
+  display: none; 
 }
+/* -------------------------------------------------------- */
 
-.speech-bubble::after {
-  content: '';
-  position: absolute;
-  left: -22px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 12px 20px 12px 0;
-  border-color: transparent #e0e0e0 transparent transparent;
-}
 
 .streak {
   text-align: center;
-  padding: 20px;
-  flex: 1;
+  padding: 5px 20px;
+  
+  /* PERUBAHAN UTAMA: Posisi Absolut agar tumpang tindih dengan header 100vh */
+  position: absolute;
+  top: 52vh; /* Sesuaikan posisi agar muncul di tengah area biru header */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  
+  z-index: 1100; /* Pastikan di depan semua elemen */
+  
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-bottom: 100px;
 }
 
 .flame {
-  font-size: clamp(48px, 10vw, 64px);
-  margin-bottom: 1vh;
+  font-size: clamp(28px, 5vw, 36px);
+  margin-bottom: 0.2vh;
   color: #ff8c00;
-  filter: drop-shadow(0 4px 8px rgba(255, 140, 0, 0.3));
+  text-shadow: 
+    -1px -1px 0 #FFFFFF,  
+     1px -1px 0 #FFFFFF,
+    -1px  1px 0 #FFFFFF,
+     1px  1px 0 #FFFFFF,
+     0 0 12px rgb(255, 255, 255);
+  filter: drop-shadow(0 2px 4px rgba(255, 140, 0, 0.3));
 }
 
 .streak-number {
-  font-size: clamp(28px, 6vw, 32px);
+  font-size: clamp(22px, 4vw, 26px);
   font-weight: 700;
   margin-bottom: 0.5vh;
   color: #333;
 }
 
 .streak-title {
-  font-size: clamp(16px, 3vw, 18px);
+  font-size: clamp(13px, 2.2vw, 15px);
   font-weight: 600;
   color: #333;
-  margin-bottom: 3vh;
+  margin-bottom: 1.5vh;
 }
 
 .progress-box {
   border: 2px solid #e0e0e0;
-  border-radius: 16px;
+  border-radius: 12px; 
   display: inline-block;
-  padding: clamp(15px, 3vw, 20px) clamp(20px, 4vw, 30px);
-  margin: 2vh 0;
+  padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 15px);
+  margin: 1vh 0;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   width: 90%;
-  max-width: 400px;
+  max-width: 320px;
 }
 
 .days {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   font-weight: 600;
-  font-size: clamp(14px, 2.5vw, 16px);
+  font-size: clamp(11px, 1.8vw, 13px);
   color: #333;
 }
-
 .days span {
   flex: 1;
   text-align: center;
 }
 
 .progress-line {
-  height: 6px;
+  height: 4px; 
   background: #e0e0e0;
-  border-radius: 3px;
+  border-radius: 2px; 
   width: 100%;
   position: relative;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
 .progress-fill {
@@ -171,18 +174,18 @@ body {
   left: 0;
   height: 100%;
   background: linear-gradient(to right, #ff8c00, #ffd700);
-  border-radius: 3px;
+  border-radius: 2px; 
   width: 71.4%;
   transition: width 0.4s ease;
 }
 
 .runner-icon {
   position: absolute;
-  top: -14px;
+  top: -10px; 
   left: 71.4%;
   transform: translateX(-50%);
   color: #333;
-  font-size: clamp(20px, 4vw, 26px);
+  font-size: clamp(16px, 3vw, 18px); 
   z-index: 10;
 }
 
@@ -198,13 +201,13 @@ body {
 }
 
 .dot {
-  width: clamp(6px, 1.2vw, 8px);
-  height: clamp(6px, 1.2vw, 8px);
+  width: clamp(5px, 1vw, 6px);
+  height: clamp(5px, 1vw, 6px);
   background-color: #333;
   border-radius: 50%;
   position: relative;
   flex: 1;
-  max-width: 8px;
+  max-width: 6px;
 }
 
 .dot.completed {
@@ -212,56 +215,253 @@ body {
 }
 
 .message {
-  margin-top: 2vh;
+  margin-top: 0.5vh;
   font-weight: 600;
-  font-size: clamp(16px, 3vw, 18px);
+  font-size: clamp(13px, 2.2vw, 15px);
   color: #333;
 }
 
-/* Mobile adjustments */
-@media (max-width: 600px) {
-  .speech-bubble {
-    left: calc(50% + 90px);
-    font-size: 12px;
-    padding: 10px 14px;
-  }
-
-  .speech-bubble::before {
-    left: -15px;
-    border-width: 8px 15px 8px 0;
-  }
-
-  .speech-bubble::after {
-    left: -18px;
-    border-width: 10px 17px 10px 0;
-  }
-}
-
-@media (max-width: 400px) {
-  .speech-bubble {
-    left: calc(50% + 70px);
-    font-size: 11px;
-    padding: 8px 12px;
-  }
-}
-
-/* Landscape mode */
-@media (orientation: landscape) and (max-height: 600px) {
+/* Mobile override (<= 768px) */
+@media (max-width: 768px) {
   .header {
-    padding: 3vh 20px 5vh;
+    background-image: url('../assets/bghome_mobile.png');
+    background-size: 100% 100%;
+    background-position: center bottom;
+    margin-top: 0; 
+    /* TETAP 100VH */
+    height: 60vh;
+  }
+  
+  /* === NEW: Tampilkan dan atur judul mobile === */
+  .header-title-mobile {
+    display: block; /* Tampilkan di mobile */
+    position: absolute; 
+    top: 20px; /* Jarak dari atas header */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000; /* Warna biru tua */
+    z-index: 20;
+    margin: 0;
+  }
+  /* --------------------------------------------- */
+
+
+  .character img {
+    width: clamp(260px, 40vw, 260px);
+    margin-top: 8vh; 
+  }
+  
+  .speech-bubble {
+    top: 14vh;
+    left: calc(27% + 0px);
+    font-size: 12px;
+  }
+  
+  .streak {
+    /* PENYESUAIAN MOBILE */
+    top: 56vh;
+    padding-bottom: 60px;
+  }
+}
+
+/* Mobile adjustments (<= 400px) */
+@media (max-width: 400px) {
+
+  .header {
+    height: 65vh;
+  }
+  
+  /* Sesuaikan judul agar tidak terlalu menempel pada sisi */
+  .header-title-mobile {
+    top: 40px; 
+    font-size: 22px;
+  }
+  
+  .character img {
+    margin-top: 12vh; 
+    width: clamp(300px, 40vw, 300px);
+  }
+  .speech-bubble {
+    top: 18vh;
+    left: calc(13% + 40px);
   }
 
   .streak {
-    padding: 10px;
-    padding-bottom: 80px;
+    top: 61vh; /* Sesuaikan posisi agar muncul di tengah area biru header */
+    left: 50%;
   }
+}
 
-  .flame {
-    font-size: 40px;
-    margin-bottom: 0.5vh;
+/* === ZOOM HANDLING === */
+/* Menggunakan transform scale agar posisi tetap, hanya ukuran yang berubah */
+
+/* Wrapper untuk scale tanpa mempengaruhi posisi */
+.flame,
+.streak-number,
+.streak-title,
+.progress-box,
+.message {
+  transform-origin: center center;
+}
+
+.character img, 
+.character,
+.speech-bubble {
+  transform-origin: center center;
+}
+
+/* Deteksi Zoom In */
+@media screen and (min-resolution: 1.25dppx) and (max-resolution: 1.49dppx) {
+  /* Zoom 125% */
+  .character img {
+    transform: scale(0.95);
   }
+  
+  .speech-bubble {
+    transform: scale(0.95);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.95);
+  }
+}
 
-  .progress-box {
-    margin: 1vh 0;
+@media screen and (min-resolution: 1.5dppx) and (max-resolution: 1.74dppx) {
+  /* Zoom 150% */
+  .character img {
+    transform: scale(0.90);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.90);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.90);
+  }
+}
+
+@media screen and (min-resolution: 1.75dppx) and (max-resolution: 1.99dppx) {
+  /* Zoom 175% */
+  .character img {
+    transform: scale(0.85);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.85);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.85);
+  }
+}
+
+@media screen and (min-resolution: 2dppx) {
+  /* Zoom 200%+ */
+  .character img {
+    transform: scale(0.80);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.80);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.80);
+  }
+}
+
+/* Deteksi Zoom Out */
+@media screen and (max-resolution: 0.9dppx) {
+  /* Zoom 90% - elemen mengecil */
+  .character img {
+    transform: scale(0.95);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.95);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.95);
+  }
+}
+
+@media screen and (max-resolution: 0.75dppx) {
+  /* Zoom 75% - elemen mengecil */
+  .character img {
+    transform: scale(0.90);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.90);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.90);
+  }
+}
+
+@media screen and (max-resolution: 0.67dppx) {
+  /* Zoom 67% - elemen mengecil */
+  .character img {
+    transform: scale(0.85);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.85);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.85);
+  }
+}
+
+@media screen and (max-resolution: 0.5dppx) {
+  /* Zoom 50% - elemen mengecil */
+  .character img {
+    transform: scale(0.75);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.75);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.75);
   }
 }

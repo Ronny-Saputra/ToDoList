@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let timeLeft = totalDurationSeconds;
     let timerInterval = null;
     let isRunning = false;
-    let activityName = "Casting Project"; // Default sesuai gambar
+    let activityName = ""; // Default sesuai gambar
 
     // --- UTILITY: Format Waktu (MM:SS atau HH:MM:SS) ---
     function formatTime(seconds) {

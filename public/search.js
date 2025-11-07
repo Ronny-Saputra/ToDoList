@@ -8,107 +8,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const emptyState = document.getElementById('emptyState');
     
     let allTasksData = []; // Variabel untuk menyimpan semua data tugas
+    
+    // ✅ NEW: Gunakan sessionStorage untuk state yang persisten
+    const STORAGE_KEY_FILTER = 'search_active_filter';
+    const STORAGE_KEY_QUERY = 'search_query';
+    
+    // Ambil state dari sessionStorage atau gunakan default
+    let currentActiveFilter = sessionStorage.getItem(STORAGE_KEY_FILTER) || 'all';
+    let currentSearchQuery = sessionStorage.getItem(STORAGE_KEY_QUERY) || '';
+    
+    // Dapatkan fungsi create card dari TaskApp global (dari task.js)
+    const createTaskCard = window.TaskApp?.createTaskCard; 
+    
+    if (!createTaskCard) {
+        console.error("Dependency Error: window.TaskApp.createTaskCard not found. Ensure task.js is loaded first.");
+        return; 
+    }
 
     // Inisialisasi status tampilan: Sembunyikan daftar, tampilkan status kosong
     if (taskListContainer) taskListContainer.style.display = 'none';
     if (emptyState) emptyState.style.display = 'flex'; 
 
-    // --- UTILITY: Format Tanggal untuk tampilan (e.g., "Today", "7 Nov") ---
-    function formatTaskDate(dateString) {
-        if (!dateString) return '';
-        try {
-             // Tanggal adalah YYYY-MM-DD. Gunakan YYYY/MM/DD untuk kompatibilitas Safari
-            const date = new Date(dateString.replace(/-/g, '/')); 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Cek apakah tanggalnya hari ini
-            if (date.toDateString() === today.toDateString()) {
-                return "Today";
-            }
-            
-            // Format ke "7 Nov"
-            return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-        } catch (e) {
-            console.error("Error formatting date:", e);
-            return dateString;
-        }
-    }
-
-
-    // --- MEMBUAT TASK CARD (Reusable & Custom) ---
-    function createTaskCardForSearch(taskObject) {
-        const { title, date, done: isDone } = taskObject;
-        const card = document.createElement('div');
-        card.classList.add('task-card-item');
-        card.setAttribute('data-task-id', taskObject.id); 
-        card.setAttribute('data-task-date', date);
-        
-        if (isDone) {
-            card.classList.add('done-task');
-        }
-
-        const formattedDate = formatTaskDate(date);
-
-        card.innerHTML = `
-            <div class="task-checkbox" style="background-color: ${isDone ? '#3f67b5' : 'transparent'};"></div>
-            <div class="task-details">
-                <span class="task-title-reminder">${title}</span>
-                <div class="task-meta">
-                    <span class="task-location-small">${taskObject.location || 'No Location'}</span>
-                </div>
-            </div>
-            <div class="task-time-box">
-                <span class="task-time-large">${formattedDate}</span>
-            </div>
-            <i class="fas fa-chevron-right task-arrow"></i>`;
-        
-        // Redirect ke halaman tugas. Anda dapat menambahkan ID tugas di query string jika diperlukan.
-        card.addEventListener('click', () => {
-             window.location.href = `task.html`; 
-        });
-
-        // Toggle 'mark as done' pada checkbox
-        const checkbox = card.querySelector('.task-checkbox');
-        checkbox.addEventListener('click', async (e) => {
-            e.stopPropagation(); 
-            const user = firebase.auth().currentUser;
-            if (!user) return alert('Please log in first.');
-
-            const db = firebase.firestore();
-            try {
-                const taskInState = allTasksData.find(t => t.id === taskObject.id) || taskObject;
-                const currentDoneStatus = taskInState.done;
-                const newDoneStatus = !currentDoneStatus; 
-                
-                // Gunakan TaskApp.formatDate (dari task.js) untuk mendapatkan tanggal hari ini (YYYY-MM-DD)
-                const newDate = newDoneStatus ? (window.TaskApp?.formatDate ? window.TaskApp.formatDate(new Date()) : taskInState.date) : taskInState.date; 
-                
-                await db.collection("users").doc(user.uid)
-                    .collection("tasks").doc(taskObject.id)
-                    .update({
-                        done: newDoneStatus,
-                        date: newDate
-                    });
-
-                // Update UI lokal
-                taskInState.done = newDoneStatus;
-                taskInState.date = newDate;
-                
-                // Render ulang daftar tugas
-                performSearchThrottled(); 
-                
-                alert(`Task marked as ${newDoneStatus ? 'done' : 'undone'}!`);
-
-            } catch (err) {
-                console.error("Error updating task status:", err);
-            }
-        });
-        
-        return card;
-    }
-
-
+    
     // --- FUNGSI UTAMA: RENDER TASK LIST ---
     function renderTasks(tasksToRender) {
         taskListContainer.innerHTML = '';
@@ -124,66 +45,40 @@ document.addEventListener('DOMContentLoaded', function() {
             tasksToRender.sort((a, b) => new Date(a.date.replace(/-/g, '/')) - new Date(b.date.replace(/-/g, '/')));
 
             tasksToRender.forEach(task => {
-                taskListContainer.appendChild(createTaskCardForSearch(task));
+                // Definisikan fungsi reload spesifik untuk halaman search (memuat ulang data dari Firebase)
+                const reloadFn = () => loadTasks(firebase.auth().currentUser);
+                
+                // Gunakan fungsi global createTaskCard dari task.js
+                const card = createTaskCard(task, reloadFn); 
+                
+                // Hapus kelas .active secara eksplisit pada saat rendering 
+                card.classList.remove('active'); 
+                
+                taskListContainer.appendChild(card);
             });
         }
     }
 
 
-    // --- FUNGSI UTAMA: LOAD TASK DARI FIREBASE ---
-    // ✅ PENTING: Fungsi ini mengambil SEMUA tugas
-    async function loadTasks(user) {
-        if (!user) return;
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-
-        try {
-            const snapshot = await tasksRef.get();
-            allTasksData = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            
-            // Panggil fungsi pencarian/filter untuk pertama kali merender data
-            performSearchThrottled(); 
-
-        } catch (err) {
-            console.error("Error loading tasks:", err);
-            renderTasks([]);
-        }
-    }
-
-
-    // --- LOGIKA PENCARIAN & FILTER ---
+    // --- LOGIKA PENCARIAN & FILTER (Kombinasi Keywords dan Bulan) ---
     function performSearchAndFilter(query, filter) {
         let filteredTasks = allTasksData;
         
-        // 1. Filter berdasarkan filter pill (tanggal/bulan)
+        // 1. Filter berdasarkan filter pill (bulan)
         if (filter !== 'all') {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
             
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            
-            filteredTasks = filteredTasks.filter(task => {
-                const taskDate = new Date(task.date.replace(/-/g, '/'));
-                taskDate.setHours(0, 0, 0, 0); 
+            const monthFilters = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            const monthIndex = monthFilters.indexOf(filter);
 
-                switch (filter) {
-                    case 'today':
-                        return taskDate.toDateString() === today.toDateString();
-                    case 'tomorrow':
-                        return taskDate.toDateString() === tomorrow.toDateString();
-                    case 'jan': case 'feb': case 'mar': case 'apr': case 'may': case 'jun':
-                    case 'jul': case 'aug': case 'sep': case 'oct': case 'nov': case 'dec':
-                        // Dapatkan index bulan (0-11)
-                        const monthIndex = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].indexOf(filter);
-                        return taskDate.getMonth() === monthIndex;
-                    default:
-                        return true;
-                }
-            });
+            if (monthIndex > -1) {
+                filteredTasks = filteredTasks.filter(task => {
+                    if (!task.date) return false;
+                    
+                    const taskDate = new Date(task.date.replace(/-/g, '/'));
+                    
+                    return taskDate.getMonth() === monthIndex;
+                });
+            }
         }
 
         // 2. Filter berdasarkan string pencarian (judul/lokasi)
@@ -198,18 +93,92 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTasks(filteredTasks);
     }
     
-    // Fungsi untuk dipanggil oleh listener keyup/input (throttled)
+    // Fungsi untuk dipanggil oleh listener keyup/input (menggunakan filter aktif saat ini)
     const performSearchThrottled = () => {
         const query = searchInput.value.trim();
-        const activePill = document.querySelector('.filter-pill.active')?.getAttribute('data-filter') || 'all';
-        performSearchAndFilter(query, activePill);
+        // ✅ UPDATE: Simpan query ke sessionStorage
+        currentSearchQuery = query;
+        sessionStorage.setItem(STORAGE_KEY_QUERY, query);
+        // Gunakan state filter yang tersimpan
+        performSearchAndFilter(query, currentActiveFilter);
     };
 
     // Fungsi untuk dipanggil oleh listener filter pill
     const performFilter = (filter) => {
-        const query = searchInput.value.trim();
+        // ✅ UPDATE STATE FILTER DAN SIMPAN KE sessionStorage
+        currentActiveFilter = filter;
+        sessionStorage.setItem(STORAGE_KEY_FILTER, filter);
+        
+        const query = searchInput ? searchInput.value.trim() : '';
+        // ✅ UPDATE: Simpan query ke sessionStorage
+        currentSearchQuery = query;
+        sessionStorage.setItem(STORAGE_KEY_QUERY, query);
+        
         performSearchAndFilter(query, filter);
     };
+
+
+    // --- FUNGSI UTAMA: LOAD TASK DARI FIREBASE ---
+    async function loadTasks(user) {
+        if (!user) return;
+        
+        console.log('=== SEARCH PAGE: Loading tasks ===');
+        console.log('User UID:', user.uid);
+        
+        const db = firebase.firestore();
+        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+
+        try {
+            const snapshot = await tasksRef.get();
+            console.log('Total tasks from Firebase:', snapshot.size);
+            
+            allTasksData = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data() 
+            }));
+            
+            console.log('All tasks data:', allTasksData);
+            
+            // ✅ UPDATE: Ambil state dari sessionStorage
+            currentSearchQuery = sessionStorage.getItem(STORAGE_KEY_QUERY) || '';
+            currentActiveFilter = sessionStorage.getItem(STORAGE_KEY_FILTER) || 'all';
+            
+            console.log('Restored state - Filter:', currentActiveFilter, 'Query:', currentSearchQuery);
+            
+            // ✅ Restore search input value dari sessionStorage
+            if (searchInput) {
+                searchInput.value = currentSearchQuery;
+                // Update clear button visibility
+                if (clearSearchBtn) {
+                    clearSearchBtn.style.display = currentSearchQuery.length > 0 ? 'flex' : 'none';
+                }
+            }
+            
+            // ✅ Restore active pill berdasarkan filter yang tersimpan
+            restoreActivePill(currentActiveFilter);
+            
+            // ✅ UPDATE: Gunakan state yang tersimpan untuk re-filter dan re-render
+            performSearchAndFilter(currentSearchQuery, currentActiveFilter);
+
+            console.log('✅ Tasks loaded and rendered successfully');
+
+        } catch (err) {
+            console.error("❌ Error loading tasks:", err);
+            renderTasks([]);
+        }
+    }
+
+    // ✅ NEW: Fungsi untuk restore active pill berdasarkan filter
+    function restoreActivePill(filter) {
+        const targetPill = document.querySelector(`.filter-pill[data-filter="${filter}"]`);
+        if (targetPill && !targetPill.classList.contains('active')) {
+            updateActivePill(targetPill);
+        }
+    }
+
+    // Ekspos fungsi loadTasks ke global agar task.js dapat memanggilnya
+    window.SearchApp = window.SearchApp || {};
+    window.SearchApp.reloadTasks = loadTasks;
 
 
     // --- INISIALISASI & LISTENERS ---
@@ -235,8 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
         filterPillsContainer.addEventListener('click', (event) => {
             const pill = event.target.closest('.filter-pill');
             if (pill && !pill.classList.contains('active')) {
-                updateActivePill(pill);
                 const filterValue = pill.getAttribute('data-filter');
+                updateActivePill(pill);
+                // ✅ Panggil performFilter yang akan mengupdate state currentActiveFilter
                 performFilter(filterValue); 
             }
         });
@@ -252,8 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         clearSearchBtn.addEventListener('click', () => {
             searchInput.value = '';
+            // ✅ UPDATE: Reset state dan sessionStorage
+            currentSearchQuery = '';
+            sessionStorage.setItem(STORAGE_KEY_QUERY, '');
             toggleClearButton();
-            performSearchThrottled(); 
+            // Gunakan state filter yang ada saat ini
+            performSearchAndFilter('', currentActiveFilter);
         });
 
         toggleClearButton();
@@ -285,14 +259,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // INISIALISASI: Atur centang pada pill 'All' saat pertama kali dimuat
-    const initialActivePill = document.querySelector('.filter-pill[data-filter="all"]');
+    // INISIALISASI: Atur centang pada pill berdasarkan state yang tersimpan
+    const savedFilter = sessionStorage.getItem(STORAGE_KEY_FILTER) || 'all';
+    const initialActivePill = document.querySelector(`.filter-pill[data-filter="${savedFilter}"]`);
     if (initialActivePill) {
-        if (!initialActivePill.classList.contains('active')) {
-             initialActivePill.classList.add('active');
-        }
         if (!initialActivePill.querySelector('.check-icon')) {
              updateActivePill(initialActivePill);
+        }
+    }
+    
+    // ✅ NEW: Restore search input saat page load
+    if (searchInput) {
+        const savedQuery = sessionStorage.getItem(STORAGE_KEY_QUERY) || '';
+        searchInput.value = savedQuery;
+        if (clearSearchBtn) {
+            clearSearchBtn.style.display = savedQuery.length > 0 ? 'flex' : 'none';
         }
     }
 });
