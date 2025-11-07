@@ -71,7 +71,7 @@ body {
 
 /* Wrapper untuk gradasi biru penuh di bagian atas (FIXED) */
 .top-task-section {
-    background: linear-gradient(to right, #dbe9ff, #bad7ff);
+    background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
     /* MODIFIKASI: Hapus bayangan agar tidak ada garis di bawah kalender */
     box-shadow: none; 
     
@@ -950,7 +950,6 @@ body {
     font-size: 16px;
     text-align: center;
     width: 25%; /* Untuk 3 kolom (Hours, Minutes, Seconds) */
-    -moz-appearance: textfield; 
 }
 
 .time-inputs.flow-duration-inputs input[type="number"]::-webkit-outer-spin-button,
