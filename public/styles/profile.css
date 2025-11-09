@@ -516,12 +516,12 @@ body,
 /* ==================================================== */
 @media (max-width: 768px) {
     .profile-header {
-        padding: 20px 20px;
+        padding: 30px 30px;
         border-radius: 0 0 24px 24px;
     }
     
     .profile-left {
-        margin-left: 0;
+        margin-left: 15px;
         gap: 10px;
     }
 
@@ -557,7 +557,7 @@ body,
     }
 
     .settings-btn {
-        margin-right: 0;
+        margin-right: 20px;
         font-size: 20px;
     }
 

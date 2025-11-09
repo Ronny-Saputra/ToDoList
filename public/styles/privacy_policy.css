@@ -1,0 +1,209 @@
+/* privacy_policy.css - VERSI AKHIR: BISA SCROLL, SCROLLBAR DISEMBUNYIKAN */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    background-color: #F5F7FA;
+    color: #1e2a78;
+    min-height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 39px;
+}
+
+/* UKURAN KOTAK SAMA PERSIS DENGAN STREAK_BADGE */
+.settings-container {
+    width: 100%;
+    max-width: 530px;
+    max-height: 85vh;
+    background: #FFFFFF;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+}
+
+/* HEADER - IDENTIK DENGAN STREAK_BADGE */
+.settings-header {
+    background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
+    padding: 20px 24px 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #14142A;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+    border-radius: 25px;
+    width: 100%;
+    pointer-events: auto;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #14142A;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
+    position: relative;
+    z-index: 101;
+    pointer-events: auto;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.settings-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* MAIN - BISA SCROLL, TAPI SCROLLBAR DISEMBUNYIKAN */
+.privacy-main {
+    padding: 20px 24px 32px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto; /* BISA SCROLL */
+    color: #14142A;
+    font-size: 14px;
+    line-height: 1.5;
+
+    /* SEMBUNYIKAN SCROLLBAR DI SEMUA BROWSER */
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.privacy-main::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* KURANGI JARAK ANTARA h3 DAN p BERIKUTNYA */
+.privacy-main h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 1px;
+    margin-bottom: -9px; /* Dikurangi dari 2px → 4px (lebih rapi dari 2px) */
+}
+
+/* PARAGRAF DI BAWAH h3: HILANGKAN margin-bottom default */
+.privacy-main h3 + p {
+    margin-top: 0;     /* Hilangkan jarak atas */
+    margin-bottom: 1px; /* Tetap beri jarak bawah untuk pisah antar bagian */
+}
+
+/* Paragraf biasa (bukan setelah h3) */
+.privacy-main p {
+    margin-bottom: 16px;
+}
+
+/* Footer tetap di bawah */
+.privacy-main .footer {
+    font-size: 12px;
+    color: #6E7B91;
+    text-align: center;
+    margin-top: auto;
+}
+
+/* RESPONSIF: TABLET (≤768px) */
+@media (max-width: 768px) {
+    body {
+        padding: 20px;
+    }
+
+    .settings-container {
+        max-height: 90vh;
+    }
+
+    .settings-header {
+        padding: 18px 20px;
+        gap: 12px;
+    }
+
+    .settings-header h1 {
+        font-size: 18px;
+    }
+
+    .back-btn {
+        font-size: 22px;
+    }
+
+    .privacy-main {
+        padding: 20px 20px 32px;
+        gap: 15px;
+    }
+
+    .privacy-main h3 {
+        font-size: 17px;
+    }
+
+    .privacy-main p {
+        font-size: 13px;
+    }
+
+    .privacy-main .footer {
+        font-size: 11px;
+    }
+}
+
+/* RESPONSIF: MOBILE (≤480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 60px 16px;
+    }
+
+    .settings-container {
+        min-height: 500px;
+        max-height: none;
+    }
+
+    .settings-header {
+        padding: 26px 18px;
+        gap: 10px;
+        border-radius: 18px 18px 20px 20px;
+    }
+
+    .settings-header h1 {
+        font-size: 17px;
+    }
+
+    .back-btn {
+        font-size: 20px;
+        padding: 6px;
+    }
+
+    .privacy-main {
+        padding: 20px 16px 32px;
+        gap: 16px;
+    }
+
+    .privacy-main h3 {
+        font-size: 16px;
+    }
+
+    .privacy-main p {
+        font-size: 12.5px;
+    }
+
+    .privacy-main .footer {
+        font-size: 10.5px;
+    }
+}

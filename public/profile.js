@@ -263,3 +263,14 @@ document.addEventListener('DOMContentLoaded', function() {
         startCamera(currentFacingMode);
     });
 });
+
+// profile.js (hanya bagian settings)
+const settingsBtn = document.querySelector('.settings-btn');
+
+if (settingsBtn) {
+    settingsBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Pindah ke halaman settings
+        window.location.href = 'settings.html';
+    });
+}
