@@ -108,8 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const setPhotoBtn = document.getElementById('setPhoto');
     const retakeBtn = document.getElementById('retake');
     const switchCameraBtn = document.getElementById('switchCameraBtn');
-    const closeModalBtn = document.querySelectorAll('.close-modal')[1]; // yang di cameraModal
-    const avatarImg = document.querySelector('.profile-avatar img');
+    const closeModalBtns = document.querySelectorAll('.close-modal');
+    const mainAvatar = document.getElementById('mainAvatar');
+    const drawerAvatar = document.getElementById('drawerAvatar');
 
     let stream = null;
     let photoData = null;
@@ -149,12 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentFacingMode = 'user';
         
         await checkBackCamera();
-        if (hasBackCamera) {
-            switchCameraBtn.style.display = 'inline-flex'; // Bukan 'block'
-            switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Ganti ke Belakang';
-        } else {
-            switchCameraBtn.style.display = 'none';
-        }
+        switchCameraBtn.style.display = hasBackCamera ? 'inline-flex' : 'none';
+        switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Ganti ke Belakang';
         
         await startCamera('user');
         previewControls.style.display = 'none';
@@ -200,16 +197,12 @@ document.addEventListener('DOMContentLoaded', function() {
         video.srcObject = null;
         video.style.display = 'none';
         preview.style.display = 'none';
-        preview.src = ''; // Clear preview
-        photoData = null; // Clear photo data
-        
-        // Reset ke tampilan awal
+        preview.src = '';
+        photoData = null;
         previewControls.style.display = 'none';
         captureControls.style.display = 'flex';
     }
 
-    // SESUDAH (BENAR)
-    const closeModalBtns = document.querySelectorAll('.close-modal');
     closeModalBtns.forEach(btn => {
         btn.addEventListener('click', closeCamera);
     });
@@ -228,26 +221,25 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0);
         photoData = canvas.toDataURL('image/png');
-        // TAMBAHAN: Stop kamera saat capture
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-    }
-
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
         openPreview(photoData);
     });
 
     function openPreview(src) {
-        cameraModal.style.display = 'flex'; // TAMBAHAN: Pastikan modal terbuka
+        cameraModal.style.display = 'flex';
         preview.src = src;
         video.style.display = 'none';
         preview.style.display = 'block';
         captureControls.style.display = 'none';
         previewControls.style.display = 'flex';
     }
+
     setPhotoBtn.addEventListener('click', () => {
         if (photoData) {
-            avatarImg.src = photoData;
+            updateAvatarGlobally(photoData);
             closeCamera();
             alert("Foto profil berhasil diperbarui!");
         } else {
@@ -262,15 +254,129 @@ document.addEventListener('DOMContentLoaded', function() {
         video.style.display = 'block';
         startCamera(currentFacingMode);
     });
-});
 
-// profile.js (hanya bagian settings)
-const settingsBtn = document.querySelector('.settings-btn');
+    // === UPDATE AVATAR GLOBALLY ===
+    function updateAvatarGlobally(photoData) {
+        if (mainAvatar) mainAvatar.src = photoData;
+        if (drawerAvatar) drawerAvatar.src = photoData;
+        localStorage.setItem('userAvatar', photoData);
+    }
 
-if (settingsBtn) {
-    settingsBtn.addEventListener('click', function(e) {
+    // === DRAWER: EDIT PROFILE ===
+    const openEditDrawerBtn = document.getElementById('openEditDrawer');
+    const editProfileDrawer = document.getElementById('editProfileDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const closeDrawerBtn = document.getElementById('closeDrawer');
+    const saveBtn = document.querySelector('.save-btn');
+    const nameInput = document.getElementById('name');
+    const usernameInput = document.getElementById('username');
+    const profileUsername = document.getElementById('profileUsername');
+
+    function closeDrawer() {
+        editProfileDrawer.classList.remove('active');
+    }
+
+    openEditDrawerBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        // Pindah ke halaman settings
-        window.location.href = 'settings.html';
+
+        const savedName = localStorage.getItem('userName') || '';
+        const savedUsername = localStorage.getItem('userUsername') || '';
+        const savedAvatar = localStorage.getItem('userAvatar');
+
+        nameInput.value = savedName;
+        usernameInput.value = savedUsername;
+
+        profileUsername.textContent = savedUsername || 'Username';
+
+        if (savedAvatar) {
+            if (mainAvatar) mainAvatar.src = savedAvatar;
+            if (drawerAvatar) drawerAvatar.src = savedAvatar;
+        }
+
+        updateInputColor(nameInput);
+        updateInputColor(usernameInput);
+
+        editProfileDrawer.classList.add('active');
     });
-}
+
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+
+    // === WARNA INPUT BERUBAH SAAT DIISI ===
+    function updateInputColor(input) {
+        if (input.value.trim() !== '') {
+            input.style.color = '#14142A';
+        } else {
+            input.style.color = '#aaa';
+        }
+    }
+
+    [nameInput, usernameInput].forEach(input => {
+        input.addEventListener('input', () => updateInputColor(input));
+    });
+
+    // === SAVE PROFILE ===
+    saveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const newName = nameInput.value.trim();
+        const newUsername = usernameInput.value.trim() || 'Username';
+
+        localStorage.setItem('userName', newName);
+        localStorage.setItem('userUsername', newUsername);
+
+        profileUsername.textContent = newUsername;
+
+        closeDrawer();
+        alert('Profil berhasil diperbarui!');
+    });
+
+    // === GENDER DROPDOWN ===
+    const genderInput = document.getElementById('genderInput');
+    const genderDropdown = document.getElementById('genderDropdown');
+    const genderOptions = document.querySelectorAll('.gender-option');
+    const selectedGenderSpan = document.getElementById('selectedGender');
+
+    genderInput.addEventListener('click', () => {
+        const isOpen = genderDropdown.classList.contains('open');
+        genderDropdown.classList.toggle('open', !isOpen);
+        genderInput.classList.toggle('open', !isOpen);
+    });
+
+    genderOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const value = option.dataset.value;
+            selectedGenderSpan.textContent = value;
+            document.querySelectorAll('.gender-option i').forEach(icon => {
+                icon.classList.add('hidden');
+            });
+            option.querySelector('i').classList.remove('hidden');
+            genderDropdown.classList.remove('open');
+            genderInput.classList.remove('open');
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!genderInput.contains(e.target) && !genderDropdown.contains(e.target)) {
+            genderDropdown.classList.remove('open');
+            genderInput.classList.remove('open');
+        }
+    });
+
+    // === EDIT AVATAR DI DRAWER ===
+    const editAvatarBtn = document.getElementById('editAvatarBtn');
+    editAvatarBtn.addEventListener('click', () => {
+        document.getElementById('cameraChoiceModal').style.display = 'flex';
+        closeDrawer();
+    });
+
+    // === LOAD DATA SAAT HALAMAN DIMUAT ===
+    const savedUsername = localStorage.getItem('userUsername');
+    const savedAvatar = localStorage.getItem('userAvatar');
+    if (savedUsername && savedUsername !== 'Username') {
+        profileUsername.textContent = savedUsername;
+    }
+    if (savedAvatar && mainAvatar) {
+        mainAvatar.src = savedAvatar;
+    }
+});

@@ -24,7 +24,7 @@
             <!-- ===== KIRI: AVATAR + DETAIL ===== -->
             <div class="profile-left">
                 <div class="profile-avatar">
-                    <img src="../assets/avatar.png" alt="User Avatar">
+                    <img src="../assets/avatar.png" alt="User Avatar" id="mainAvatar">
                     <span class="camera-icon">
                         <img src="../assets/mdi_camera.png" alt="Camera">
                     </span>
@@ -32,13 +32,13 @@
 
                 <div class="profile-details">
                     <div class="user-streak-wrapper">
-                        <div class="username">Username</div>
+                        <div class="username" id="profileUsername">Username</div>
                         <div class="streak">
                             <i class="fas fa-fire"></i>
                             <span>130</span>
                         </div>
                     </div>
-                    <button class="edit-profile-btn">Edit Profile</button>
+                    <button class="edit-profile-btn" id="openEditDrawer">Edit Profile</button>
                 </div>
             </div>
 
@@ -107,15 +107,13 @@
                     <div class="summary-box completed">
                         <span>Completed Tasks (9)</span>
                         <div class="icon-wrapper">
-                            <i class="far fa-circle-check"></i>   <!-- regular -->
-
+                            <i class="far fa-circle-check"></i>
                         </div>
                     </div>
                     <div class="summary-box missed">
                         <span>Missed Tasks (10)</span>
                         <div class="icon-wrapper">
                             <i class="far fa-circle-check"></i>
-
                         </div>
                     </div>
                     <div class="summary-box deleted">
@@ -155,7 +153,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Ganti Foto Profil</h3>
-                <button class="close-modal">&times;</button>
+                <button class="close-modal">×</button>
             </div>
 
             <video id="video" autoplay playsinline></video>
@@ -176,6 +174,62 @@
                     <button id="retake" class="btn-secondary">Ambil Ulang</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- DRAWER: EDIT PROFILE (DARI KANAN) -->
+    <div class="edit-profile-drawer" id="editProfileDrawer">
+        <div class="drawer-overlay" id="drawerOverlay"></div>
+        <div class="drawer-content">
+            <!-- HEADER BIRU -->
+            <div class="drawer-header">
+                <button class="drawer-close" id="closeDrawer">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2>Edit Profile</h2>
+            </div>
+
+            <!-- AVATAR + EDIT -->
+            <div class="profile-avatar">
+                <div class="avatar-circle">
+                    <img src="../assets/avatar2.svg" alt="Avatar" class="avatar-img" id="drawerAvatar">
+                </div>
+                <button class="edit-avatar-btn" id="editAvatarBtn">Edit</button>
+            </div>
+
+            <!-- FORM -->
+            <form class="profile-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="Name" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Username" class="form-input">
+                </div>
+
+                <!-- GENDER DENGAN DROPDOWN -->
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="gender-wrapper">
+                        <div class="gender-input" id="genderInput">
+                            <span id="selectedGender">Male</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="gender-dropdown" id="genderDropdown">
+                            <div class="gender-option" data-value="Male">
+                                <i class="fas fa-check"></i> Male
+                            </div>
+                            <div class="gender-option" data-value="Female">
+                                <i class="fas fa-check hidden"></i> Female
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="save-btn">SAVE</button>
+            </form>
         </div>
     </div>
 
