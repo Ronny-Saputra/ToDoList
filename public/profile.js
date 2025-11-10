@@ -380,3 +380,268 @@ document.addEventListener('DOMContentLoaded', function() {
         mainAvatar.src = savedAvatar;
     }
 });
+
+// === DRAWER: COMPLETED TASKS ===
+const completedDrawer = document.getElementById('completedDrawer');
+const completedDrawerContent = document.getElementById('completedDrawerContent');
+const closeCompletedDrawer = document.getElementById('closeCompletedDrawer');
+const completedDrawerOverlay = document.getElementById('completedDrawerOverlay');
+
+const completedBox = document.querySelector('.summary-box.completed');
+
+completedBox.style.cursor = 'pointer';
+
+completedBox.addEventListener('click', () => {
+    renderCompletedTasksInDrawer();
+    completedDrawer.classList.add('active');
+});
+
+closeCompletedDrawer.addEventListener('click', () => {
+    completedDrawer.classList.remove('active');
+});
+
+completedDrawerOverlay.addEventListener('click', () => {
+    completedDrawer.classList.remove('active');
+});
+
+function renderCompletedTasksInDrawer() {
+    completedDrawerContent.innerHTML = '';
+    const tasks = getCompletedTasks();
+
+    if (tasks.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'completed-empty';
+        emptyDiv.innerHTML = `
+            <i class="fas fa-clock"></i>
+            <p>Yay, all tasks completed!</p>
+        `;
+        completedDrawerContent.appendChild(emptyDiv);
+    } else {
+        tasks.forEach(group => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'task-group';
+
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'task-date';
+            dateDiv.textContent = group.date;
+            groupDiv.appendChild(dateDiv);
+
+            group.tasks.forEach(task => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.textContent = task;
+                groupDiv.appendChild(itemDiv);
+            });
+
+            completedDrawerContent.appendChild(groupDiv);
+        });
+    }
+}
+
+// Data dummy (ganti dengan real data jika ada)
+function getCompletedTasks() {
+    return [
+        { date: 'Wednesday, 22 October 2025', tasks: ['Dinner Date', 'Movie Night', 'Zoom Meeting', 'Gym'] },
+        { date: 'Tuesday, 21 October 2025', tasks: ['Pay Electricity Bill', 'Doctor Appointment'] },
+        { date: 'Monday, 20 October 2025', tasks: ['Study Group Session', 'Clean the Room', 'Morning Run'] },
+        { date: 'Sunday, 19 October 2025', tasks: ['Weekend Picnic'] }
+    ];
+    // return []; // Uncomment untuk uji empty state
+}
+
+// === DRAWER: DELETED TASKS ===
+const deletedDrawer = document.getElementById('deletedDrawer');
+const deletedDrawerContent = document.getElementById('deletedDrawerContent');
+const closeDeletedDrawer = document.getElementById('closeDeletedDrawer');
+const deletedDrawerOverlay = document.getElementById('deletedDrawerOverlay');
+
+const deletedBox = document.querySelector('.summary-box.deleted');
+
+deletedBox.style.cursor = 'pointer';
+
+deletedBox.addEventListener('click', () => {
+    renderDeletedTasksInDrawer();
+    deletedDrawer.classList.add('active');
+});
+
+closeDeletedDrawer.addEventListener('click', () => {
+    deletedDrawer.classList.remove('active');
+});
+
+deletedDrawerOverlay.addEventListener('click', () => {
+    deletedDrawer.classList.remove('active');
+});
+
+function renderDeletedTasksInDrawer() {
+    deletedDrawerContent.innerHTML = '';
+    const tasks = getDeletedTasks();
+
+    if (tasks.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'deleted-empty';
+        emptyDiv.innerHTML = `
+            <i class="fas fa-clock"></i>
+            <p>Yay, trash is empty!</p>
+        `;
+        deletedDrawerContent.appendChild(emptyDiv);
+    } else {
+        tasks.forEach(group => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'deleted-task-group';
+
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'deleted-task-date';
+            dateDiv.textContent = group.date;
+            groupDiv.appendChild(dateDiv);
+
+            group.tasks.forEach(task => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'deleted-task-item';
+                itemDiv.innerHTML = `
+                    <span>${task}</span>
+                    <button class="restore-btn">Restore</button>
+                `;
+                // Tambahkan event untuk restore (placeholder)
+                itemDiv.querySelector('.restore-btn').addEventListener('click', () => {
+                    alert(`Restoring task: ${task}`);
+                    // Di sini bisa tambah logika real: hapus dari deleted, tambah ke list aktif, update UI
+                });
+                groupDiv.appendChild(itemDiv);
+            });
+
+            deletedDrawerContent.appendChild(groupDiv);
+        });
+    }
+}
+
+// Data dummy (ganti dengan real data jika ada)
+function getDeletedTasks() {
+    return [
+        { date: 'Wednesday, 23 October 2025', tasks: ['Practice Guitar'] },
+        { date: 'Tuesday, 21 October 2025', tasks: ['Read a Chapter of Book', 'Wash the Car', 'Organize Bookshelf'] },
+        { date: 'Monday, 20 October 2025', tasks: ['Watch Online Lecture'] },
+        { date: 'Sunday, 19 October 2025', tasks: ['Coffee with Friend'] },
+        { date: 'Saturday, 18 October 2025', tasks: ['Call Grandma', 'Yoga Class'] }
+    ];
+    // return []; // Uncomment untuk uji empty state
+}
+
+// === DRAWER: MISSED TASKS ===
+const missedDrawer = document.getElementById('missedDrawer');
+const missedDrawerContent = document.getElementById('missedDrawerContent');
+const closeMissedDrawer = document.getElementById('closeMissedDrawer');
+const missedDrawerOverlay = document.getElementById('missedDrawerOverlay');
+
+const missedBox = document.querySelector('.summary-box.missed');
+
+missedBox.style.cursor = 'pointer';
+
+missedBox.addEventListener('click', () => {
+    renderMissedTasksInDrawer();
+    missedDrawer.classList.add('active');
+});
+
+closeMissedDrawer.addEventListener('click', () => {
+    missedDrawer.classList.remove('active');
+});
+
+missedDrawerOverlay.addEventListener('click', () => {
+    missedDrawer.classList.remove('active');
+});
+
+function renderMissedTasksInDrawer() {
+    missedDrawerContent.innerHTML = '';
+    const tasks = getMissedTasks();
+
+    if (tasks.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'missed-empty';
+        emptyDiv.innerHTML = `
+            <i class="fas fa-clock"></i>
+            <p>Yay, no missed tasks!</p>
+        `;
+        missedDrawerContent.appendChild(emptyDiv);
+    } else {
+        tasks.forEach(group => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'missed-task-group';
+
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'missed-task-date';
+            dateDiv.textContent = group.date;
+            groupDiv.appendChild(dateDiv);
+
+            group.tasks.forEach(task => {
+                if (task.subTasks) {
+                    // Tugas dengan sub-tasks (dropdown)
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'missed-task-header';
+                    headerDiv.innerHTML = `
+                        <span>${task.name}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    `;
+
+                    const subTasksDiv = document.createElement('div');
+                    subTasksDiv.className = 'missed-sub-tasks';
+
+                    task.subTasks.forEach((sub, index) => {
+                        const subDiv = document.createElement('div');
+                        subDiv.className = `missed-sub-task ${index === 0 ? 'orange' : 'gray'}`;
+                        subDiv.innerHTML = `
+                            <span>${sub}</span>
+                            <button class="reschedule-btn">Reschedule</button>
+                        `;
+                        subDiv.querySelector('.reschedule-btn').addEventListener('click', () => {
+                            alert(`Rescheduling sub-task: ${sub}`);
+                            // Logika real: pindah ke tanggal baru, update UI
+                        });
+                        subTasksDiv.appendChild(subDiv);
+                    });
+
+                    headerDiv.addEventListener('click', () => {
+                        headerDiv.classList.toggle('open');
+                        subTasksDiv.classList.toggle('open');
+                    });
+
+                    groupDiv.appendChild(headerDiv);
+                    groupDiv.appendChild(subTasksDiv);
+                } else {
+                    // Tugas standalone
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'missed-task-item';
+                    itemDiv.innerHTML = `
+                        <span>${task.name}</span>
+                        <button class="reschedule-btn">Reschedule</button>
+                    `;
+                    itemDiv.querySelector('.reschedule-btn').addEventListener('click', () => {
+                        alert(`Rescheduling task: ${task.name}`);
+                        // Logika real: pindah ke tanggal baru, update UI
+                    });
+                    groupDiv.appendChild(itemDiv);
+                }
+            });
+
+            missedDrawerContent.appendChild(groupDiv);
+        });
+    }
+}
+
+// Data dummy (ganti dengan real data jika ada; filtered berdasarkan current date Nov 10 2025)
+function getMissedTasks() {
+    return [
+        { date: 'Wednesday, 22 October 2025', tasks: [
+            { name: 'Do Science Project', subTasks: ['Elephant Toothpaste Experiment', 'Analysis Report', 'Oral Presentation'] }
+        ] },
+        { date: 'Tuesday, 21 October 2025', tasks: [
+            { name: 'Laundry' },
+            { name: 'Grocery Shopping' },
+            { name: 'Math Homework' }
+        ] },
+        { date: 'Monday, 20 October 2025', tasks: [
+            { name: 'Laptop Repair' },
+            { name: 'Mom\'s Birthday' },
+            { name: 'Cake Baking' }
+        ] }
+    ];
+    // return []; // Uncomment untuk uji empty state
+}

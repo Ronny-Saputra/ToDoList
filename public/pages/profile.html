@@ -43,9 +43,9 @@
             </div>
 
             <!-- ===== KANAN: SETTINGS ===== -->
-            <button class="settings-btn">
+            <a href="settings.html" class="settings-btn">
                 <i class="fas fa-cog"></i>
-            </button>
+            </a>
         </header>
         
         <!-- ================== KONTEN UTAMA ================== -->
@@ -232,6 +232,54 @@
             </form>
         </div>
     </div>
+
+<!-- ================== DRAWER: COMPLETED TASKS (DARI KANAN) ================== -->
+<div class="completed-drawer" id="completedDrawer">
+    <div class="drawer-overlay" id="completedDrawerOverlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <button class="drawer-close" id="closeCompletedDrawer">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2>Completed Tasks</h2>
+        </div>
+        <div id="completedDrawerContent" class="drawer-body">
+            <!-- Konten akan di-render oleh JS -->
+        </div>
+    </div>
+</div>
+
+<!-- ================== DRAWER: DELETED TASKS (DARI KANAN) ================== -->
+<div class="deleted-drawer" id="deletedDrawer">
+    <div class="drawer-overlay" id="deletedDrawerOverlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <button class="drawer-close" id="closeDeletedDrawer">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2>Deleted Tasks</h2>
+        </div>
+        <div id="deletedDrawerContent" class="drawer-body">
+            <!-- Konten akan di-render oleh JS -->
+        </div>
+    </div>
+</div>
+
+<!-- ================== DRAWER: MISSED TASKS (DARI KANAN) ================== -->
+<div class="missed-drawer" id="missedDrawer">
+    <div class="drawer-overlay" id="missedDrawerOverlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <button class="drawer-close" id="closeMissedDrawer">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2>Missed Tasks</h2>
+        </div>
+        <div id="missedDrawerContent" class="drawer-body">
+            <!-- Konten akan di-render oleh JS -->
+        </div>
+    </div>
+</div>
 
     <!-- Script -->
     <script src="../navbar.js"></script>
