@@ -2,139 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timy Time</title>
-  
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="../styles/navbar.css"> 
   <link rel="stylesheet" href="../styles/home.css">
-  
+  <link rel="stylesheet" href="../styles/navbar.css">
 </head>
-<body class="font-lexend bg-gray-100 w-full h-full overflow-hidden">
+<body>
 
-  <!-- Main Container - 100% Viewport -->
-  <div class="main-container w-full h-screen flex flex-col relative bg-white overflow-y-auto">
+  <!-- Container -->
+  <div class="container">
     
-    <!-- Background Section with Timy - 100% Width -->
-    <div class="responsive-bg full-width container-padding pb-8 relative flex-shrink-0 rounded-bottom-responsive overflow-hidden">
+    <!-- Header -->
+    <div class="header">
       
-      <!-- Title (Mobile Only) -->
-      <h1 class="block lg:hidden absolute top-5 left-1/2 -translate-x-1/2 font-bold text-black z-20 responsive-title">
-        Timy Time
-      </h1>
+      <!-- Title Mobile Only -->
+      <h1 class="header-title-mobile">Timy Time</h1>
       
-      <!-- Timy Character & Speech Bubble Container - 100% Width -->
-      <div class="flex justify-center items-start relative w-full mx-auto">
-        <!-- Timy Image -->
-        <img 
-          src="../assets/timy2.png" 
-          alt="Timy" 
-          onerror="this.style.display='none'" 
-          class="timy-image timy-wrapper"
-        >
-        
-        <!-- Speech Bubble -->
-        <div class="speech-bubble responsive-bubble">
-          Hi! I'm Timy,<br>
-          Your Personal Time Assistant
+      <!-- Character & Speech Bubble -->
+      <div class="character-wrapper">
+        <div class="character">
+          <!-- Character Image -->
+          <img 
+            src="../assets/timy2.png" 
+            alt="Timy" 
+            class="character-img"
+            onerror="this.style.display='none'"
+          >
+          
+          <!-- Speech Bubble -->
+          <div class="speech-bubble">
+            Hi! I'm Timy,<br>
+            Your Personal Time Assistant
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Streak Display Section - 100% Width -->
-    <div class="streak-container">
+    <!-- Streak Section (Overlapping) -->
+    <div class="streak">
       
       <!-- Flame Icon -->
-      <div class="spacing-tight text-orange-500 flame-icon responsive-flame">
+      <div class="flame">
         <i class="fa-solid fa-fire"></i>
       </div>
       
       <!-- Streak Number -->
-      <div class="font-bold spacing-tight text-gray-800 responsive-number" id="streak-number">
-        0
-      </div>
+      <div class="streak-number" id="streak-number">0</div>
       
-      <!-- Streak Label -->
-      <div class="font-semibold text-gray-800 spacing-normal responsive-text">
-        Productive Streak
-      </div>
-
-      <!-- Streak Progress Card - 100% Width -->
-      <div class="streak-card">
+      <!-- Streak Title -->
+      <div class="streak-title">Productive Streak</div>
+      
+      <!-- Progress Box -->
+      <div class="progress-box">
         
-        <!-- Days of Week - 100% Width -->
-        <div class="flex justify-between w-full spacing-normal font-semibold text-gray-800 responsive-days">
-          <span class="flex-1 text-center">M</span>
-          <span class="flex-1 text-center">T</span>
-          <span class="flex-1 text-center">W</span>
-          <span class="flex-1 text-center">T</span>
-          <span class="flex-1 text-center">F</span>
-          <span class="flex-1 text-center">S</span>
-          <span class="flex-1 text-center">S</span>
+        <!-- Days -->
+        <div class="days">
+          <span>M</span>
+          <span>T</span>
+          <span>W</span>
+          <span>T</span>
+          <span>F</span>
+          <span>S</span>
+          <span>S</span>
         </div>
         
-        <!-- Progress Bar Container - 100% Width -->
-        <div class="h-1 bg-gray-200 rounded-full w-full relative mb-2">
-          
+        <!-- Progress Line -->
+        <div class="progress-line">
           <!-- Progress Fill -->
-          <div 
-            class="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full transition-all duration-300" 
-            id="progress-fill" 
-            style="width: 71.4%;">
-          </div>
+          <div id="progress-fill" class="progress-fill"></div>
           
           <!-- Runner Icon -->
-          <i 
-            class="fa-solid fa-person-running absolute -top-2.5 text-gray-800 z-10 responsive-runner" 
-            id="runner-icon" 
-            style="left: 71.4%;">
-          </i>
+          <i id="runner-icon" class="runner-icon fa-solid fa-person-running"></i>
           
-          <!-- Progress Dots - 100% Width -->
-          <div class="flex justify-between w-full absolute top-1/2 -translate-y-1/2" id="dot-track">
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-            <div class="progress-dot bg-gray-800 rounded-full"></div>
-          </div>
+          <!-- Dot Track -->
+          <div id="dot-track" class="dot-track"></div>
         </div>
       </div>
-
-      <!-- Motivational Message -->
-      <div class="spacing-loose font-semibold text-gray-800 responsive-text">
-        Well Done, Keep Going!
-      </div>
+      
+      <!-- Message -->
+      <div class="message">Well Done, Keep Going!</div>
     </div>
   </div>
   
-  <!-- Bottom Navigation -->
-  <nav class="navbar">
-    <div class="nav-item active" data-page="home">
-      <i class="fas fa-home"></i>
-    </div>
-    <div class="nav-item" data-page="task">
-      <i class="fas fa-list-ul"></i>
-    </div>
-    <div class="nav-item" data-page="profile">
-      <i class="fas fa-user"></i>
-    </div>
-  </nav>
+  
 
-  <!-- Firebase & Custom Scripts -->
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- External scripts -->
   <script src="../streak.js"></script>
+  <script src="../navbar.js"></script>
   <script src="../main.js"></script>
 </body>
 </html>
