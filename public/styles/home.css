@@ -1,68 +1,305 @@
-/* File: public/styles/home_tailwind.css */
+/* File: public/styles/home.css */
 
-/* === Tailwind Base & Utilities Emulation === */
+/* === Base Font === */
 .font-lexend {
     font-family: 'Lexend', sans-serif;
 }
 
-/* === Responsive Background Logic === */
+/* === Responsive Background dengan breakpoint yang lebih spesifik === */
 .responsive-bg {
     background-position: center bottom;
-    background-size: 100% 100%;
+    background-size: cover;
     background-repeat: no-repeat;
+    position: relative;
 }
 
-/* 768px -> 48rem */
-@media (max-width: 48rem) { 
+/* Mobile: sampai 768px */
+@media (max-width: 768px) {
     .responsive-bg {
         background-image: url('../assets/bghome_mobile.png');
+        background-size: 100% 100%;
     }
 }
 
-/* 769px -> 48.0625rem */
-@media (min-width: 48.0625rem) { 
+/* Tablet & Laptop: 769px ke atas */
+@media (min-width: 769px) {
     .responsive-bg {
         background-image: url('../assets/bghome.png');
+        background-size: cover;
+        background-position: center center;
     }
 }
 
-/* Perbaikan kecil agar ikon runner di tengah */
+/* === Container utama dengan max-width untuk konsistensi === */
+.main-container {
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+/* === TYPOGRAPHY - Menggunakan rem untuk konsistensi === */
+/* Mobile-first approach dengan scaling yang konsisten */
+
+/* Title Timy Time */
+.responsive-title {
+    font-size: 1.25rem; /* 20px */
+}
+
+@media (min-width: 640px) {
+    .responsive-title {
+        font-size: 1.375rem; /* 22px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-title {
+        font-size: 1.5rem; /* 24px */
+    }
+}
+
+/* Flame Icon */
+.responsive-flame {
+    font-size: 1.75rem; /* 28px */
+}
+
+@media (min-width: 640px) {
+    .responsive-flame {
+        font-size: 2rem; /* 32px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-flame {
+        font-size: 2.25rem; /* 36px */
+    }
+}
+
+/* Streak Number */
+.responsive-number {
+    font-size: 1.5rem; /* 24px */
+}
+
+@media (min-width: 640px) {
+    .responsive-number {
+        font-size: 1.625rem; /* 26px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-number {
+        font-size: 1.75rem; /* 28px */
+    }
+}
+
+/* General Text (Productive Streak, Well Done) */
+.responsive-text {
+    font-size: 0.875rem; /* 14px */
+}
+
+@media (min-width: 640px) {
+    .responsive-text {
+        font-size: 0.9375rem; /* 15px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-text {
+        font-size: 1rem; /* 16px */
+    }
+}
+
+/* Days Label (M T W T F S S) */
+.responsive-days {
+    font-size: 0.75rem; /* 12px */
+}
+
+@media (min-width: 640px) {
+    .responsive-days {
+        font-size: 0.8125rem; /* 13px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-days {
+        font-size: 0.875rem; /* 14px */
+    }
+}
+
+/* Runner Icon */
+.responsive-runner {
+    font-size: 1rem; /* 16px */
+}
+
+@media (min-width: 640px) {
+    .responsive-runner {
+        font-size: 1.0625rem; /* 17px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-runner {
+        font-size: 1.125rem; /* 18px */
+    }
+}
+
+/* Speech Bubble */
+.responsive-bubble {
+    font-size: 0.8125rem; /* 13px */
+}
+
+@media (min-width: 640px) {
+    .responsive-bubble {
+        font-size: 0.875rem; /* 14px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-bubble {
+        font-size: 0.9375rem; /* 15px */
+    }
+}
+
+/* === Timy Image Sizing - Konsisten di semua laptop === */
+.timy-image {
+    width: 16.25rem; /* 260px mobile */
+    height: auto;
+    display: block;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+    .timy-image {
+        width: 22rem; /* 352px - konsisten untuk semua laptop */
+        max-width: 22rem;
+    }
+}
+
+/* Untuk layar sangat besar (> 1920px) */
+@media (min-width: 1920px) {
+    .timy-image {
+        width: 23.75rem; /* 380px */
+    }
+}
+
+/* === Speech Bubble Positioning === */
+.speech-bubble {
+    position: absolute;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    z-index: 10;
+}
+
+/* Mobile positioning */
+.speech-bubble {
+    top: 5vh;
+    left: 53%;
+    transform: translateX(60px);
+}
+
+@media (min-width: 1024px) {
+    .speech-bubble {
+        padding: 0.75rem 1rem;
+        transform: translateX(90px);
+    }
+}
+
+/* === Streak Card Container === */
+.streak-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 50;
+    padding: 0 1.25rem;
+}
+
+/* Mobile */
+.streak-container {
+    top: 56vh;
+}
+
+/* Tablet & Laptop */
+@media (min-width: 768px) {
+    .streak-container {
+        top: 54vh;
+    }
+}
+
+@media (min-width: 1024px) {
+    .streak-container {
+        top: 52vh;
+    }
+}
+
+/* === Streak Progress Card === */
+.streak-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.875rem;
+    background: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 17.5rem;
+}
+
+@media (min-width: 640px) {
+    .streak-card {
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .streak-card {
+        padding: 1.125rem;
+        max-width: 18.5rem;
+    }
+}
+
+/* === Runner Icon Fix === */
 #runner-icon {
     transform: translateX(-50%);
+    transition: left 0.3s ease;
 }
 
-/* === RESPONSIVE FONT & ICON SIZING (CLAMPS) === */
-/* Clamp: (Min 20px -> 1.25rem, 5vw, 24px -> 1.5rem) */
-.responsive-title {
-    font-size: clamp(1.25rem, 5vw, 1.5rem); 
+/* === Background Height Control === */
+.bg-section {
+    height: 60vh;
 }
 
-/* Clamp: (Min 24px -> 1.5rem, 6vw, 36px -> 2.25rem) */
-.responsive-flame {
-    font-size: clamp(1.5rem, 6vw, 2.25rem); 
+@media (min-width: 1024px) {
+    .bg-section {
+        height: 65vh;
+        min-height: 600px;
+        max-height: 750px;
+    }
 }
 
-/* Clamp: (Min 20px -> 1.25rem, 5vw, 26px -> 1.625rem) */
-.responsive-number {
-    font-size: clamp(1.25rem, 5vw, 1.625rem);
+/* === Flame Effect === */
+.flame-icon {
+    text-shadow: 0 0 12px rgba(255, 255, 255, 1);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
-/* Clamp: (Min 12px -> 0.75rem, 2.5vw, 15px -> 0.9375rem) */
-.responsive-text {
-    font-size: clamp(0.75rem, 2.5vw, 0.9375rem);
+/* === Smooth Transitions === */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Clamp: (Min 10px -> 0.625rem, 2vw, 13px -> 0.8125rem) */
-.responsive-days {
-    font-size: clamp(0.625rem, 2vw, 0.8125rem);
-}
-
-/* Clamp: (Min 16px -> 1rem, 3vw, 18px -> 1.125rem) */
-.responsive-runner {
-    font-size: clamp(1rem, 3vw, 1.125rem);
-}
-
-/* Clamp: (Min 11px -> 0.6875rem, 2.5vw, 14px -> 0.875rem) */
-.responsive-bubble {
-    font-size: clamp(0.6875rem, 2.5vw, 0.875rem);
+/* === Print & High DPI Support === */
+@media print, (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .responsive-bg {
+        background-size: cover;
+    }
 }
