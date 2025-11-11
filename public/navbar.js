@@ -36,9 +36,9 @@ function loadNavbarCSS() {
     link.rel = 'stylesheet';
     link.href = '../css/navbar.css';
     document.head.appendChild(link);
-    console.log('✅ Navbar CSS loaded dynamically');
+    console.log('Navbar CSS loaded dynamically');
   } else {
-    console.log('✅ Navbar CSS already linked');
+    console.log('Navbar CSS already linked');
   }
 }
 
@@ -88,7 +88,7 @@ function setupNavigation() {
     }
   });
   
-  console.log('✅ Navbar navigation ready');
+  console.log('Navbar navigation ready');
 }
 
 // Auto-load saat DOM ready
