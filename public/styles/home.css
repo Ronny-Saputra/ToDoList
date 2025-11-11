@@ -1,467 +1,68 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* File: public/styles/home_tailwind.css */
+
+/* === Tailwind Base & Utilities Emulation === */
+.font-lexend {
+    font-family: 'Lexend', sans-serif;
 }
 
-html, body {
-  height: 100%;
-  width: 100%;
-  overflow: hidden; /* Mencegah scrolling pada body */
-}
-
-body {
-  font-family: 'Lexend', 'Roboto', sans-serif;
-  background-color: #f0f4f9;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.container {
-  /* Container utama mengambil seluruh viewport */
-  height: 100vh;
-  width: 100%;
-
-  background-color: #fff;
-  box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow-y: auto; /* Memungkinkan konten di dalamnya (header + streak) untuk di-scroll */
-}
-
-/* === HEADER: Menggunakan height: 100vh sesuai permintaan === */
-.header {
-  width: 100%;
-  height: 100vh; /* <-- PERUBAHAN EKSPLISIT SESUAI PERMINTAAN USER */
-  background-image: url('../assets/bghome.png');
-  background-size: 100% 100%; 
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  padding: 1vh 20px 2vh; 
-  position: relative;
-  flex-shrink: 0;
-  border-radius: 0 0 32px 32px;
-  margin-top: 0;
-}
-
-.character {
-  display: flex;
-  justify-content: center;
-  align-items: flex;
-  position: relative;
-  margin: 0 auto;
-}
-
-.character img {
-  width: clamp(380px, 30vw, 380px); 
-  height: auto;
-  display: block;
-  /* Kunci: Menaikkan posisi karakter agar berada di tengah area biru */
-  margin-top: -18vh;
-  position: relative;
-}
-
-.speech-bubble {
-  position: absolute;
-  top: 5vh;
-  left: calc(53% + clamp(60px, 12vw, 100px));
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  padding: clamp(6px, 1.2vw, 10px) clamp(8px, 1.5vw, 12px);
-  font-size: clamp(10px, 1.8vw, 14px);
-  font-weight: 500;
-  line-height: 1.2;
-  text-align: left;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-  z-index: 10;
-}
-
-/* --- NEW STYLES: Sembunyikan Judul Mobile secara default --- */
-.header-title-mobile {
-  display: none; 
-}
-/* -------------------------------------------------------- */
-
-
-.streak {
-  text-align: center;
-  padding: 5px 20px;
-  
-  /* PERUBAHAN UTAMA: Posisi Absolut agar tumpang tindih dengan header 100vh */
-  position: absolute;
-  top: 52vh; /* Sesuaikan posisi agar muncul di tengah area biru header */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  
-  z-index: 1100; /* Pastikan di depan semua elemen */
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.flame {
-  font-size: clamp(28px, 5vw, 36px);
-  margin-bottom: 0.2vh;
-  color: #ff8c00;
-  text-shadow: 
-    -1px -1px 0 #FFFFFF,  
-     1px -1px 0 #FFFFFF,
-    -1px  1px 0 #FFFFFF,
-     1px  1px 0 #FFFFFF,
-     0 0 12px rgb(255, 255, 255);
-  filter: drop-shadow(0 2px 4px rgba(255, 140, 0, 0.3));
-}
-
-.streak-number {
-  font-size: clamp(22px, 4vw, 26px);
-  font-weight: 700;
-  margin-bottom: 0.5vh;
-  color: #333;
-}
-
-.streak-title {
-  font-size: clamp(13px, 2.2vw, 15px);
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1.5vh;
-}
-
-.progress-box {
-  border: 2px solid #e0e0e0;
-  border-radius: 12px; 
-  display: inline-block;
-  padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 15px);
-  margin: 1vh 0;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  width: 90%;
-  max-width: 320px;
-}
-
-.days {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 8px;
-  font-weight: 600;
-  font-size: clamp(11px, 1.8vw, 13px);
-  color: #333;
-}
-.days span {
-  flex: 1;
-  text-align: center;
-}
-
-.progress-line {
-  height: 4px; 
-  background: #e0e0e0;
-  border-radius: 2px; 
-  width: 100%;
-  position: relative;
-  margin-bottom: 8px;
-}
-
-.progress-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: linear-gradient(to right, #ff8c00, #ffd700);
-  border-radius: 2px; 
-  width: 71.4%;
-  transition: width 0.4s ease;
-}
-
-.runner-icon {
-  position: absolute;
-  top: -10px; 
-  left: 71.4%;
-  transform: translateX(-50%);
-  color: #333;
-  font-size: clamp(16px, 3vw, 18px); 
-  z-index: 10;
-}
-
-.dot-track {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  padding: 0 2px;
-}
-
-.dot {
-  width: clamp(5px, 1vw, 6px);
-  height: clamp(5px, 1vw, 6px);
-  background-color: #333;
-  border-radius: 50%;
-  position: relative;
-  flex: 1;
-  max-width: 6px;
-}
-
-.dot.completed {
-  background-color: transparent;
-}
-
-.message {
-  margin-top: 0.5vh;
-  font-weight: 600;
-  font-size: clamp(13px, 2.2vw, 15px);
-  color: #333;
-}
-
-/* Mobile override (<= 768px) */
-@media (max-width: 768px) {
-  .header {
-    background-image: url('../assets/bghome_mobile.png');
-    background-size: 100% 100%;
+/* === Responsive Background Logic === */
+.responsive-bg {
     background-position: center bottom;
-    margin-top: 0; 
-    /* TETAP 100VH */
-    height: 60vh;
-  }
-  
-  /* === NEW: Tampilkan dan atur judul mobile === */
-  .header-title-mobile {
-    display: block; /* Tampilkan di mobile */
-    position: absolute; 
-    top: 20px; /* Jarak dari atas header */
-    left: 50%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* 768px -> 48rem */
+@media (max-width: 48rem) { 
+    .responsive-bg {
+        background-image: url('../assets/bghome_mobile.png');
+    }
+}
+
+/* 769px -> 48.0625rem */
+@media (min-width: 48.0625rem) { 
+    .responsive-bg {
+        background-image: url('../assets/bghome.png');
+    }
+}
+
+/* Perbaikan kecil agar ikon runner di tengah */
+#runner-icon {
     transform: translateX(-50%);
-    font-size: 24px;
-    font-weight: 700;
-    color: #000000; /* Warna biru tua */
-    z-index: 20;
-    margin: 0;
-  }
-  /* --------------------------------------------- */
-
-
-  .character img {
-    width: clamp(260px, 40vw, 260px);
-    margin-top: 8vh; 
-  }
-  
-  .speech-bubble {
-    top: 14vh;
-    left: calc(27% + 0px);
-    font-size: 12px;
-  }
-  
-  .streak {
-    /* PENYESUAIAN MOBILE */
-    top: 56vh;
-    padding-bottom: 60px;
-  }
 }
 
-/* Mobile adjustments (<= 400px) */
-@media (max-width: 400px) {
-
-  .header {
-    height: 65vh;
-  }
-  
-  /* Sesuaikan judul agar tidak terlalu menempel pada sisi */
-  .header-title-mobile {
-    top: 40px; 
-    font-size: 22px;
-  }
-  
-  .character img {
-    margin-top: 12vh; 
-    width: clamp(300px, 40vw, 300px);
-  }
-  .speech-bubble {
-    top: 18vh;
-    left: calc(13% + 40px);
-  }
-
-  .streak {
-    top: 61vh; /* Sesuaikan posisi agar muncul di tengah area biru header */
-    left: 50%;
-  }
+/* === RESPONSIVE FONT & ICON SIZING (CLAMPS) === */
+/* Clamp: (Min 20px -> 1.25rem, 5vw, 24px -> 1.5rem) */
+.responsive-title {
+    font-size: clamp(1.25rem, 5vw, 1.5rem); 
 }
 
-/* === ZOOM HANDLING === */
-/* Menggunakan transform scale agar posisi tetap, hanya ukuran yang berubah */
-
-/* Wrapper untuk scale tanpa mempengaruhi posisi */
-.flame,
-.streak-number,
-.streak-title,
-.progress-box,
-.message {
-  transform-origin: center center;
+/* Clamp: (Min 24px -> 1.5rem, 6vw, 36px -> 2.25rem) */
+.responsive-flame {
+    font-size: clamp(1.5rem, 6vw, 2.25rem); 
 }
 
-.character img, 
-.character,
-.speech-bubble {
-  transform-origin: center center;
+/* Clamp: (Min 20px -> 1.25rem, 5vw, 26px -> 1.625rem) */
+.responsive-number {
+    font-size: clamp(1.25rem, 5vw, 1.625rem);
 }
 
-/* Deteksi Zoom In */
-@media screen and (min-resolution: 1.25dppx) and (max-resolution: 1.49dppx) {
-  /* Zoom 125% */
-  .character img {
-    transform: scale(0.95);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.95);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.95);
-  }
+/* Clamp: (Min 12px -> 0.75rem, 2.5vw, 15px -> 0.9375rem) */
+.responsive-text {
+    font-size: clamp(0.75rem, 2.5vw, 0.9375rem);
 }
 
-@media screen and (min-resolution: 1.5dppx) and (max-resolution: 1.74dppx) {
-  /* Zoom 150% */
-  .character img {
-    transform: scale(0.90);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.90);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.90);
-  }
+/* Clamp: (Min 10px -> 0.625rem, 2vw, 13px -> 0.8125rem) */
+.responsive-days {
+    font-size: clamp(0.625rem, 2vw, 0.8125rem);
 }
 
-@media screen and (min-resolution: 1.75dppx) and (max-resolution: 1.99dppx) {
-  /* Zoom 175% */
-  .character img {
-    transform: scale(0.85);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.85);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.85);
-  }
+/* Clamp: (Min 16px -> 1rem, 3vw, 18px -> 1.125rem) */
+.responsive-runner {
+    font-size: clamp(1rem, 3vw, 1.125rem);
 }
 
-@media screen and (min-resolution: 2dppx) {
-  /* Zoom 200%+ */
-  .character img {
-    transform: scale(0.80);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.80);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.80);
-  }
-}
-
-/* Deteksi Zoom Out */
-@media screen and (max-resolution: 0.9dppx) {
-  /* Zoom 90% - elemen mengecil */
-  .character img {
-    transform: scale(0.95);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.95);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.95);
-  }
-}
-
-@media screen and (max-resolution: 0.75dppx) {
-  /* Zoom 75% - elemen mengecil */
-  .character img {
-    transform: scale(0.90);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.90);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.90);
-  }
-}
-
-@media screen and (max-resolution: 0.67dppx) {
-  /* Zoom 67% - elemen mengecil */
-  .character img {
-    transform: scale(0.85);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.85);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.85);
-  }
-}
-
-@media screen and (max-resolution: 0.5dppx) {
-  /* Zoom 50% - elemen mengecil */
-  .character img {
-    transform: scale(0.75);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.75);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.75);
-  }
+/* Clamp: (Min 11px -> 0.6875rem, 2.5vw, 14px -> 0.875rem) */
+.responsive-bubble {
+    font-size: clamp(0.6875rem, 2.5vw, 0.875rem);
 }
