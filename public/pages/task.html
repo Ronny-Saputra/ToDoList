@@ -17,7 +17,7 @@
             <header class="header">
                 <div class="date-info">
                     <span class="today-text">Today <i class="fas fa-sun"></i></span>
-                    <span class="date-text" id="month-year-display">Januari 2025</span>
+                    <span class="date-text" id="month-year-display"></span>
                 </div>
                 <div class="header-icons">
                     <a href="calendar.html">
@@ -141,9 +141,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
+    
     <script>
-        // ✅ Initialize Firebase (use *your* project’s config)
         const firebaseConfig = {
             apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
             authDomain: "todolist-43.firebaseapp.com",
@@ -151,21 +150,21 @@
             storageBucket: "todolist-43.appspot.com",
             messagingSenderId: "795548747542",
             appId: "1:795548747542:web:deb1efc52ed1aa247af237",
-            measurementId: "G-67K7H7XXWW"
+            measurementId: "G-67K7H7XXWW" 
         };
-
-    // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        
+        // Inisialisasi Firebase jika belum diinisialisasi
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Redirect jika pengguna tidak login
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "../pages/login.html";
+            }
+        });
     </script>
-
-    <script>
-    firebase.auth().onAuthStateChanged(user => {
-    if (!user) {
-        window.location.href = "../pages/login.html";
-    }
-    });
-    </script>
-
     <script src="../main.js"></script>
     <script src="../navbar.js"></script>
     <script src="../task.js"></script> 

@@ -366,6 +366,16 @@ body {
 }
 
 /* ==================================================== */
+/* ========== TABLET VIEW (768px - 1200px) ========== */
+/* ==================================================== */
+@media (max-width: 1200px) and (min-width: 768px) {
+    .month-list-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+}
+
+/* ==================================================== */
 /* ========== MOBILE VIEW OVERRIDES (MAX-WIDTH 767px) ========== */
 /* ==================================================== */
 @media (max-width: 767px) {
@@ -507,7 +517,7 @@ body {
         height: 5px;
     }
 
-        .nav-btn {
+    .nav-btn {
         margin-top: 40px;
     }
 
@@ -559,5 +569,28 @@ body {
     .add-reminder-box {
         height: 40px;
         font-size: 0.8em;
+    }
+}
+
+/* ==================================================== */
+/* ========== LARGE DESKTOP VIEW (MIN-WIDTH 1440px) ========== */
+/* ==================================================== */
+@media (min-width: 1440px) {
+    /* Gap antar tanggal: Lebih kecil agar kotak bisa lebih tinggi */
+    .dates {
+        gap: 15px; /* Dikurangi dari 6px ke 3px untuk ruang vertikal lebih besar */
+    }
+
+    /* Kotak Tanggal: MEMANJANG KE BAWAH */
+    .date-box {
+        min-height: 80px; /* Diperbesar drastis untuk efek memanjang yang lebih jelas */
+        padding-bottom: 30px; /* Tambah padding bawah untuk ruang dot indicator */
+    }
+
+    /* Indikator Titik: Sesuaikan dengan tinggi baru */
+    .dot-indicator-calendar {
+        bottom: 10px; /* Sesuaikan posisi dengan tinggi baru */
+        width: 7px;
+        height: 7px;
     }
 }

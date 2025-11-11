@@ -72,7 +72,7 @@ body {
 /* Wrapper untuk gradasi biru penuh di bagian atas (FIXED) */
 .top-task-section {
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    /* MODIFIKASI: Hapus bayangan agar tidak ada garis di bawah kalender */
+    /* MODIFIKASI: Hapus bayangan agar terlihat menyatu dengan layar */
     box-shadow: none; 
     
     /* Tetap fixed pada posisi atas container */
@@ -83,12 +83,12 @@ body {
     margin: 0; 
     width: 100%; 
     
-    /* MODIFIKASI UTAMA: Tambahkan border-radius di bagian bawah */
-    border-radius: 0 0 32px 32px; 
+    /* MODIFIKASI UTAMA: Mengurangi border-radius di bagian bawah */
+    border-radius: 0 0 12px 12px; 
     
     /* MODIFIKASI: Mengurangi padding vertikal (Default/Desktop) */
     padding-top: 15px; 
-    padding-bottom: 15px;
+    padding-bottom: 25px;
     
     display: flex;
     flex-direction: column;
@@ -629,7 +629,8 @@ body {
     .top-task-section {
         margin: 0; 
         width: 100%;
-        border-radius: 0 0 32px 32px; 
+        /* Menerapkan perubahan border-radius di mobile juga (Konsisten 16px) */
+        border-radius: 0 0 16px 16px; 
         /* MODIFIKASI: Mengurangi padding vertikal untuk tampilan HP yang lebih ringkas */
         padding-top: 10px; 
         padding-bottom: 10px; 

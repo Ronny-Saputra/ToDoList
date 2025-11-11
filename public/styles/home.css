@@ -1,3 +1,5 @@
+/* File: public/styles/home.css */
+/* ===== RESET & BASE ===== */
 * {
   margin: 0;
   padding: 0;
@@ -7,7 +9,7 @@
 html, body {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Mencegah scrolling pada body */
+  overflow: hidden;
 }
 
 body {
@@ -18,88 +20,104 @@ body {
   align-items: center;
 }
 
+/* ===== CONTAINER ===== */
 .container {
-  /* Container utama mengambil seluruh viewport */
   height: 100vh;
   width: 100%;
-
   background-color: #fff;
   box-shadow: none;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-y: auto; /* Memungkinkan konten di dalamnya (header + streak) untuk di-scroll */
+  overflow-y: auto;
 }
 
-/* === HEADER: Menggunakan height: 100vh sesuai permintaan === */
+/* ===== HEADER ===== */
 .header {
   width: 100%;
-  height: 100vh; /* <-- PERUBAHAN EKSPLISIT SESUAI PERMINTAAN USER */
+  /* PERBAIKAN: Menggunakan clamp() untuk membatasi tinggi maksimum (max 1000px) 
+     agar header tidak meregang di monitor yang sangat tinggi, menjaga proporsi. */
+  height: 58%; 
   background-image: url('../assets/bghome.png');
-  background-size: 100% 100%; 
-  background-position: center bottom;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
-  padding: 1vh 20px 2vh; 
+  padding: clamp(2rem, 3vw, 3rem) clamp(1.25rem, 2vw, 2rem);
   position: relative;
   flex-shrink: 0;
-  border-radius: 0 0 32px 32px;
-  margin-top: 0;
+  border-radius: 0 0 2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Title Mobile - Hidden by default */
+.header-title-mobile {
+  display: none;
+  position: absolute;
+  top: clamp(1.5rem, 2.5vw, 2rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  color: #000;
+  z-index: 20;
+  margin: 0;
+}
+
+/* ===== CHARACTER ===== */
+.character-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  margin-top: clamp(4vh, -15vw, -12vh);
 }
 
 .character {
   display: flex;
   justify-content: center;
-  align-items: flex;
+  align-items: centert;
   position: relative;
-  margin: 0 auto;
 }
 
-.character img {
-  width: clamp(380px, 30vw, 380px); 
+.character-img {
+  width: clamp(25rem, 28vw, 32rem);
   height: auto;
   display: block;
-  /* Kunci: Menaikkan posisi karakter agar berada di tengah area biru */
-  margin-top: -18vh;
-  position: relative;
 }
 
 .speech-bubble {
   position: absolute;
-  top: 5vh;
-  left: calc(53% + clamp(60px, 12vw, 100px));
+  top: clamp(7rem, 4vw, 5rem);
+  left: calc(85% + clamp(1.5rem, 3vw, 3rem));
   background: white;
   border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  padding: clamp(6px, 1.2vw, 10px) clamp(8px, 1.5vw, 12px);
-  font-size: clamp(10px, 1.8vw, 14px);
+  border-radius: clamp(0.75rem, 1vw, 1rem);
+  padding: clamp(0.5rem, 0.8vw, 0.875rem) clamp(0.75rem, 1.2vw, 1.25rem);
+  font-size: clamp(0.875rem, 1.1vw, 1.125rem);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.4;
   text-align: left;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
   z-index: 10;
 }
 
-/* --- NEW STYLES: Sembunyikan Judul Mobile secara default --- */
-.header-title-mobile {
-  display: none; 
-}
-/* -------------------------------------------------------- */
-
-
+/* ===== STREAK SECTION ===== */
 .streak {
   text-align: center;
-  padding: 5px 20px;
-  
-  /* PERUBAHAN UTAMA: Posisi Absolut agar tumpang tindih dengan header 100vh */
+  padding: clamp(0.5rem, 0.5vw, 0.5rem);
   position: absolute;
-  top: 52vh; /* Sesuaikan posisi agar muncul di tengah area biru header */
+  /* PERBAIKAN: Menggunakan % agar posisi vertikal relatif terhadap tinggi header yang sudah di-clamp, bukan viewport. */
+  top: 53%; 
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  
-  z-index: 1100; /* Pastikan di depan semua elemen */
-  
+  max-width: clamp(24rem, 32vw, 32rem);
+  z-index: 1100;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -107,8 +125,8 @@ body {
 }
 
 .flame {
-  font-size: clamp(28px, 5vw, 36px);
-  margin-bottom: 0.2vh;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  margin-bottom: clamp(0.5rem, 0.8vw, 0.75rem);
   color: #ff8c00;
   text-shadow: 
     -1px -1px 0 #FFFFFF,  
@@ -120,52 +138,52 @@ body {
 }
 
 .streak-number {
-  font-size: clamp(22px, 4vw, 26px);
+  font-size: clamp(1.75rem, 2.8vw, 2.5rem);
   font-weight: 700;
-  margin-bottom: 0.5vh;
   color: #333;
 }
 
 .streak-title {
-  font-size: clamp(13px, 2.2vw, 15px);
+  font-size: clamp(1rem, 1vw, 1rem);
   font-weight: 600;
   color: #333;
-  margin-bottom: 1.5vh;
 }
 
 .progress-box {
   border: 2px solid #e0e0e0;
-  border-radius: 12px; 
+  border-radius: clamp(0.75rem, 1vw, 1rem);
   display: inline-block;
-  padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 15px);
-  margin: 1vh 0;
+  padding: clamp(0.875rem, 1.3vw, 1.25rem) clamp(1rem, 1.5vw, 1.5rem);
+  margin: clamp(0.3rem, 0.3vw, 0.3rem) 0;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   width: 90%;
-  max-width: 320px;
+  max-width: clamp(20rem, 28vw, 28rem);
+
 }
 
 .days {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: clamp(0.75rem, 1vw, 1rem);
   font-weight: 600;
-  font-size: clamp(11px, 1.8vw, 13px);
+  font-size: clamp(0.875rem, 1.1vw, 1rem);
   color: #333;
 }
+
 .days span {
   flex: 1;
   text-align: center;
 }
 
 .progress-line {
-  height: 4px; 
+  height: clamp(0.25rem, 0.4vw, 0.375rem);
   background: #e0e0e0;
-  border-radius: 2px; 
+  border-radius: clamp(0.125rem, 0.2vw, 0.25rem);
   width: 100%;
   position: relative;
-  margin-bottom: 8px;
+  margin-bottom: clamp(0.5rem, 0.8vw, 0.75rem);
 }
 
 .progress-fill {
@@ -174,19 +192,20 @@ body {
   left: 0;
   height: 100%;
   background: linear-gradient(to right, #ff8c00, #ffd700);
-  border-radius: 2px; 
+  border-radius: clamp(0.125rem, 0.2vw, 0.25rem);
   width: 71.4%;
   transition: width 0.4s ease;
 }
 
 .runner-icon {
   position: absolute;
-  top: -10px; 
+  top: clamp(-0.625rem, -0.9vw, -0.875rem);
   left: 71.4%;
   transform: translateX(-50%);
   color: #333;
-  font-size: clamp(16px, 3vw, 18px); 
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
   z-index: 10;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dot-track {
@@ -197,17 +216,17 @@ body {
   top: 50%;
   left: 0;
   transform: translateY(-50%);
-  padding: 0 2px;
+  padding: 0 0.125rem;
 }
 
 .dot {
-  width: clamp(5px, 1vw, 6px);
-  height: clamp(5px, 1vw, 6px);
+  width: clamp(0.375rem, 0.5vw, 0.5rem);
+  height: clamp(0.375rem, 0.5vw, 0.5rem);
   background-color: #333;
   border-radius: 50%;
   position: relative;
   flex: 1;
-  max-width: 6px;
+  max-width: 0.5rem;
 }
 
 .dot.completed {
@@ -215,253 +234,690 @@ body {
 }
 
 .message {
-  margin-top: 0.5vh;
+  margin-top: clamp(0.5rem, 0.8vw, 0.75rem);
   font-weight: 600;
-  font-size: clamp(13px, 2.2vw, 15px);
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
   color: #333;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
 }
 
-/* Mobile override (<= 768px) */
+
+
+/* ===== SMOOTH ZOOM TRANSITIONS ===== */
+@media (min-resolution: 1dppx) and (max-resolution: 1.24dppx) {
+  /* 100% Zoom - Base styles already applied */
+}
+
+@media (min-resolution: 1.25dppx) and (max-resolution: 1.49dppx) {
+  /* 125% Zoom */
+  .character-img {
+    transform: scale(0.95);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.95);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.95);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(0.95);
+  }
+
+}
+
+@media (min-resolution: 1.5dppx) and (max-resolution: 1.74dppx) {
+  /* 150% Zoom */
+  .character-img {
+    transform: scale(0.90);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.90);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.90);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(0.90);
+  }
+  
+
+}
+
+@media (min-resolution: 1.75dppx) and (max-resolution: 1.99dppx) {
+  /* 175% Zoom */
+  .character-img {
+    transform: scale(0.85);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.85);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.85);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(0.85);
+  }
+ 
+}
+
+@media (min-resolution: 2dppx) {
+  /* 200%+ Zoom */
+  .character-img {
+    transform: scale(0.80);
+  }
+  
+  .speech-bubble {
+    transform: scale(0.80);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(0.80);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(0.80);
+  }
+  
+
+}
+
+/* Zoom Out */
+@media (max-resolution: 0.9dppx) {
+  /* 90% Zoom */
+  .character-img {
+    transform: scale(1.05);
+  }
+  
+  .speech-bubble {
+    transform: scale(1.05);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(1.05);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(1.05);
+  }
+
+}
+
+@media (max-resolution: 0.75dppx) {
+  /* 75% Zoom */
+  .character-img {
+    transform: scale(1.10);
+  }
+  
+  .speech-bubble {
+    transform: scale(1.10);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(1.10);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(1.10);
+  }
+
+}
+
+@media (max-resolution: 0.67dppx) {
+  /* 67% Zoom */
+  .character-img {
+    transform: scale(1.15);
+  }
+  
+  .speech-bubble {
+    transform: scale(1.15);
+  }
+  
+  .flame,
+  .streak-number,
+  .streak-title,
+  .progress-box,
+  .message {
+    transform: scale(1.15);
+  }
+  
+  .runner-icon {
+    transform: translateX(-50%) scale(1.15);
+  }
+}
+
+/* ===== TABLET (≤ 1024px) ===== */
+@media (max-width: 1024px) {
+  .header {
+    background-image: url('../assets/bghome_mobile.png');
+    height:64%;
+  }
+  .character-wrapper {
+    margin-top: 8rem;
+  }
+  .character-img {
+    width: clamp(22rem, 26vw, 22rem);
+  }
+  
+  .speech-bubble {
+    font-size: clamp(0.8125rem, 1vw, 1rem);
+    left: calc(20% + clamp(1.25rem, 2.5vw, 2.5rem));
+    top: clamp(2rem, 20vw, -8rem);
+  }
+  
+  .streak {
+    top: 61%;
+    max-width: clamp(22rem, 30vw, 26rem);
+  }
+  
+  .flame {
+    font-size: clamp(2.25rem, 3.5vw, 3rem);
+    margin-bottom: 0.8rem;
+  }
+  
+  .streak-number {
+    font-size: clamp(1.625rem, 2.5vw, 2.25rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(0.9375rem, 1.2vw, 1.125rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .progress-box {
+    max-width: clamp(18rem, 26vw, 24rem);
+    margin-bottom: 0.8rem;
+  }
+}
+
+/* ===== MOBILE (≤ 768px) ===== */
 @media (max-width: 768px) {
   .header {
     background-image: url('../assets/bghome_mobile.png');
-    background-size: 100% 100%;
-    background-position: center bottom;
-    margin-top: 0; 
-    /* TETAP 100VH */
-    height: 60vh;
+    height: 68vh;
   }
   
-  /* === NEW: Tampilkan dan atur judul mobile === */
   .header-title-mobile {
-    display: block; /* Tampilkan di mobile */
-    position: absolute; 
-    top: 20px; /* Jarak dari atas header */
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    font-weight: 700;
-    color: #000000; /* Warna biru tua */
-    z-index: 20;
-    margin: 0;
+    /* Perbaikan 1: Pastikan elemen muncul */
+    display: block; 
+    font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Atur top ke nilai positif yang aman agar terlihat */
+    top: clamp(2rem, 5vw, 3rem); 
   }
-  /* --------------------------------------------- */
-
-
-  .character img {
-    width: clamp(260px, 40vw, 260px);
-    margin-top: 8vh; 
+  
+  .character-wrapper {
+    top: 2rem;
+  }
+  
+  .character-img {
+    width: clamp(23rem, 30vw, 23rem);
   }
   
   .speech-bubble {
-    top: 14vh;
-    left: calc(27% + 0px);
-    font-size: 12px;
+    top: clamp(2rem, 20vw, -23rem);
+    left: calc(7% + clamp(2rem, 5vw, 2.5rem));
+    font-size: clamp(0.6875rem, 2.2vw, 0.875rem);
+    padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
   
   .streak {
-    /* PENYESUAIAN MOBILE */
-    top: 56vh;
-    padding-bottom: 60px;
+    top: 65vh;
+  }
+  
+  .flame {
+    font-size: clamp(2rem, 1vw, 4rem);
+  }
+  
+  .streak-number {
+    font-size: clamp(1rem, 1vw, 1rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(0.8rem, 1vw, 1rem);
+  }
+  
+  .progress-box {
+    padding: clamp(0.625rem, 1vw, 0.875rem) clamp(0.875rem, 2vw, 1.125rem);
+    max-width: clamp(16rem, 70vw, 20rem);
+  }
+  
+  .days {
+    font-size: clamp(0.6875rem, 1vw, 0.875rem);
+    margin-bottom: clamp(0.625rem, 2vw, 0.875rem);
+  }
+  
+  .runner-icon {
+    font-size: clamp(0.9375rem, 1vw, 1.25rem);
+  }
+  
+  .message {
+    font-size: clamp(0.8125rem, 1vw, 0.9375rem);
   }
 }
 
-/* Mobile adjustments (<= 400px) */
-@media (max-width: 400px) {
-
+/* ===== SMALL MOBILE (≤ 480px) ===== */
+@media (max-width: 480px) {
   .header {
-    height: 65vh;
+    height: 76vh;
   }
   
-  /* Sesuaikan judul agar tidak terlalu menempel pada sisi */
   .header-title-mobile {
-    top: 40px; 
-    font-size: 22px;
+    /* Perbaikan 1: Pastikan elemen muncul */
+    display: block;
+    font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
+    top: clamp(2rem, 5vw, 3rem); 
   }
   
-  .character img {
-    margin-top: 12vh; 
-    width: clamp(300px, 40vw, 300px);
+  .character-wrapper {
+    margin-top: 2rem;
   }
+  
+  .character-img {
+    width: clamp(15rem, 30vw, 15rem);
+  }
+  
   .speech-bubble {
-    top: 18vh;
-    left: calc(13% + 40px);
+    top: clamp(0rem, 20vw, -13rem);
+    left: calc(2% + clamp(2rem, 5vw, 2.5rem));
+    font-size: clamp(0.6875rem, 2.2vw, 0.875rem);
+    padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
-
+  
   .streak {
-    top: 61vh; /* Sesuaikan posisi agar muncul di tengah area biru header */
-    left: 50%;
+    top: 62vh;
+  }
+  
+  .flame {
+    font-size: clamp(2rem, 1vw, 4rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-number {
+    font-size: clamp(1rem, 1vw, 1rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .progress-box {
+    padding: clamp(0.625rem, 1vw, 0.875rem) clamp(0.875rem, 2vw, 1.125rem);
+    max-width: clamp(16rem, 70vw, 20rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .days {
+    font-size: clamp(0.6875rem, 1vw, 0.875rem);
+    margin-bottom: clamp(0.625rem, 2vw, 0.875rem);
+  }
+  
+  .runner-icon {
+    font-size: clamp(0.9375rem, 1vw, 1.25rem);
+  }
+  
+  .message {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
   }
 }
 
-/* === ZOOM HANDLING === */
-/* Menggunakan transform scale agar posisi tetap, hanya ukuran yang berubah */
-
-/* Wrapper untuk scale tanpa mempengaruhi posisi */
-.flame,
-.streak-number,
-.streak-title,
-.progress-box,
-.message {
-  transform-origin: center center;
-}
-
-.character img, 
-.character,
-.speech-bubble {
-  transform-origin: center center;
-}
-
-/* Deteksi Zoom In */
-@media screen and (min-resolution: 1.25dppx) and (max-resolution: 1.49dppx) {
-  /* Zoom 125% */
-  .character img {
-    transform: scale(0.95);
+/* ===== EXTRA SMALL (≤ 360px) ===== */
+@media (max-width: 576px) {
+   .header {
+    height: 63vh;
+  }
+  
+  .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
+    display: block;
+    font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
+    top: clamp(2rem, 5vw, 3rem); 
+  }
+  
+  .character-wrapper {
+    margin-top: 4rem;
+  }
+  
+  .character-img {
+    width: clamp(15rem, 30vw, 15rem);
   }
   
   .speech-bubble {
-    transform: scale(0.95);
+    top: clamp(1.5rem, 20vw, -10rem);
+    left: calc(2% + clamp(2rem, 5vw, 2.5rem));
+    font-size: clamp(0.6875rem, 2.2vw, 0.875rem);
+    padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
   
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
+  .streak {
+    top: 57vh;
+  }
+  
+  .flame {
+    font-size: clamp(2rem, 1vw, 4rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-number {
+    font-size: clamp(1rem, 1vw, 1rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .progress-box {
+    padding: clamp(0.625rem, 1vw, 0.875rem) clamp(0.875rem, 2vw, 1.125rem);
+    max-width: clamp(16rem, 70vw, 20rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .days {
+    font-size: clamp(0.6875rem, 1vw, 0.875rem);
+    margin-bottom: clamp(0.625rem, 2vw, 0.875rem);
+  }
+  
+  .runner-icon {
+    font-size: clamp(0.9375rem, 1vw, 1.25rem);
+  }
+  
   .message {
-    transform: scale(0.95);
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
   }
 }
 
-@media screen and (min-resolution: 1.5dppx) and (max-resolution: 1.74dppx) {
-  /* Zoom 150% */
-  .character img {
-    transform: scale(0.90);
+@media (max-width: 592px) {
+   .header {
+    height: 63vh;
+  }
+  
+  .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
+    display: block;
+    font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
+    top: clamp(2rem, 5vw, 3rem); 
+  }
+  
+  .character-wrapper {
+    margin-top: 4rem;
+  }
+  
+  .character-img {
+    width: clamp(15rem, 30vw, 15rem);
   }
   
   .speech-bubble {
-    transform: scale(0.90);
+    top: clamp(1.5rem, 20vw, -10rem);
+    left: calc(2% + clamp(2rem, 5vw, 2.5rem));
+    font-size: clamp(0.6875rem, 2.2vw, 0.875rem);
+    padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
   
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
+  .streak {
+    top: 57vh;
+  }
+  
+  .flame {
+    font-size: clamp(2rem, 1vw, 4rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-number {
+    font-size: clamp(1rem, 1vw, 1rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .progress-box {
+    padding: clamp(0.625rem, 1vw, 0.875rem) clamp(0.875rem, 2vw, 1.125rem);
+    max-width: clamp(16rem, 70vw, 20rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .days {
+    font-size: clamp(0.6875rem, 1vw, 0.875rem);
+    margin-bottom: clamp(0.625rem, 2vw, 0.875rem);
+  }
+  
+  .runner-icon {
+    font-size: clamp(0.9375rem, 1vw, 1.25rem);
+  }
+  
   .message {
-    transform: scale(0.90);
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
   }
 }
 
-@media screen and (min-resolution: 1.75dppx) and (max-resolution: 1.99dppx) {
-  /* Zoom 175% */
-  .character img {
-    transform: scale(0.85);
+@media (max-width: 360px) {
+   .header {
+    height: 80vh;
+  }
+  
+  .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
+    display: block;
+    font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
+    top: clamp(2rem, 5vw, 3rem); 
+  }
+  
+  .character-wrapper {
+    margin-top: -4rem;
+  }
+  
+  .character-img {
+    width: clamp(14rem, 30vw, 14rem);
   }
   
   .speech-bubble {
-    transform: scale(0.85);
+    top: clamp(1.5rem, 20vw, -10rem);
+    left: calc(0% + clamp(1.2rem, 5vw, 1.2rem));
+    font-size: clamp(0.6875rem, 2.2vw, 0.6rem);
+    padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
   
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
+  .streak {
+    top: 55vh;
+  }
+  
+  .flame {
+    font-size: clamp(2rem, 1vw, 4rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-number {
+    font-size: clamp(1rem, 1vw, 1rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .progress-box {
+    padding: clamp(0.625rem, 1vw, 0.875rem) clamp(0.875rem, 2vw, 1.125rem);
+    max-width: clamp(16rem, 70vw, 20rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+  
+  .days {
+    font-size: clamp(0.6875rem, 1vw, 0.875rem);
+    margin-bottom: clamp(0.625rem, 2vw, 0.875rem);
+  }
+  
+  .runner-icon {
+    font-size: clamp(0.9375rem, 1vw, 1.25rem);
+  }
+  
   .message {
-    transform: scale(0.85);
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
   }
 }
 
-@media screen and (min-resolution: 2dppx) {
-  /* Zoom 200%+ */
-  .character img {
-    transform: scale(0.80);
+/* ===== LANDSCAPE MODE ===== */
+@media (max-height: 600px) and (orientation: landscape) {
+  .header {
+    height: 100vh;
+    margin-top: -41vh;
   }
   
+  .character-wrapper {
+    margin-top: 16rem;
+  }
+  
+  .character-img {
+    width: clamp(20rem, 20vw, 20rem);
+  }
+
   .speech-bubble {
-    transform: scale(0.80);
+    top: clamp(6rem, 4.5vw, 20rem);
+    left: calc(70% + clamp(2.5rem, 3.5vw, 5rem));
+    font-size: clamp(0.7rem, 1.3vw, 0.7rem);
+    padding: clamp(0.6rem, 1vw, 0.8rem) clamp(0.9rem, 1vw, 1.5rem);
   }
   
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.80);
+  .streak {
+    top: 53vh;
+    padding-bottom: 4rem;
   }
+
+  
+  .flame {
+    font-size: 2rem;
+    margin-bottom: 0.35rem;
+  }
+  
+  .streak-number {
+    font-size: 1.25rem;
+
+  }
+  
+  .streak-title {
+    font-size: 0.75rem;
+
+  }
+  
+  .progress-box {
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+  }
+  
+  .message {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  
+
 }
 
-/* Deteksi Zoom Out */
-@media screen and (max-resolution: 0.9dppx) {
-  /* Zoom 90% - elemen mengecil */
-  .character img {
-    transform: scale(0.95);
+/* ===== LARGE DESKTOP (≥ 1440px) ===== */
+@media (min-width: 1440px) {
+  .header{
+    height: 59vh;
+  }
+  .character-img {
+    width: clamp(28rem, 20vw, 30rem);
   }
   
   .speech-bubble {
-    transform: scale(0.95);
+    top: clamp(8rem, 4.5vw, 30rem);
+    left: calc(80% + clamp(3rem, 3.5vw, 4rem));
+    font-size: clamp(1.125rem, 1.3vw, 1.25rem);
+    padding: clamp(0.875rem, 1vw, 1rem) clamp(1.25rem, 1.5vw, 1.5rem);
   }
   
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.95);
+  .streak {
+    max-width: clamp(28rem, 20vw, 30rem);
+    padding: clamp(1rem, 1vw, 1rem);
   }
+  
+  .flame {
+    font-size: clamp(3.5rem, 3vw, 3.5rem);
+    padding: clamp(0.2rem, 1vw, 0.2rem);
+  }
+  
+  .streak-number {
+    font-size: clamp(2.2rem, 2vw, 2.2rem);
+    padding: clamp(0.2rem, 1vw, 0.2rem);
+  }
+  
+  .streak-title {
+    font-size: clamp(1.2rem, 1vw, 1.2rem);
+    padding: clamp(0.5rem, 1vw, 0.5rem);
+  }
+  
+  .progress-box {
+    max-width: clamp(20rem, 20vw, 20rem);
+    padding: clamp(1rem, 1vw, 1rem) clamp(1rem, 1vw, 1rem);
+  }
+  
+  .days {
+    font-size: clamp(1rem, 1vw, 1rem);
+  }
+  
+  .runner-icon {
+    font-size: clamp(1rem, 1vw, 1rem);
+  }
+  
+  .message {
+    font-size: clamp(1.2rem, 1vw, 1.2rem);
+  }
+
 }
 
-@media screen and (max-resolution: 0.75dppx) {
-  /* Zoom 75% - elemen mengecil */
-  .character img {
-    transform: scale(0.90);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.90);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.90);
-  }
-}
 
-@media screen and (max-resolution: 0.67dppx) {
-  /* Zoom 67% - elemen mengecil */
-  .character img {
-    transform: scale(0.85);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.85);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.85);
-  }
-}
-
-@media screen and (max-resolution: 0.5dppx) {
-  /* Zoom 50% - elemen mengecil */
-  .character img {
-    transform: scale(0.75);
-  }
-  
-  .speech-bubble {
-    transform: scale(0.75);
-  }
-  
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
-  .message {
-    transform: scale(0.75);
+/* ===== PRINT STYLES ===== */
+@media print {
+  .container {
+    overflow: visible;
   }
 }

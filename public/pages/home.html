@@ -3,32 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timy Time </title>
-  <link rel="stylesheet" href="../styles/home.css">
-  <link rel="stylesheet" href="../styles/navbar.css">
+  <title>Timy Time</title>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../styles/home.css">
+  <link rel="stylesheet" href="../styles/navbar.css">
 </head>
 <body>
 
+  <!-- Container -->
   <div class="container">
+    
+    <!-- Header -->
     <div class="header">
+      
+      <!-- Title Mobile Only -->
       <h1 class="header-title-mobile">Timy Time</h1>
-      <div class="character">
-        <img src="../assets/timy2.png" alt="Timy" onerror="this.style.display='none'">
-        <div class="speech-bubble">
-          Hi! I'm Timy,<br>
-          Your Personal Time Assistant
+      
+      <!-- Character & Speech Bubble -->
+      <div class="character-wrapper">
+        <div class="character">
+          <!-- Character Image -->
+          <img 
+            src="../assets/timy2.png" 
+            alt="Timy" 
+            class="character-img"
+            onerror="this.style.display='none'"
+          >
+          
+          <!-- Speech Bubble -->
+          <div class="speech-bubble">
+            Hi! I'm Timy,<br>
+            Your Personal Time Assistant
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Streak Section (Overlapping) -->
     <div class="streak">
-      <div class="flame"><i class="fa-solid fa-fire"></i></div>
-      <div class="streak-number">0</div>
+      
+      <!-- Flame Icon -->
+      <div class="flame">
+        <i class="fa-solid fa-fire"></i>
+      </div>
+      
+      <!-- Streak Number -->
+      <div class="streak-number" id="streak-number">0</div>
+      
+      <!-- Streak Title -->
       <div class="streak-title">Productive Streak</div>
-
+      
+      <!-- Progress Box -->
       <div class="progress-box">
+        
+        <!-- Days -->
         <div class="days">
           <span>M</span>
           <span>T</span>
@@ -38,51 +67,34 @@
           <span>S</span>
           <span>S</span>
         </div>
+        
+        <!-- Progress Line -->
         <div class="progress-line">
-          <div class="progress-fill" id="progress-fill"></div>
-          <i class="fa-solid fa-person-running runner-icon" id="runner-icon"></i>
-          <div class="dot-track" id="dot-track">
-            </div>
+          <!-- Progress Fill -->
+          <div id="progress-fill" class="progress-fill"></div>
+          
+          <!-- Runner Icon -->
+          <i id="runner-icon" class="runner-icon fa-solid fa-person-running"></i>
+          
+          <!-- Dot Track -->
+          <div id="dot-track" class="dot-track"></div>
         </div>
       </div>
-
+      
+      <!-- Message -->
       <div class="message">Well Done, Keep Going!</div>
     </div>
   </div>
   
-  <nav class="navbar">
-    <div class="nav-item active" data-page="home">
-      <i class="fas fa-home"></i>
-    </div>
-    <div class="nav-item" data-page="task">
-      <i class="fas fa-list-ul"></i>
-    </div>
-    <div class="nav-item" data-page="profile">
-      <i class="fas fa-user"></i>
-    </div>
-  </nav>
+  
 
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-  <script>
-    // Initialize Firebase (use *your* project's config)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
-      authDomain: "todolist-43.firebaseapp.com",
-      projectId: "todolist-43",
-      storageBucket: "todolist-43.appspot.com",
-      messagingSenderId: "795548747542",
-      appId: "1:795548747542:web:deb1efc52ed1aa247af237",
-      measurementId: "G-67K7H7XXWW"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-  </script>
-
+  <!-- External scripts -->
   <script src="../streak.js"></script>
+  <script src="../navbar.js"></script>
   <script src="../main.js"></script>
 </body>
 </html>
