@@ -111,7 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
             window.TaskApp.editingTaskId = null;
             
             // [PERBAIKAN IKON HEADER]
-            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa-solid fa-clipboard-list" style="margin-right: 8px;"></i>New Reminder';
+            // Hapus ikon
+            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
             
             if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
             if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
@@ -170,7 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // [PERBAIKAN IKON HEADER]
-        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa-solid fa-pen" style="margin-right: 8px;"></i>Edit Reminder';
+        // Hapus ikon
+        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'Edit Reminder';
         
         if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Update';
         
@@ -980,7 +982,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         text: 'Add more', 
                         action: () => {
                             window.TaskApp.editingTaskId = null;
-                            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa-solid fa-clipboard-list" style="margin-right: 8px;"></i>New Reminder';
+                            // [PERBAIKAN IKON HEADER] - Hapus ikon
+                            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
                             if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
                             
                             const taskListForDrawer = document.getElementById('taskListForDrawer');
@@ -1048,8 +1051,8 @@ document.addEventListener('DOMContentLoaded', function() {
         newReminderBtn.addEventListener('click', () => {
             window.TaskApp.editingTaskId = null;
             
-            // [PERBAIKAN IKON HEADER]
-            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa fa-clipboard-list" style="margin-right: 8px;"></i>New Reminder';
+            // [PERBAIKAN IKON HEADER] - Hapus ikon
+            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
             
             if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
             if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();

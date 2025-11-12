@@ -629,6 +629,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Reset ke mode New Reminder
             window.TaskApp.editingTaskId = null;
+            
+            // [PERBAIKAN IKON HEADER] - Hapus ikon
             if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
             
             // PASTIKAN INI MENAMPILKAN FORM DAN MENYEMBUNYIKAN TASK LIST
@@ -880,6 +882,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     text: 'Add more', 
                                     action: () => {
                                         window.TaskApp.editingTaskId = null;
+                                        // [PERBAIKAN IKON HEADER] - Hapus ikon
                                         if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
                                         if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
                                         
