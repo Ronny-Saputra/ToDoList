@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const STORAGE_KEY_FILTER = 'search_active_filter';
     const STORAGE_KEY_QUERY = 'search_query';
     
-    // Ambil state dari sessionStorage atau gunakan default
-    let currentActiveFilter = sessionStorage.getItem(STORAGE_KEY_FILTER) || 'all';
-    let currentSearchQuery = sessionStorage.getItem(STORAGE_KEY_QUERY) || '';
+    // Inisialisasi state awal (akan di-override di loadTasks)
+    let currentActiveFilter = 'all'; // Mulai dari 'all'
+    let currentSearchQuery = ''; 
     
     // Dapatkan fungsi create card dari TaskApp global (dari task.js)
     const createTaskCard = window.TaskApp?.createTaskCard; 
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- FUNGSI UTAMA: RENDER TASK LIST ---
     function renderTasks(tasksToRender) {
         taskListContainer.innerHTML = '';
+        console.log(`[Search] Rendering ${tasksToRender.length} tasks.`); // <-- LOG: Jumlah tugas yang akan dirender
         
         if (tasksToRender.length === 0) {
             emptyState.style.display = 'flex';
@@ -42,7 +43,17 @@ document.addEventListener('DOMContentLoaded', function() {
             taskListContainer.style.display = 'grid'; // Menggunakan grid
             
             // Urutkan berdasarkan tanggal (paling dekat duluan)
-            tasksToRender.sort((a, b) => new Date(a.date.replace(/-/g, '/')) - new Date(b.date.replace(/-/g, '/')));
+            tasksToRender.sort((a, b) => {
+                // [FIX TYPERROR] Handle missing 'date' property
+                if (!a.date && !b.date) return 0;
+                if (!a.date) return 1; // Push 'a' (missing date) to the end
+                if (!b.date) return -1; // Keep 'a' (has date) in place, push 'b' (missing date) to the end
+
+                const dateA = new Date(a.date.replace(/-/g, '/'));
+                const dateB = new Date(b.date.replace(/-/g, '/'));
+                
+                return dateA - dateB;
+            });
 
             tasksToRender.forEach(task => {
                 // Definisikan fungsi reload spesifik untuk halaman search (memuat ulang data dari Firebase)
@@ -53,6 +64,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Hapus kelas .active secara eksplisit pada saat rendering 
                 card.classList.remove('active'); 
+                
+                // [MODIFIKASI: BUKA DRAWER EDIT SAAT KLIK KARTU]
+                // HAPUS BLOCK INI agar logika .active di main.js yang berjalan, 
+                // dan tombol Edit/Flow Timer/Delete di task.js dapat diakses.
+                /*
+                card.addEventListener('click', (e) => {
+                    const isActionButton = e.target.closest(".action-btn");
+                    const isCheckbox = e.target.closest(".task-checkbox");
+                    
+                    // Jika yang diklik bukan tombol aksi (Edit, Delete, Flow Timer) atau checkbox,
+                    // maka langsung buka drawer edit.
+                    if (!isActionButton && !isCheckbox) {
+                        e.stopPropagation(); // Hentikan propagasi ke listener body di main.js
+                        window.TaskApp.openDrawerForEdit(task);
+                    }
+                });
+                */
                 
                 taskListContainer.appendChild(card);
             });
@@ -65,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let filteredTasks = allTasksData;
         
         // 1. Filter berdasarkan filter pill (bulan)
+        // Jika filter adalah 'all', blok ini dilewati, dan filteredTasks tetap berisi semua tugas.
         if (filter !== 'all') {
             
             const monthFilters = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -96,9 +125,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fungsi untuk dipanggil oleh listener keyup/input (menggunakan filter aktif saat ini)
     const performSearchThrottled = () => {
         const query = searchInput.value.trim();
-        // ✅ UPDATE: Simpan query ke sessionStorage
+        
         currentSearchQuery = query;
-        sessionStorage.setItem(STORAGE_KEY_QUERY, query);
+        if (query) {
+             sessionStorage.setItem(STORAGE_KEY_QUERY, query);
+        } else {
+             sessionStorage.removeItem(STORAGE_KEY_QUERY);
+        }
+       
         // Gunakan state filter yang tersimpan
         performSearchAndFilter(query, currentActiveFilter);
     };
@@ -109,12 +143,30 @@ document.addEventListener('DOMContentLoaded', function() {
         currentActiveFilter = filter;
         sessionStorage.setItem(STORAGE_KEY_FILTER, filter);
         
-        const query = searchInput ? searchInput.value.trim() : '';
-        // ✅ UPDATE: Simpan query ke sessionStorage
-        currentSearchQuery = query;
-        sessionStorage.setItem(STORAGE_KEY_QUERY, query);
+        let query = searchInput ? searchInput.value.trim() : '';
+
+        // >> START PERBAIKAN: LOGIKA TOMBOL 'ALL'
+        if (filter === 'all') {
+            // Reset query secara eksplisit (seperti saat load)
+            query = '';
+            currentSearchQuery = '';
+            // Hapus query dari UI dan storage
+            if (searchInput) searchInput.value = ''; 
+            sessionStorage.removeItem(STORAGE_KEY_QUERY);
+            if (clearSearchBtn) clearSearchBtn.style.display = 'none'; 
+        }
+        // << END PERBAIKAN
+
+        // Simpan query saat ini (jika tidak direset oleh tombol 'All')
+        if (filter !== 'all' && query) {
+             currentSearchQuery = query;
+             sessionStorage.setItem(STORAGE_KEY_QUERY, query);
+        } else if (filter !== 'all' && !query) {
+             currentSearchQuery = '';
+             sessionStorage.removeItem(STORAGE_KEY_QUERY);
+        }
         
-        performSearchAndFilter(query, filter);
+        performSearchAndFilter(query, currentActiveFilter);
     };
 
 
@@ -122,45 +174,37 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadTasks(user) {
         if (!user) return;
         
-        console.log('=== SEARCH PAGE: Loading tasks ===');
-        console.log('User UID:', user.uid);
-        
         const db = firebase.firestore();
         const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
 
         try {
-            const snapshot = await tasksRef.get();
-            console.log('Total tasks from Firebase:', snapshot.size);
-            
+            // [MODIFIKASI: PASTIKAN HANYA MEMUAT TASK PENDING UNTUK FILTER ALL]
+            const snapshot = await tasksRef.where("status", "==", "pending").get();
             allTasksData = snapshot.docs.map(doc => ({ 
                 id: doc.id, 
                 ...doc.data() 
             }));
             
-            console.log('All tasks data:', allTasksData);
+            console.log(`[Search] Loaded ${allTasksData.length} pending tasks.`); // <-- LOG: Jumlah total task dimuat
             
-            // ✅ UPDATE: Ambil state dari sessionStorage
-            currentSearchQuery = sessionStorage.getItem(STORAGE_KEY_QUERY) || '';
-            currentActiveFilter = sessionStorage.getItem(STORAGE_KEY_FILTER) || 'all';
+            // 1. TENTUKAN STATE AWAL YANG DIINGINKAN
+            currentActiveFilter = 'all'; // PAKSA FILTER 'ALL' SAAT MEMUAT
+            currentSearchQuery = ''; 
+            sessionStorage.removeItem(STORAGE_KEY_QUERY);
             
-            console.log('Restored state - Filter:', currentActiveFilter, 'Query:', currentSearchQuery);
-            
-            // ✅ Restore search input value dari sessionStorage
+            // 2. Update UI Search Input (FIX: Input Selalu Kosong)
             if (searchInput) {
-                searchInput.value = currentSearchQuery;
-                // Update clear button visibility
+                searchInput.value = '';
                 if (clearSearchBtn) {
-                    clearSearchBtn.style.display = currentSearchQuery.length > 0 ? 'flex' : 'none';
+                    clearSearchBtn.style.display = 'none';
                 }
             }
             
-            // ✅ Restore active pill berdasarkan filter yang tersimpan
+            // 3. Restore active pill ke 'all'
             restoreActivePill(currentActiveFilter);
             
-            // ✅ UPDATE: Gunakan state yang tersimpan untuk re-filter dan re-render
+            // 4. Filter & Render (dengan query kosong dan filter ALL)
             performSearchAndFilter(currentSearchQuery, currentActiveFilter);
-
-            console.log('✅ Tasks loaded and rendered successfully');
 
         } catch (err) {
             console.error("❌ Error loading tasks:", err);
@@ -170,8 +214,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ✅ NEW: Fungsi untuk restore active pill berdasarkan filter
     function restoreActivePill(filter) {
+        // Hapus class 'active' dan ikon centang dari semua pill
+        document.querySelectorAll('.filter-pill.active').forEach(pill => {
+             pill.classList.remove('active');
+             const checkIcon = pill.querySelector('.check-icon');
+             if (checkIcon) pill.removeChild(checkIcon);
+        });
+        
+        // Tambahkan kembali ke pill yang sesuai
         const targetPill = document.querySelector(`.filter-pill[data-filter="${filter}"]`);
-        if (targetPill && !targetPill.classList.contains('active')) {
+        if (targetPill) {
             updateActivePill(targetPill);
         }
     }
@@ -224,12 +276,13 @@ document.addEventListener('DOMContentLoaded', function() {
             searchInput.value = '';
             // ✅ UPDATE: Reset state dan sessionStorage
             currentSearchQuery = '';
-            sessionStorage.setItem(STORAGE_KEY_QUERY, '');
+            sessionStorage.removeItem(STORAGE_KEY_QUERY);
             toggleClearButton();
             // Gunakan state filter yang ada saat ini
             performSearchAndFilter('', currentActiveFilter);
         });
 
+        // Dipanggil saat load untuk inisialisasi tampilan
         toggleClearButton();
     }
     
@@ -259,21 +312,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // INISIALISASI: Atur centang pada pill berdasarkan state yang tersimpan
-    const savedFilter = sessionStorage.getItem(STORAGE_KEY_FILTER) || 'all';
-    const initialActivePill = document.querySelector(`.filter-pill[data-filter="${savedFilter}"]`);
+    // INISIALISASI: Atur centang pada pill berdasarkan filter 'all'
+    const initialActivePill = document.querySelector(`.filter-pill[data-filter="all"]`);
     if (initialActivePill) {
-        if (!initialActivePill.querySelector('.check-icon')) {
-             updateActivePill(initialActivePill);
-        }
-    }
-    
-    // ✅ NEW: Restore search input saat page load
-    if (searchInput) {
-        const savedQuery = sessionStorage.getItem(STORAGE_KEY_QUERY) || '';
-        searchInput.value = savedQuery;
-        if (clearSearchBtn) {
-            clearSearchBtn.style.display = savedQuery.length > 0 ? 'flex' : 'none';
-        }
+        // Panggil updateActivePill agar ikon centang muncul pada filter 'all'
+        updateActivePill(initialActivePill);
     }
 });

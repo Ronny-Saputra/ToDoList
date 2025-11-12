@@ -1,3 +1,4 @@
+/* File: public/styles/task.css */
 /* PERBAIKAN: Hapus padding dan batasan agar full screen, dan implementasi scrollable content */
 *{
     box-sizing: border-box;
@@ -462,20 +463,23 @@ body {
 }
 
 .drawer-header {
-    background: #ffffff; 
-    padding: 20px 24px;
-    border-radius: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
+    padding: 20px 50px;
     display: flex;
     align-items: center;
+    gap: 16px; /* Menambahkan jarak antar ikon dan judul */
+    color: #14142A; /* Warna default untuk elemen di header */
+    flex-shrink: 0;
+    border-radius: 0 0 25px 25px; /* Hanya sudut bawah yang melengkung */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
     position: relative; 
 }
 
 .drawer-header h2 {
     font-size: 18px;
     font-weight: 600;
-    color: #333;
-    margin-left: 20px;
+    color: #14142A; /* Menyesuaikan warna judul */
+    margin: 0; /* Menghapus margin-left lama karena ada gap */
 }
 
 .close-drawer-btn {
@@ -504,6 +508,8 @@ body {
 .form-section {
     display: flex;
     flex-direction: column;
+    /* TAMBAHKAN/UBAH INI: Penting untuk konteks posisi absolute anak-anaknya */
+    position: relative; 
 }
 
 .form-section label {
@@ -970,4 +976,107 @@ body {
     .time-inputs.flow-duration-inputs input[type="number"] {
         width: 30%; /* Sedikit lebih lebar */
     }
+}
+
+/* ---------------------------------------------------- */
+/* NEW: PRIORITY DROPDOWN STYLES (FINAL FIX) */
+/* ---------------------------------------------------- */
+
+.priority-dropdown-wrapper {
+    /* Posisikan absolut di dalam .form-section */
+    position: absolute; 
+    /* *PERBAIKAN UTAMA: Atur top ke nilai yang melewati Label dan Selector */
+    /* top: 75px; 
+    Nilai yang lebih rendah sedikit untuk meminimalisir gap antara selector dan dropdown */
+    top: 70px;
+    left: 0;
+    right: 0;
+    
+    /* Jaminan visibilitas tertinggi */
+    z-index: 1000; 
+    
+    visibility: hidden; 
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    
+    margin-top: 0; 
+}
+
+.priority-dropdown-wrapper.open {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.priority-dropdown {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.priority-option {
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background-color 0.1s ease;
+}
+
+.priority-option:hover {
+    background-color: #f0f4f9;
+}
+
+.priority-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.priority-option i.fa-check {
+    color: #1e2a78;
+    font-size: 14px;
+}
+
+/* ---------------------------------------------------- */
+/* === PRIORITY ICON STYLES (NEW) === */
+/* ---------------------------------------------------- */
+.priority-icon {
+    font-size: 14px; 
+    margin-left: 5px;
+    vertical-align: middle;
+    transition: color 0.2s ease;
+}
+
+i.priority-low {
+    color: #1e2a78; /* Biru Navy */
+}
+
+i.priority-medium {
+    color: #ffc234; /* Kuning (Mengambil dari warna sun icon/fire di file lain) */
+}
+
+i.priority-high {
+    color: #d32f2f; /* Merah */
+}
+
+/* ---------------------------------------------------- */
+/* === EMPTY STATE STYLES === */
+/* ---------------------------------------------------- */
+.empty-task-message {
+    grid-column: 1 / -1; /* Memastikan div ini membentang di seluruh kolom grid */
+    height: 50vh; /* Memberi tinggi yang cukup untuk pemusatan vertikal */
+    display: flex;
+    align-items: center; /* Pemusatan vertikal */
+    justify-content: center; /* Pemusatan horizontal */
+    width: 100%;
+}
+
+.empty-task-message p {
+    text-align: center;
+    color: #777; 
+    padding: 0; /* Menghapus padding-top 50px yang lama */
 }

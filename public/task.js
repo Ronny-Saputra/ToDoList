@@ -1,10 +1,15 @@
-// File: public/task.js (Kode Final - Fixed Edit in Search)
+// File: public/task.js (Kode Lengkap dengan Logic Flow Timer Text Update dan New Task Design)
 
 document.addEventListener('DOMContentLoaded', function() {
     // === EXPOSE GLOBAL STATE & FUNCTIONS ===
     window.TaskApp = window.TaskApp || {};
     window.TaskApp.tasksData = []; 
     window.TaskApp.editingTaskId = null; 
+    
+    // NEW: Variable untuk menyimpan durasi Flow Timer dalam milidetik (Kotlin parity)
+    window.TaskApp.flowDurationMillis = 30 * 60 * 1000; // 30 menit default
+    
+    // Hapus baris ini: const STORAGE_KEY_PRIORITY = 'LAST_PRIORITY_SELECTION'; 
 
     const calendarContainer = document.getElementById('calendar-cards-container');
     const monthYearDisplay = document.getElementById('month-year-display');
@@ -56,11 +61,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     window.TaskApp.formatDate = formatDate;
     
+    // --- UTILITY: Format Durasi Milis ke String (Kotlin parity) ---
+    window.TaskApp.formatDurationToString = function(millis) {
+        const MILLIS_IN_HOUR = 3600000;
+        const MILLIS_IN_MINUTE = 60000;
+        const MILLIS_IN_SECOND = 1000;
+
+        const durationHours = Math.floor(millis / MILLIS_IN_HOUR);
+        const remainingAfterHours = millis % MILLIS_IN_HOUR;
+        const durationMinutes = Math.floor(remainingAfterHours / MILLIS_IN_MINUTE);
+        const durationSeconds = Math.floor((remainingAfterHours % MILLIS_IN_MINUTE) / MILLIS_IN_SECOND);
+
+        let parts = [];
+        if (durationHours > 0) parts.push(`${durationHours}h`);
+        if (durationMinutes > 0) parts.push(`${durationMinutes}m`);
+        if (durationSeconds > 0) parts.push(`${durationSeconds}s`);
+
+        return parts.join(' ') || '0s';
+    }
+
     // --- FUNGSI BUKA DRAWER BARU (Global) ---
     window.TaskApp.openDrawer = function() {
         if (window.TaskApp.newReminderDrawer) {
             window.TaskApp.newReminderDrawer.classList.add('open');
             document.body.style.overflow = 'hidden';
+            
+            // Perbarui teks Flow Timer saat membuka drawer
+            updateFlowTimerLinkText();
+            
+            // ✅ PERBAIKAN LOGIC 1: SELALU SET PRIORITAS KE 'None' UNTUK MODE ADD/NEW
+            if (window.TaskApp.editingTaskId === null) {
+                const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+                if (selectorSpan) {
+                    selectorSpan.textContent = 'None'; 
+                    // Update tampilan dropdown secara visual agar 'None' terpilih
+                    updatePriorityDropdownSelection('None');
+                }
+            }
         }
     }
     
@@ -72,7 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Reset state edit
             window.TaskApp.editingTaskId = null;
-            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
+            
+            // [PERBAIKAN IKON HEADER]
+            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa-solid fa-clipboard-list" style="margin-right: 8px;"></i>New Reminder';
+            
             if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
             if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
 
@@ -82,6 +122,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 taskListForDrawer.innerHTML = ''; 
                 taskListForDrawer.style.display = 'none'; 
             }
+            
+            // Tutup priority dropdown
+            if (window.TaskApp.priorityWrapper) {
+                 window.TaskApp.priorityWrapper.classList.remove('open');
+            }
+            
+            // Hapus data-end-millis yang disimpan
+            if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
         }
     }
 
@@ -91,12 +139,39 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Gunakan referensi global yang aman
         if (window.TaskApp.activityInput) window.TaskApp.activityInput.value = task.title || '';
-        if (window.TaskApp.timeInput) window.TaskApp.timeInput.value = task.time || ''; 
+        if (window.TaskApp.timeInput) {
+            window.TaskApp.timeInput.value = task.time || ''; 
+            
+            // Set data-end-millis untuk time range jika ada
+            if (task.endTimeMillis && task.endTimeMillis > 0) {
+                 window.TaskApp.timeInput.setAttribute('data-end-millis', task.endTimeMillis.toString());
+            } else {
+                 window.TaskApp.timeInput.removeAttribute('data-end-millis');
+            }
+        }
+        
         if (window.TaskApp.locationInput) window.TaskApp.locationInput.value = task.location || '';
         if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = task.date; 
         
-        // Perbarui judul drawer dan teks tombol
-        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'Edit Reminder';
+        // Set Flow Timer state
+        if (task.flowDurationMillis && task.flowDurationMillis > 0) {
+             window.TaskApp.flowDurationMillis = task.flowDurationMillis;
+        } else {
+             window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
+        }
+        
+        // ✅ PERBAIKAN LOGIC 2: LOAD PRIORITAS DARI TASK YANG DIEDIT
+        const taskPriority = task.priority || 'None';
+        const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+        if (selectorSpan) {
+            selectorSpan.textContent = taskPriority;
+            // Panggil fungsi update seleksi
+            updatePriorityDropdownSelection(taskPriority);
+        }
+        
+        // [PERBAIKAN IKON HEADER]
+        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa-solid fa-pen" style="margin-right: 8px;"></i>Edit Reminder';
+        
         if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Update';
         
         // Pastikan list disembunyikan dan form ditampilkan
@@ -129,7 +204,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: 'Delete', 
                     action: async () => {
                         try {
-                            await tasksRef.doc(taskId).delete();
+                            // UPDATE status ke "deleted" (seperti di Kotlin TaskRepository.kt)
+                            await tasksRef.doc(taskId).update({
+                                status: "deleted",
+                                deletedAt: firebase.firestore.Timestamp.now()
+                            });
                             
                             window.showCustomDialog(
                                 "Reminder deleted successfully!",
@@ -167,7 +246,22 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {function} reloadFn - Fungsi untuk me-reload tampilan (spesifik per halaman)
      */
     window.TaskApp.createTaskCard = function(taskObject, reloadFn) {
-        const { title, time, location, id: taskId, done: isDone } = taskObject;
+        const { title, time, location, id: taskId, done: isDone, priority, endTimeMillis, flowDurationMillis } = taskObject;
+        
+        // --- LOGIKA PRIORITY ICON ---
+        let priorityIconHtml = '';
+        if (priority && priority !== 'None') {
+            const priorityClass = priority.toLowerCase(); // low, medium, high
+            // *[PERBAIKAN IKON]* Menggunakan fa-solid untuk memastikan ikon termuat
+            priorityIconHtml = `<i class="fa-solid fa-circle-exclamation priority-icon priority-${priorityClass}"></i>`;
+        }
+
+        // --- LOGIKA DETAIL TUGAS ---
+        // Jika flowDurationMillis > 0, Flow Timer dianggap aktif
+        const isFlowTimerOnly = flowDurationMillis > 0 && time.includes('(Flow)');
+        const hasTimeRange = endTimeMillis && endTimeMillis > 0;
+        const hasLocation = location && location.trim() !== '';
+        
         const card = document.createElement('div');
         card.classList.add('task-card-item');
         card.setAttribute('data-task-id', taskId); 
@@ -176,22 +270,29 @@ document.addEventListener('DOMContentLoaded', function() {
             card.classList.add('done-task');
         }
 
+        // --- Perubahan Struktur HTML Task Card ---
         card.innerHTML = `
             <div class="task-checkbox" style="background-color: ${isDone ? '#3f67b5' : 'transparent'};"></div>
+            
             <div class="task-details">
-                <span class="task-title-reminder" style="text-decoration: ${isDone ? 'line-through' : 'none'}; color: ${isDone ? '#777' : '#333'};">${title}</span>
+                <span class="task-title-reminder" style="text-decoration: ${isDone ? 'line-through' : 'none'}; color: ${isDone ? '#777' : '#333'};">
+                    ${title}
+                    ${priorityIconHtml}
+                </span>
+                
                 <div class="task-meta">
-                    <span class="dot-indicator"></span>
-                    <span class="task-location-small">${location}</span>
-                </div>
+                    </div>
             </div>
-            <div class="task-time-box">
-                <span class="task-time-large">${time}</span>
+            
+            <div class="task-meta-right">
+                ${(hasTimeRange || (time && !isFlowTimerOnly)) ? `<span class="task-time-large">${time}</span>` : ''}
+                ${hasLocation ? `<span class="task-location-small">${location}</span>` : ''}
             </div>
+            
             <i class="fas fa-chevron-right task-arrow"></i>
 
             <div class="task-actions">
-                <button class="action-btn flow-timer-btn">
+                <button class="action-btn flow-timer-btn" ${flowDurationMillis <= 0 ? 'disabled' : ''}>
                     <i class="fas fa-stopwatch"></i>
                     Flow Timer
                 </button>
@@ -211,32 +312,8 @@ document.addEventListener('DOMContentLoaded', function() {
         flowTimerBtn.addEventListener('click', (e) => {
             e.stopPropagation(); 
             
-            // Dapatkan durasi dari task.time (Start - End Time, e.g., "10:00 - 11:30")
-            const timeRange = taskObject.time; 
-            let durationInSeconds = 1800; // Default 30 menit (30 * 60)
-            
-            if (timeRange && timeRange.includes(' - ')) {
-                try {
-                    const [startTimeStr, endTimeStr] = timeRange.split(' - ');
-                    
-                    // Gunakan tanggal dummy yang sama untuk menghitung selisih waktu
-                    const dummyDate = '2000/01/01 '; 
-                    const startTime = new Date(dummyDate + startTimeStr);
-                    let endTime = new Date(dummyDate + endTimeStr);
-                    
-                    // Jika waktu berakhir lebih kecil, asumsikan itu hari berikutnya (untuk kasus lewat tengah malam)
-                    if (endTime.getTime() < startTime.getTime()) {
-                         endTime = new Date(endTime.getTime() + 24 * 60 * 60 * 1000); // Tambah 24 jam
-                    }
-                    
-                    const diffMs = endTime.getTime() - startTime.getTime();
-                    durationInSeconds = Math.floor(diffMs / 1000); 
-                    
-                } catch (error) {
-                    console.error("Error calculating duration from time range:", error);
-                    // Tetap gunakan default jika perhitungan gagal
-                }
-            }
+            // Gunakan flowDurationMillis dari task object atau default 30 menit
+            const durationInSeconds = Math.floor((flowDurationMillis || (30 * 60 * 1000)) / 1000); 
             
             // Arahkan ke halaman flowtimer dengan parameter
             const encodedActivity = encodeURIComponent(taskObject.title);
@@ -279,7 +356,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     .collection("tasks").doc(taskId)
                     .update({
                         done: newDoneStatus,
-                        // Jika selesai, pindahkan tanggalnya ke hari ini
+                        completedAt: newDoneStatus ? firebase.firestore.Timestamp.now() : null, // Set completedAt
+                        // Jika selesai, pindahkan tanggalnya ke hari ini (Sesuai logic Kotlin)
                         date: newDoneStatus ? formatDate(new Date()) : taskInState.date 
                     });
 
@@ -308,23 +386,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
 
         try {
-            const snapshot = await tasksRef.get();
+            // Hanya ambil task dengan status "pending"
+            const snapshot = await tasksRef.where("status", "==", "pending").get();
             window.TaskApp.tasksData = snapshot.docs.map(doc => ({ 
                 id: doc.id, 
                 ...doc.data() 
             }));
-            
-            activeDate = new Date();
-            activeDate.setHours(0, 0, 0, 0);
-            
-            if (calendarContainer) {
-                generateCalendar(startDate, numberOfDays, window.TaskApp.tasksData);
-                setupCalendarScroll(calendarContainer); 
-                displayTasksForActiveDate(activeDate);
-            }
-
         } catch (err) {
             console.error("Error loading tasks:", err);
+            // Pastikan tasksData disetel ke array kosong jika gagal
+            window.TaskApp.tasksData = []; 
+        }
+        
+        activeDate = new Date();
+        activeDate.setHours(0, 0, 0, 0);
+        
+        // Memindahkan rendering ke luar try/catch agar kalender selalu muncul
+        if (calendarContainer) {
+            generateCalendar(startDate, numberOfDays, window.TaskApp.tasksData);
+            setupCalendarScroll(calendarContainer); 
+            displayTasksForActiveDate(activeDate);
         }
     }
 
@@ -398,7 +479,6 @@ document.addEventListener('DOMContentLoaded', function() {
             card.setAttribute('data-date-string', dateString); 
             
             if (isToday) {
-                // Hapus penambahan kelas 'active' di sini. Biarkan setupCalendarScroll yang menanganinya.
                 card.classList.add('today');  
             }
             
@@ -448,7 +528,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const tasksForDate = window.TaskApp.tasksData.filter(task => task.date === dateString);
         
         if (tasksForDate.length === 0) {
-            taskListContainer.innerHTML = '<p style="text-align: center; color: #777; padding-top: 50px;">No reminders scheduled for this date.</p>';
+            // [PERBAIKAN] Mengganti <p style="..."> dengan div class="empty-task-message"
+            taskListContainer.innerHTML = '<div class="empty-task-message"><p>No reminders scheduled for this date.</p></div>';
         } else {
             tasksForDate.forEach(task => {
                 const reloadFn = () => loadTasksAndRenderCalendar(firebase.auth().currentUser, new Date('2025-01-01'), 365);
@@ -598,21 +679,42 @@ document.addEventListener('DOMContentLoaded', function() {
             const start = startTimeInput.value;
             const end = endTimeInput.value;
 
-            if (start && end) {
-                const startDate = new Date(`2000/01/01 ${start}`);
-                const endDate = new Date(`2000/01/01 ${end}`);
+            if (!start || !end) return;
+
+            // Dapatkan activeDate sebagai base date untuk perhitungan
+            let baseDate = new Date(activeDate.getTime());
+            
+            // 1. Hitung Milis dari Waktu Mulai pada Base Date
+            const [startHour, startMinute] = start.split(':').map(Number);
+            baseDate.setHours(startHour, startMinute, 0, 0);
+            const startMillis = baseDate.getTime();
+            
+            // 2. Hitung Milis dari Waktu Akhir pada Base Date
+            const [endHour, endMinute] = end.split(':').map(Number);
+            baseDate.setHours(endHour, endMinute, 0, 0);
+            let endMillis = baseDate.getTime();
+
+            // 3. Atasi Roll-over Tanggal (Seperti di Kotlin)
+            if (endMillis <= startMillis) {
+                // Waktu Akhir <= Waktu Mulai, maju 1 hari
+                endMillis += 24 * 60 * 60 * 1000;
                 
-                if (startDate.getTime() >= endDate.getTime()) {
-                    window.showCustomDialog(
-                        "Start time must be before end time.",
-                        [{ text: 'OK', action: () => {}, isPrimary: true }]
-                    );
-                    return;
+                // Update activeDate (Global State) untuk mencerminkan tanggal roll-over
+                let newDate = new Date(activeDate.getTime());
+                newDate.setDate(newDate.getDate() + 1);
+                activeDate = newDate;
+                
+                // Perbarui tampilan Date Input di Drawer (agar user melihat perubahan tanggal)
+                if (window.TaskApp.dateInputEdit) {
+                    window.TaskApp.dateInputEdit.value = formatDate(activeDate);
                 }
-                
-                timeInput.value = `${start} - ${end}`;
-                timePickerOverlay.classList.remove('open'); 
             }
+            
+            // 4. Set input value (string) dan simpan endMillis di atribut data
+            timeInput.value = `${start} - ${end}`;
+            timeInput.setAttribute('data-end-millis', endMillis.toString());
+            
+            timePickerOverlay.classList.remove('open'); 
         });
         
         if (timePickerOverlay) timePickerOverlay.addEventListener('click', (event) => {
@@ -625,6 +727,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // ====================================================
     // NEW: FLOW TIMER DURATION LOGIC
     // ====================================================
+    
+    function updateFlowTimerLinkText() {
+        if(window.TaskApp.flowTimerLink) {
+            const durationText = window.TaskApp.formatDurationToString(window.TaskApp.flowDurationMillis);
+            window.TaskApp.flowTimerLink.textContent = `+ Add Flow Timer (${durationText})`;
+        }
+    }
+
     const flowTimerLink = window.TaskApp.flowTimerLink;
     const flowTimerPickerOverlay = window.TaskApp.flowTimerPickerOverlay;
     const flowTimerHoursInput = window.TaskApp.flowTimerHoursInput;
@@ -633,6 +743,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const flowTimerCancelBtn = window.TaskApp.flowTimerCancelBtn;
     const flowTimerSaveBtn = window.TaskApp.flowTimerSaveBtn;
 
+    // Panggil saat DOMContentLoaded untuk inisialisasi teks
+    updateFlowTimerLinkText();
+
     if (flowTimerLink) {
         flowTimerLink.addEventListener('click', (e) => {
             e.preventDefault(); 
@@ -640,8 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Tampilkan overlay flow timer
                 flowTimerPickerOverlay.classList.add('open');
             }
-            // Reset input time range
-            if (timeInput) timeInput.value = '';
+            // Hapus baris ini: Logic to clear timeInput is removed, preserving existing value.
         });
     }
 
@@ -665,7 +777,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const minutes = parseInt(flowTimerMinutesInput.value) || 0;
             const seconds = parseInt(flowTimerSecondsInput.value) || 0;
 
-            if (hours === 0 && minutes === 0 && seconds === 0) {
+            const totalMillis = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+
+            if (totalMillis <= 0) {
                  window.showCustomDialog(
                     "Duration cannot be zero.",
                     [{ text: 'OK', action: () => {}, isPrimary: true }]
@@ -673,28 +787,115 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Hitung waktu selesai berdasarkan durasi dari waktu saat ini
-            const now = new Date();
-            const startHours = String(now.getHours()).padStart(2, '0');
-            const startMinutes = String(now.getMinutes()).padStart(2, '0');
-            
-            // Hitung waktu akhir
-            now.setHours(now.getHours() + hours);
-            now.setMinutes(now.getMinutes() + minutes);
-            now.setSeconds(now.getSeconds() + seconds);
+            // 1. UPDATE GLOBAL MILLIS STATE (Kotlin parity)
+            window.TaskApp.flowDurationMillis = totalMillis;
 
-            const endHours = String(now.getHours()).padStart(2, '0');
-            const endMinutes = String(now.getMinutes()).padStart(2, '0');
-            
-            const timeRange = `${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+            // 2. UPDATE TEXT LINK
+            updateFlowTimerLinkText(); // Memanggil fungsi update teks
 
-            // Update time input field
-            if (window.TaskApp.timeInput) window.TaskApp.timeInput.value = timeRange;
+            // 3. Clear data-end-millis (Flow Timer override Time Range)
+            if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
             
             // Tutup overlay
             flowTimerPickerOverlay.classList.remove('open');
         });
     }
+    
+    // ====================================================
+    // NEW: PRIORITY SELECTOR LOGIC (FINAL)
+    // ====================================================
+    window.TaskApp.prioritySelector = document.querySelector('.priority-selector');
+    window.TaskApp.priorityWrapper = document.createElement('div');
+    window.TaskApp.priorityWrapper.classList.add('priority-dropdown-wrapper');
+    window.TaskApp.priorityWrapper.id = 'priorityDropdownWrapper';
+
+    const priorityFormSection = window.TaskApp.prioritySelector?.closest('.form-section');
+
+    if (priorityFormSection) {
+        // Sisipkan wrapper sebagai anak terakhir dari form-section
+        priorityFormSection.appendChild(window.TaskApp.priorityWrapper);
+    }
+    
+    const priorityLevels = ['None', 'Low', 'Medium', 'High'];
+
+    /**
+     * Memperbarui tampilan opsi dropdown agar yang terpilih memiliki tanda centang.
+     * @param {string} selectedLevel - Level prioritas yang aktif (misalnya 'Medium').
+     */
+    function updatePriorityDropdownSelection(selectedLevel) {
+        const priorityDropdown = window.TaskApp.priorityWrapper.querySelector('.priority-dropdown');
+        if (!priorityDropdown) return;
+
+        priorityDropdown.querySelectorAll('.priority-option').forEach(option => {
+            const isSelected = option.getAttribute('data-value') === selectedLevel;
+            const checkIcon = option.querySelector('.fa-check');
+            if (checkIcon) {
+                checkIcon.style.visibility = isSelected ? 'visible' : 'hidden';
+            }
+        });
+    }
+
+    function createPriorityDropdown() {
+        if (!window.TaskApp.priorityWrapper || !window.TaskApp.prioritySelector) return;
+        
+        const currentLevel = window.TaskApp.prioritySelector.querySelector('span').textContent;
+        
+        let dropdownHtml = '<div class="priority-dropdown">';
+
+        priorityLevels.forEach(level => {
+            const isSelected = currentLevel === level;
+            // [PERBAIKAN IKON] Menggunakan fa-solid
+            const checkIconHtml = isSelected 
+                ? '<i class="fa-solid fa-check"></i>' 
+                : '<i class="fa-solid fa-check" style="visibility: hidden;"></i>';
+            
+            dropdownHtml += `<div class="priority-option" data-value="${level}">${checkIconHtml} ${level}</div>`;
+        });
+        
+        dropdownHtml += '</div>';
+        
+        window.TaskApp.priorityWrapper.innerHTML = dropdownHtml; 
+    }
+
+    if (window.TaskApp.prioritySelector) {
+        window.TaskApp.prioritySelector.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            createPriorityDropdown(); // Buat ulang dropdown dengan status saat ini
+            
+            window.TaskApp.priorityWrapper.classList.toggle('open');
+            
+            window.TaskApp.timePickerOverlay?.classList.remove('open');
+            window.TaskApp.flowTimerPickerOverlay?.classList.remove('open');
+        });
+    }
+
+    window.TaskApp.priorityWrapper.addEventListener('click', function(e) {
+        const option = e.target.closest('.priority-option');
+        if (option) {
+            const selectedLevel = option.getAttribute('data-value');
+            const selectorSpan = window.TaskApp.prioritySelector.querySelector('span');
+            
+            if (selectorSpan) {
+                selectorSpan.textContent = selectedLevel;
+                // **PENTING: Hapus persistence ke localStorage sesuai permintaan**
+                // localStorage.setItem(STORAGE_KEY_PRIORITY, selectedLevel); 
+            }
+            
+            // Update tampilan visual segera setelah klik
+            updatePriorityDropdownSelection(selectedLevel);
+            
+            window.TaskApp.priorityWrapper.classList.remove('open');
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (window.TaskApp.priorityWrapper && window.TaskApp.priorityWrapper.classList.contains('open') && 
+            !window.TaskApp.prioritySelector.contains(e.target) && 
+            !window.TaskApp.priorityWrapper.contains(e.target)) {
+            window.TaskApp.priorityWrapper.classList.remove('open');
+        }
+    });
     
     // --- MODIFIKASI: Form Submit Handler (Handle Edit/Update) ---
     const taskPageFormSubmitHandler = async function(event, user) {
@@ -704,130 +905,128 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mengambil nilai input dengan aman
         const activity = window.TaskApp.activityInput ? window.TaskApp.activityInput.value.trim() : '';
-        const time = window.TaskApp.timeInput ? window.TaskApp.timeInput.value.trim() : ''; 
-        const location = window.TaskApp.locationInput ? window.TaskApp.locationInput.value.trim() || 'No Location' : 'No Location'; 
-        const dateToUse = window.TaskApp.dateInputEdit ? window.TaskApp.dateInputEdit.value : '';
+        const timeInput = window.TaskApp.timeInput;
+        const location = window.TaskApp.locationInput ? window.TaskApp.locationInput.value.trim() : ''; 
+        let dateToUse = window.TaskApp.dateInputEdit ? window.TaskApp.dateInputEdit.value : '';
+        const priority = window.TaskApp.prioritySelector ? window.TaskApp.prioritySelector.querySelector('span').textContent : 'None';
 
-        if (activity && time && dateToUse) {
+        if (activity && dateToUse) {
+            
+            // --- START KOTLIN SYNC LOGIC ---
+            const inputTimeText = timeInput ? timeInput.value.trim() : '';
+            const endMillisAttr = timeInput ? timeInput.getAttribute('data-end-millis') : null;
+
+            const isTimeRangeSet = endMillisAttr && parseInt(endMillisAttr) > 0;
+            const isFlowTimerSet = window.TaskApp.flowDurationMillis > 0;
+            
+            let finalTime = inputTimeText; 
+            let finalEndTimeMillis = 0;
+            let finalFlowDurationMillis = 0;
+            
+            if (isTimeRangeSet) {
+                finalEndTimeMillis = parseInt(endMillisAttr);
+                finalFlowDurationMillis = window.TaskApp.flowDurationMillis; 
+                finalTime = inputTimeText; 
+                
+                // BARIS PENGGANTI YANG DIHAPUS: dateToUse = window.TaskApp.formatDate(activeDate);
+
+            } else if (isFlowTimerSet) {
+                finalEndTimeMillis = 0;
+                finalFlowDurationMillis = window.TaskApp.flowDurationMillis;
+                
+                if (inputTimeText.length === 0) {
+                    const durationText = window.TaskApp.formatDurationToString(finalFlowDurationMillis);
+                    finalTime = `${durationText} (Flow)`;
+                } else {
+                    finalTime = inputTimeText; 
+                }
+
+            } else {
+                finalEndTimeMillis = 0;
+                finalFlowDurationMillis = 0;
+                finalTime = inputTimeText; 
+            }
+            
+            const taskData = {
+                title: activity,
+                time: finalTime,
+                location: location, 
+                date: dateToUse, // Tanggal yang akan digunakan untuk navigasi
+                priority: priority,
+                endTimeMillis: finalEndTimeMillis,      
+                flowDurationMillis: finalFlowDurationMillis, 
+                dueDate: firebase.firestore.Timestamp.fromDate(new Date(dateToUse + (finalEndTimeMillis > 0 ? '' : ' 23:59:59'))), 
+                status: "pending"
+            };
+            // --- END KOTLIN SYNC LOGIC ---
+
             try {
-                const taskData = {
-                    title: activity,
-                    time, 
-                    location,
-                    date: dateToUse, 
-                };
-
                 const isEditing = window.TaskApp.editingTaskId;
 
                 if (isEditing) {
-                    // ✅ PASTIKAN UPDATE BERJALAN DENGAN ID YANG BENAR
-                    console.log('=== EDIT MODE ===');
-                    console.log('Editing Task ID:', isEditing);
-                    console.log('Task data to update:', taskData);
-                    console.log('User UID:', user.uid);
-                    console.log('Firebase path:', `users/${user.uid}/tasks/${isEditing}`);
-                    
-                    // Cek apakah task ada sebelum update
-                    const taskDoc = await tasksRef.doc(isEditing).get();
-                    console.log('Task exists before update:', taskDoc.exists);
-                    if (taskDoc.exists) {
-                        console.log('Current task data:', taskDoc.data());
-                    }
-                    
                     await tasksRef.doc(isEditing).update(taskData);
-                    console.log('✅ Task updated successfully in Firebase');
-                    
-                    // Verifikasi update
-                    const updatedDoc = await tasksRef.doc(isEditing).get();
-                    console.log('Updated task data:', updatedDoc.data());
                 } else {
-                    console.log('=== ADD MODE ===');
                     taskData.done = false;
-                    const docRef = await tasksRef.add(taskData);
-                    console.log('✅ Task added with ID:', docRef.id);
+                    await tasksRef.add(taskData);
                 }
 
                 if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset(); 
                 
-                // ✅ PERBAIKAN: Deteksi halaman dengan lebih akurat
-                const currentPath = window.location.pathname;
-                const isTaskOrCalendar = currentPath.includes("task.html") || currentPath.includes("calendar.html");
-                const isSearchPage = currentPath.includes("search.html");
+                if (timeInput) timeInput.removeAttribute('data-end-millis');
 
-                console.log('=== RELOAD PAGE DATA ===');
-                console.log('Current path:', currentPath);
-                console.log('Is task/calendar page:', isTaskOrCalendar);
-                console.log('Is search page:', isSearchPage);
+                // Tentukan tombol dialog setelah Add/Edit sukses
+                const dialogButtons = [
+                    { 
+                        text: 'Add more', 
+                        action: () => {
+                            window.TaskApp.editingTaskId = null;
+                            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa-solid fa-clipboard-list" style="margin-right: 8px;"></i>New Reminder';
+                            if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
+                            
+                            const taskListForDrawer = document.getElementById('taskListForDrawer');
+                            if (taskListForDrawer) taskListForDrawer.style.display = 'none';
+                            if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
 
-                // ✅ RELOAD DATA TUGAS SETELAH EDIT/TAMBAH (MEKANISME YANG SAMA)
-                if (isTaskOrCalendar) {
-                    console.log('Reloading task/calendar page...');
-                    await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
-                    displayTasksForActiveDate(activeDate);
-                    console.log('✅ Task/calendar page reloaded');
-                } else if (isSearchPage) {
-                    console.log('Checking SearchApp availability...');
-                    console.log('window.SearchApp:', window.SearchApp);
-                    
-                    if (window.SearchApp?.reloadTasks) {
-                        // ✅ Panggil fungsi reload yang sama seperti loadTasksAndRenderCalendar
-                        console.log('🔄 Calling SearchApp.reloadTasks...');
-                        await window.SearchApp.reloadTasks(user);
-                        console.log('✅ Search page reloaded successfully');
-                    } else {
-                        console.error('❌ SearchApp.reloadTasks not found!');
-                        console.log('Available on window:', Object.keys(window).filter(k => k.includes('Search') || k.includes('Task')));
+                            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+                            
+                            // ✅ PERBAIKAN: PASTIKAN PRIORITAS KEMBALI KE NONE SAAT ADD MORE
+                            const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+                            if (selectorSpan) {
+                                selectorSpan.textContent = 'None'; 
+                                updatePriorityDropdownSelection('None');
+                            }
+                            
+                            window.TaskApp.openDrawer();
+                        }, 
+                        isPrimary: false 
+                    },
+                    { 
+                        text: 'View', 
+                        action: () => {
+                            window.TaskApp.closeDrawer();
+                            // LOGIKA REDIREKSI KE TASK.HTML DENGAN HASH TANGGAL
+                            // dateToUse sudah berisi YYYY-MM-DD
+                            window.location.href = `../pages/task.html#date=${dateToUse}`;
+                        }, 
+                        isPrimary: true 
                     }
-                } else {
-                    console.warn('⚠️ Unknown page, no reload performed');
-                }
-                
-                // Tentukan opsi dialog
-                let dialogButtons;
-
-                if (isEditing) {
-                    // ✅ Jika editing, hanya OK untuk menutup dialog dan drawer.
-                    dialogButtons = [
-                        { 
-                            text: 'OK', 
-                            action: () => {
-                                window.TaskApp.closeDrawer();
-                            }, 
-                            isPrimary: true 
-                        }
-                    ];
-                } else {
-                    // Jika menambahkan: opsi "Add More" dan "View"
-                    dialogButtons = [
-                        { 
-                            text: 'Add more', 
-                            action: () => {
-                                window.TaskApp.editingTaskId = null;
-                                if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
-                                if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
-                                
-                                // Reset tanggal default di form edit
-                                if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(activeDate);
-
-                                window.TaskApp.openDrawer();
-                            }, 
-                            isPrimary: false 
-                        },
-                        { 
-                            text: 'View', 
-                            action: () => {
-                                // Tutup drawer, list sudah ter-update
-                                window.TaskApp.closeDrawer();
-                            }, 
-                            isPrimary: true 
-                        }
-                    ];
-                }
+                ];
                 
                 window.showCustomDialog(
                     isEditing ? "Success Update Reminder" : "Success Add New Reminder",
                     dialogButtons
                 );
+
+                // Jika di halaman Task, refresh data lokal untuk memastikan tampilan Task sudah update
+                if (window.location.pathname.includes("task.html")) {
+                    await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+                    displayTasksForActiveDate(activeDate);
+                } else if (window.location.pathname.includes("search.html")) {
+                    if (window.SearchApp?.reloadTasks) {
+                        await window.SearchApp.reloadTasks(user);
+                    }
+                }
+                
             } catch (err) {
                 console.error(`Error ${isEditing ? 'updating' : 'adding'} task:`, err);
                 window.showCustomDialog(
@@ -837,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             window.showCustomDialog(
-                "Activity, Time, and Date are required!",
+                "Activity and Date are required!",
                 [{ text: 'OK', action: () => {}, isPrimary: true }]
             );
         }
@@ -848,7 +1047,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (newReminderBtn) {
         newReminderBtn.addEventListener('click', () => {
             window.TaskApp.editingTaskId = null;
-            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
+            
+            // [PERBAIKAN IKON HEADER]
+            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = '<i class="fa fa-clipboard-list" style="margin-right: 8px;"></i>New Reminder';
+            
             if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
             if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
             
@@ -858,6 +1060,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
             
             if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+            
+            // Reset Flow Timer State
+            window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
+            updateFlowTimerLinkText();
+            if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
+            
+            // ✅ PERBAIKAN: PASTIKAN PRIORITAS KEMBALI KE NONE SAAT KLIK TOMBOL 'New Reminder'
+            const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+            if (selectorSpan) {
+                selectorSpan.textContent = 'None'; 
+                updatePriorityDropdownSelection('None');
+            }
             
             window.TaskApp.openDrawer();
         });

@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
 
         try {
-            const snapshot = await tasksRef.get();
+            // Hanya ambil task dengan status "pending"
+            const snapshot = await tasksRef.where("status", "==", "pending").get();
             allTasksData = snapshot.docs.map(doc => ({ 
                 id: doc.id, 
                 ...doc.data() 
@@ -374,6 +375,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         selectedDate = { year, month, day };
         
+        // Update activeDate (Global State) untuk sinkronisasi
+        window.TaskApp.activeDate = new Date(year, month, day);
+
         populateTaskDrawer(dateString); 
         window.TaskApp.openDrawer(); // Ganti dengan fungsi global dari task.js
     }
@@ -495,7 +499,40 @@ document.addEventListener('DOMContentLoaded', function() {
      * Initialize calendar
      */
     function init(user) {
-        loadTasksAndRenderCalendar(user);
+        loadTasksAndRenderCalendar(user).then(() => {
+            const hash = window.location.hash;
+            if (hash.startsWith('#date=')) {
+                const params = new URLSearchParams(hash.substring(1));
+                const dateString = params.get('date');
+                const viewFlag = params.get('view');
+                
+                if (dateString) {
+                    // Update internal state from hash
+                    const dateParts = dateString.split('-');
+                    selectedDate = { 
+                        year: parseInt(dateParts[0]), 
+                        month: parseInt(dateParts[1]) - 1, 
+                        day: parseInt(dateParts[2]) 
+                    };
+                    
+                    if (viewFlag === 'list') {
+                        // 1. Ensure the correct date box is visually selected
+                        document.querySelectorAll('.date-box.selected').forEach(el => el.classList.remove('selected'));
+                        const activeBox = document.querySelector(`.date-box[data-year="${selectedDate.year}"][data-month="${selectedDate.month}"][data-day="${selectedDate.day}"]`);
+                        if(activeBox) activeBox.classList.add('selected');
+                        
+                        // 2. Open the task list drawer for this date
+                        populateTaskDrawer(dateString); 
+                        window.TaskApp.openDrawer();
+                        window.TaskApp.reminderForm.style.display = 'none';
+                        document.getElementById('taskListForDrawer').style.display = 'flex';
+                        
+                        // 3. Clear the hash after use
+                        history.replaceState(null, null, window.location.pathname);
+                    }
+                }
+            }
+        });
 
         let resizeTimer;
         window.addEventListener('resize', function() {
@@ -547,6 +584,13 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = "../pages/login.html";
             return;
         }
+        
+        // Inisialisasi activeDate global di sini untuk digunakan dalam save handler
+        if (!window.TaskApp.activeDate) {
+            window.TaskApp.activeDate = new Date();
+            window.TaskApp.activeDate.setHours(0, 0, 0, 0);
+        }
+        
         init(user);
     });
 
@@ -580,6 +624,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector(`.date-box[data-year="${todayYear}"][data-month="${todayMonth}"][data-day="${todayDate}"]`)?.classList.add('selected');
             }
             
+            // Set activeDate global
+            window.TaskApp.activeDate = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
+
             // Reset ke mode New Reminder
             window.TaskApp.editingTaskId = null;
             if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.textContent = 'New Reminder';
@@ -594,6 +641,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Set tanggal default di form edit
             if (dateInputEdit) dateInputEdit.value = formatDate(selectedDate.year, selectedDate.month, selectedDate.day);
 
+            // Reset Flow Timer State
+            window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
+            window.TaskApp.timeInput.removeAttribute('data-end-millis');
+            window.TaskApp.timeInput.value = '';
+            
+            // window.TaskApp.openDrawer() akan dipanggil, dan di sana prioritas akan diatur ke 'None'
             window.TaskApp.openDrawer();
         });
     }
@@ -628,21 +681,42 @@ document.addEventListener('DOMContentLoaded', function() {
             const start = startTimeInput.value;
             const end = endTimeInput.value;
 
-            if (start && end) {
-                const startDate = new Date(`2000/01/01 ${start}`);
-                const endDate = new Date(`2000/01/01 ${end}`);
+            if (!start || !end) return;
+
+            // Dapatkan activeDate sebagai base date untuk perhitungan
+            let baseDate = new Date(window.TaskApp.activeDate.getTime());
+            
+            // 1. Hitung Milis dari Waktu Mulai pada Base Date
+            const [startHour, startMinute] = start.split(':').map(Number);
+            baseDate.setHours(startHour, startMinute, 0, 0);
+            const startMillis = baseDate.getTime();
+            
+            // 2. Hitung Milis dari Waktu Akhir pada Base Date
+            const [endHour, endMinute] = end.split(':').map(Number);
+            baseDate.setHours(endHour, endMinute, 0, 0);
+            let endMillis = baseDate.getTime();
+
+            // 3. Atasi Roll-over Tanggal (Seperti di Kotlin)
+            if (endMillis <= startMillis) {
+                // Waktu Akhir <= Waktu Mulai, roll date forward
+                endMillis += 24 * 60 * 60 * 1000;
                 
-                if (startDate.getTime() >= endDate.getTime()) {
-                    window.showCustomDialog(
-                        "Start time must be before end time.",
-                        [{ text: 'OK', action: () => {}, isPrimary: true }]
-                    );
-                    return;
+                // Update activeDate (Global State) untuk mencerminkan tanggal roll-over
+                let newDate = new Date(window.TaskApp.activeDate.getTime());
+                newDate.setDate(newDate.getDate() + 1);
+                window.TaskApp.activeDate = newDate;
+                
+                // Perbarui tampilan Date Input di Drawer (agar user melihat perubahan tanggal)
+                if (window.TaskApp.dateInputEdit) {
+                    window.TaskApp.dateInputEdit.value = window.TaskApp.formatDate(newDate);
                 }
-                
-                timeInput.value = `${start} - ${end}`;
-                timePickerOverlay.classList.remove('open'); 
             }
+            
+            // 4. Set input value (string) dan simpan endMillis di atribut data
+            timeInput.value = `${start} - ${end}`;
+            timeInput.setAttribute('data-end-millis', endMillis.toString()); 
+            
+            timePickerOverlay.classList.remove('open'); 
         });
         
         timePickerOverlay.addEventListener('click', (event) => {
@@ -663,8 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Tampilkan overlay flow timer
                 flowTimerPickerOverlay.classList.add('open');
             }
-            // Reset input time range
-            if (timeInput) timeInput.value = '';
+            // Hapus baris ini: Logic to clear timeInput is removed, preserving existing value.
         });
     }
 
@@ -686,7 +759,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const minutes = parseInt(flowTimerMinutesInput.value) || 0;
             const seconds = parseInt(flowTimerSecondsInput.value) || 0;
 
-            if (hours === 0 && minutes === 0 && seconds === 0) {
+            const totalMillis = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+
+            if (totalMillis <= 0) {
                  window.showCustomDialog(
                     "Duration cannot be zero.",
                     [{ text: 'OK', action: () => {}, isPrimary: true }]
@@ -694,23 +769,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Hitung waktu selesai berdasarkan durasi dari waktu saat ini
-            const now = new Date();
-            const startHours = String(now.getHours()).padStart(2, '0');
-            const startMinutes = String(now.getMinutes()).padStart(2, '0');
-            
-            // Hitung waktu akhir
-            now.setHours(now.getHours() + hours);
-            now.setMinutes(now.getMinutes() + minutes);
-            now.setSeconds(now.getSeconds() + seconds);
+            // 1. UPDATE GLOBAL MILLIS STATE (Kotlin parity)
+            window.TaskApp.flowDurationMillis = totalMillis;
 
-            const endHours = String(now.getHours()).padStart(2, '0');
-            const endMinutes = String(now.getMinutes()).padStart(2, '0');
-            
-            const timeRange = `${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+            // 2. UPDATE TEXT LINK
+            window.TaskApp.formatDurationToString(totalMillis);
 
-            // Update time input field
-            timeInput.value = timeRange;
+            // 3. Clear data-end-millis (Flow Timer override Time Range)
+            if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
             
             // Tutup overlay
             flowTimerPickerOverlay.classList.remove('open');
@@ -727,18 +793,71 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.preventDefault();
 
                 const activity = document.getElementById('activity-input').value.trim();
-                const time = document.getElementById('time-input').value.trim();
-                const location = document.getElementById('location-input').value.trim() || 'No Location';
-                const dateString = dateInputEdit.value; 
+                const timeInput = document.getElementById('time-input');
+                const location = document.getElementById('location-input').value.trim() || ''; // Sesuai Kotlin: ifEmpty { "" }
+                let dateString = dateInputEdit.value; 
+                const priority = window.TaskApp.prioritySelector.querySelector('span').textContent;
 
-                if (activity && time && dateString) {
+
+                if (activity && dateString) {
+                    
+                    // --- START KOTLIN SYNC LOGIC ---
+                    const inputTimeText = timeInput ? timeInput.value.trim() : '';
+                    const endMillisAttr = timeInput ? timeInput.getAttribute('data-end-millis') : null;
+
+                    const isTimeRangeSet = endMillisAttr && parseInt(endMillisAttr) > 0;
+                    const isFlowTimerSet = window.TaskApp.flowDurationMillis > 0;
+                    
+                    let finalTime = inputTimeText; 
+                    let finalEndTimeMillis = 0;
+                    let finalFlowDurationMillis = 0;
+                    
+                    if (isTimeRangeSet) {
+                        finalEndTimeMillis = parseInt(endMillisAttr);
+                        finalFlowDurationMillis = window.TaskApp.flowDurationMillis; 
+                        finalTime = inputTimeText; // "Start - End" string
+                        
+                        // BARIS INI DIHAPUS: dateString = window.TaskApp.formatDate(window.TaskApp.activeDate);
+
+                    } else if (isFlowTimerSet) {
+                        finalEndTimeMillis = 0;
+                        finalFlowDurationMillis = window.TaskApp.flowDurationMillis;
+                        
+                        // KOTLIN LOGIC: Hanya isi field time jika inputTime kosong (dan Flow Timer aktif)
+                        if (inputTimeText.length === 0) {
+                            const durationText = window.TaskApp.formatDurationToString(finalFlowDurationMillis);
+                            finalTime = `${durationText} (Flow)`;
+                        } else {
+                            finalTime = inputTimeText; // Biarkan teks yang ada
+                        }
+
+                    } else {
+                        finalEndTimeMillis = 0;
+                        finalFlowDurationMillis = 0;
+                        finalTime = inputTimeText; // String kosong atau teks biasa
+                    }
+                    
+                    // 3. Final Task Data Object with Kotlin-style fields
+                    const taskData = {
+                        title: activity,
+                        time: finalTime,
+                        category: location, // Menggunakan category sesuai Kotlin Task model
+                        date: dateString, 
+                        priority: priority,
+                        endTimeMillis: finalEndTimeMillis,      // NEW: For Time Range
+                        flowDurationMillis: finalFlowDurationMillis, // NEW: For Flow Timer
+                        // Tambahkan field status dan dueDate (Timestamp) untuk sinkronisasi
+                        dueDate: firebase.firestore.Timestamp.fromDate(new Date(dateString + (finalEndTimeMillis > 0 ? '' : ' 23:59:59'))), // Fallback ke akhir hari jika bukan Time Range
+                        status: "pending"
+                    };
+
+                    // --- END KOTLIN SYNC LOGIC ---
+
                     try {
                         const db = firebase.firestore();
                         const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
                         const isEditing = window.TaskApp.editingTaskId;
                         
-                        const taskData = { title: activity, time, location, date: dateString };
-
                         if (isEditing) {
                             await tasksRef.doc(isEditing).update(taskData);
                         } else {
@@ -749,6 +868,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         reminderForm.reset();
                         window.TaskApp.closeDrawer();
                         
+                        // Clear data-end-millis after successful save
+                        if (timeInput) timeInput.removeAttribute('data-end-millis');
+
                         await reloadCalendarView();
 
                         window.showCustomDialog(
@@ -765,6 +887,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                         if (reminderForm) reminderForm.style.display = 'flex';
                                         if (taskListForDrawer) taskListForDrawer.style.display = 'none';
                                         
+                                        // Set tanggal default di form edit
+                                        const parts = dateString.split('-');
+                                        const currentActiveDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                                        window.TaskApp.dateInputEdit.value = window.TaskApp.formatDate(currentActiveDate);
+                                        
+                                        // window.TaskApp.openDrawer() akan dipanggil, dan di sana prioritas akan diatur ke 'None'
                                         window.TaskApp.openDrawer();
                                     },
                                     isPrimary: false
@@ -772,14 +900,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 { 
                                     text: 'View', 
                                     action: () => {
-                                        const parts = dateString.split('-');
-                                        selectedDate = { year: parseInt(parts[0]), month: parseInt(parts[1]) - 1, day: parseInt(parts[2]) };
-                                        
-                                        currentYear = selectedDate.year;
-                                        currentMonthIndex = selectedDate.month;
-                                        loadTasksAndRenderCalendar(user);
-                                        populateTaskDrawer(dateString);
-                                        window.TaskApp.openDrawer();
+                                        window.TaskApp.closeDrawer();
+                                        // ✅ LOGIKA REDIREKSI KE CALENDAR.HTML DENGAN HASH TANGGAL DAN FLAG
+                                        window.location.href = `calendar.html#date=${dateString}&view=list`;
                                     },
                                     isPrimary: true
                                 }
@@ -794,7 +917,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     window.showCustomDialog(
-                        "Activity, Time, and Date are required!",
+                        "Activity and Date are required!",
                         [{ text: 'OK', action: () => {}, isPrimary: true }]
                     );
                 }
