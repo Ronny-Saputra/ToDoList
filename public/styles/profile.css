@@ -780,7 +780,7 @@ body,
 .camera-modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 1200;
     left: 0; 
     top: 0;
     width: 100%; 
@@ -1017,7 +1017,6 @@ body,
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
 }
 
 .edit-profile-drawer.active .drawer-overlay {
@@ -1074,7 +1073,6 @@ body,
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
 }
 
 .edit-profile-drawer.active .drawer-overlay {
@@ -1436,7 +1434,6 @@ body,
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
 }
 
 .completed-drawer.active .drawer-overlay {
@@ -1605,7 +1602,6 @@ body,
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
 }
 
 .deleted-drawer.active .drawer-overlay {
@@ -1792,7 +1788,6 @@ body,
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
 }
 
 .missed-drawer.active .drawer-overlay {
@@ -2005,3 +2000,4 @@ body,
         padding: 16px;
     }
 }
+
