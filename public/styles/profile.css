@@ -44,12 +44,12 @@ body,
 /* ==================================================== */
 .profile-header {
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 30px 40px;
+    padding: 11px 40px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     width: 100%;
-    border-radius: 0 0 32px 32px;
+    border-radius: 0 0 12px 12px;
     flex-shrink: 0;
     position: sticky;
     top: 0;
@@ -76,37 +76,38 @@ body,
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Pastikan semua avatar tetap bulat dan tidak terdistorsi */
-.profile-avatar img,
-.avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;        /* Penting! */
+/* HANYA target avatar utama, BUKAN camera icon */
+.profile-avatar > img:first-child,
+.avatar-circle img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
     border-radius: 50%;
     display: block;
 }
 
+/* === CAMERA ICON === */
 .camera-icon {
     position: absolute;
-    bottom: 2px;
+    bottom: 1px;
     right: 5px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: transform 0.2s ease;
+    z-index: 10;
 }
 
 .camera-icon:hover {
     transform: scale(1.1);
 }
 
+/* SVG di dalam camera-icon */
 .camera-icon img {
-    width: 100%;
-    height: 100%;
+    width: 35px;           /* Ukuran icon SVG */
+    height: 35px;
+    display: block;
 }
 
 .profile-details {
@@ -126,7 +127,7 @@ body,
 .username {
     font-size: 28px;
     font-weight: 400;
-    color: #1e2a78;
+    color: #14142A;
     font-family: 'Lexend', sans-serif;
     font-style: normal;
     line-height: normal;
@@ -136,7 +137,7 @@ body,
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 600;
+    font-weight: 1000;
 }
 
 .streak .fa-fire {
@@ -165,19 +166,27 @@ body,
 }
 
 .settings-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
     margin-right: 90px;
-    transition: transform 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    padding: 50px; /* Biar icon tidak nempel pinggir */
 }
 
 .settings-btn:hover {
     transform: rotate(30deg);
 }
 
+/* INI YANG PENTING: KECILKAN SVG */
+.settings-icon {
+    width: 30px;   /* Ubah ini sesuka hati */
+    height: 30px;
+    display: block;
+}
 
 /* ==================================================== */
 /* KONTEN UTAMA */
@@ -299,8 +308,8 @@ body,
 
 .card-header h3 {
     font-size: 16px;
-    font-weight: 600;
-    color: #1e2a78;
+    font-weight: 400;
+    color: #14142A;
     margin: 0;
     text-align: left;
 }
@@ -311,7 +320,7 @@ body,
     gap: 6px;
     font-size: 18px;
     font-weight: bold;
-    color: #1e2a78;
+    color: #14142A;
 }
 
 .productivity-score .fa-fire {
@@ -432,6 +441,13 @@ body,
     background: #283F6D;
 }
 
+.icon-outline {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+
+
 .summary-box.missed span {
     color: #ffffff;
 }
@@ -530,8 +546,8 @@ body,
     }
 
     .profile-avatar {
-        width: 60px;
-        height: 60px;
+        width: 100px;
+        height: 100px;
     }
 
     .camera-icon {
@@ -561,7 +577,7 @@ body,
     }
 
     .settings-btn {
-        margin-right: 20px;
+        margin-right: 40px;
         font-size: 20px;
     }
 
@@ -1069,7 +1085,6 @@ body,
 .drawer-content {
     position: absolute;
     top: 0;
-    right: -100%;
     width: 90%;
     max-width: 400px;
     height: 100%;
@@ -1140,8 +1155,8 @@ body,
 /* Hanya avatar yang punya lingkaran */
 /* Khusus drawer avatar */
 .avatar-circle {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     overflow: hidden;
     background: #f5f5f5;
@@ -1337,10 +1352,22 @@ body,
     background: #1a2b4f;
 }
 
+/* FIX: Pastikan .profile-avatar selalu square dan tidak menyusut */
+.profile-avatar {
+    width: 120px !important;
+    height: 120px !important;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 /* RESPONSIVE */
 @media (max-width: 480px) {
     .drawer-content {
         width: 100%;
+        height: 100%;
         max-width: none;
         border-radius: 0;
     }
@@ -1357,13 +1384,18 @@ body,
     .drawer-content > .profile-avatar {
         margin-top: 40px;
         margin-bottom: 16px;
+        margin: 20px auto 12px; /* center + spacing */
     }
     
-    .avatar-circle {
+    .drawer-content > .profile-avatar .avatar-circle {
         width: 70px;
         height: 70px;
     }
 
+    .drawer-content > .profile-avatar .edit-avatar-btn {
+        margin-top: 8px;
+        font-size: 13px;
+    }
     .form-input,
     .gender-input {
         padding: 10px 14px;
@@ -1434,7 +1466,7 @@ body,
 /* HEADER BIRU */
 .completed-drawer .drawer-header {
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 20px 24px;
+    padding: 40px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -1467,11 +1499,23 @@ body,
 
 /* BODY */
 .completed-drawer .drawer-body {
-    padding: 19px;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto;           /* Tetap aktif agar bisa scroll jika konten panjang */
     background: #E3EEFB;
-     border-radius: 20px;
+    padding: 19px 15px;         /* Atas-bawah: 19px, Kanan-kiri: 24px */
+    margin: 0 16px;             /* Jarak kiri-kanan dari drawer */
+    margin-top: 10px;           /* Jarak dari header */
+    margin-bottom: 16px;        /* Jarak bawah */
+    border-radius: 20px;        /* Rounded semua sudut (atas & bawah) */
+    box-sizing: border-box;
+    
+    /* === HILANGKAN SCROLLBAR TAPI TETAP BISA SCROLL === */
+    -ms-overflow-style: none;   /* IE & Edge */
+    scrollbar-width: none;      /* Firefox */
+}
+
+.completed-drawer .drawer-body::-webkit-scrollbar {
+    display: none;              /* Chrome, Safari, Opera */
 }
 
 /* EMPTY STATE */
@@ -1504,7 +1548,7 @@ body,
     font-weight: 600;
     color: #14142A;
     background: #e5effb;
-    padding: 8px 16px;
+    padding: 2px 0;
     border-radius: 8px;
     margin-bottom: 8px;
 }
@@ -1512,7 +1556,7 @@ body,
 .task-item {
     background: #fff;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 15px;
     margin-bottom: 8px;
     font-size: 14px;
     color: #14142A;
@@ -1591,7 +1635,7 @@ body,
 /* HEADER BIRU */
 .deleted-drawer .drawer-header {
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 20px 24px;
+    padding: 40px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -1624,10 +1668,23 @@ body,
 
 /* BODY */
 .deleted-drawer .drawer-body {
-    padding: 24px;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto;           /* Tetap aktif agar bisa scroll jika konten panjang */
     background: #E3EEFB;
+    padding: 19px 15px;         /* Atas-bawah: 19px, Kanan-kiri: 24px */
+    margin: 0 16px;             /* Jarak kiri-kanan dari drawer */
+    margin-top: 10px;           /* Jarak dari header */
+    margin-bottom: 16px;        /* Jarak bawah */
+    border-radius: 20px;        /* Rounded semua sudut (atas & bawah) */
+    box-sizing: border-box;
+    
+    /* === HILANGKAN SCROLLBAR TAPI TETAP BISA SCROLL === */
+    -ms-overflow-style: none;   /* IE & Edge */
+    scrollbar-width: none;  
+}
+
+.deleted-drawer .drawer-body::-webkit-scrollbar {
+    display: none;              /* Chrome, Safari, Opera */
 }
 
 /* EMPTY STATE */
@@ -1660,7 +1717,7 @@ body,
     font-weight: 600;
     color: #14142A;
     background: #e5effb;
-    padding: 8px 16px;
+    padding: 2px 0;
     border-radius: 8px;
     margin-bottom: 8px;
 }
@@ -1668,7 +1725,7 @@ body,
 .deleted-task-item {
     background: #fff;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 15px;
     margin-bottom: 8px;
     font-size: 14px;
     color: #14142A;
@@ -1679,10 +1736,10 @@ body,
 }
 
 .restore-btn {
-    background: none;
-    border: none;
-    color: #1e2a78;
-    font-size: 14px;
+    background: #14142A;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     padding: 4px 8px;
@@ -1690,7 +1747,6 @@ body,
 }
 
 .restore-btn:hover {
-    color: #0d1a5e;
     text-decoration: underline;
 }
 
@@ -1766,7 +1822,7 @@ body,
 /* HEADER BIRU */
 .missed-drawer .drawer-header {
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 20px 24px;
+    padding: 40px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -1799,10 +1855,23 @@ body,
 
 /* BODY */
 .missed-drawer .drawer-body {
-    padding: 24px;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto;           /* Tetap aktif agar bisa scroll jika konten panjang */
     background: #E3EEFB;
+    padding: 19px 15px;         /* Atas-bawah: 19px, Kanan-kiri: 24px */
+    margin: 0 16px;             /* Jarak kiri-kanan dari drawer */
+    margin-top: 10px;           /* Jarak dari header */
+    margin-bottom: 16px;        /* Jarak bawah */
+    border-radius: 20px;        /* Rounded semua sudut (atas & bawah) */
+    box-sizing: border-box;
+    
+    /* === HILANGKAN SCROLLBAR TAPI TETAP BISA SCROLL === */
+    -ms-overflow-style: none;   /* IE & Edge */
+    scrollbar-width: none;  
+}
+
+.missed-drawer .drawer-body::-webkit-scrollbar {
+    display: none;              /* Chrome, Safari, Opera */
 }
 
 /* EMPTY STATE */
@@ -1835,7 +1904,7 @@ body,
     font-weight: 600;
     color: #14142A;
     background: #e5effb;
-    padding: 8px 16px;
+    padding: 2px 0;
     border-radius: 8px;
     margin-bottom: 8px;
 }
@@ -1844,7 +1913,7 @@ body,
 .missed-task-item {
     background: #fff;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 15px;
     margin-bottom: 8px;
     font-size: 14px;
     color: #14142A;
@@ -1858,7 +1927,7 @@ body,
 .missed-task-header {
     background: #fff;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 15px;
     margin-bottom: 8px;
     font-size: 14px;
     color: #14142A;
@@ -1908,10 +1977,11 @@ body,
 
 /* RESCHEDULE BUTTON */
 .reschedule-btn {
-    background: none;
+    background: #14142A;
+    border-radius: 10px;
     border: none;
-    color: #1e2a78;
-    font-size: 14px;
+    color: #FFFFFF;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     padding: 4px 8px;
@@ -1919,7 +1989,6 @@ body,
 }
 
 .reschedule-btn:hover {
-    color: #0d1a5e;
     text-decoration: underline;
 }
 
