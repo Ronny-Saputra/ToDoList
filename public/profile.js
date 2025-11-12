@@ -170,8 +170,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            photoData = e.target.result;
-            openPreview(photoData);
+            // BARU: Crop otomatis ke square sebelum preview
+            cropToSquare(e.target.result, (croppedData) => {
+                photoData = croppedData;
+                openPreview(photoData);
+            });
         };
         reader.readAsDataURL(file);
     });
@@ -216,17 +219,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     captureBtn.addEventListener('click', () => {
-        const context = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0);
-        photoData = canvas.toDataURL('image/png');
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-        openPreview(photoData);
-    });
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            const tempPhotoData = canvas.toDataURL('image/png');
+            
+            // BARU: Crop otomatis ke square setelah capture
+            cropToSquare(tempPhotoData, (croppedData) => {
+                photoData = croppedData;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                openPreview(photoData);
+            });
+        });
+
+       // BARU: Fungsi untuk crop gambar ke square (center crop)
+    function cropToSquare(imageSrc, callback) {
+        const img = new Image();
+        img.onload = () => {
+            const size = Math.min(img.width, img.height);
+            const x = (img.width - size) / 2;
+            const y = (img.height - size) / 2;
+
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, x, y, size, size, 0, 0, size, size);
+            const croppedData = canvas.toDataURL('image/png');
+            callback(croppedData);
+        };
+        img.src = imageSrc;
+    }
 
     function openPreview(src) {
         cameraModal.style.display = 'flex';
