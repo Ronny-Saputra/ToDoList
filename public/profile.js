@@ -791,7 +791,7 @@ function renderMissedTasksInDrawer() {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'missed-empty';
         emptyDiv.innerHTML = `
-            <i class="fas fa-clock"></i>
+            <img src="../assets/missed_tasks.svg" alt="No missed tasks" style="width: 48px; height: 48px; margin-bottom: 16px;">
             <p>Yay, no missed tasks!</p>
         `;
         missedDrawerContent.appendChild(emptyDiv);
