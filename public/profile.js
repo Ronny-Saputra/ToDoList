@@ -587,8 +587,7 @@ function renderCompletedTasksInDrawer() {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'completed-empty';
         emptyDiv.innerHTML = `
-            <i class="fas fa-clock"></i>
-            <p>No completed tasks yet!</p>
+        <img src="../assets/completed_tasks.svg" alt="No completed tasks" style="width: 200px; height: 200px; margin-bottom: 16px;">
         `;
         completedDrawerContent.appendChild(emptyDiv);
     } else {
@@ -640,6 +639,7 @@ if (deletedDrawerOverlay) {
     });
 }
 
+// === UPDATE RENDER DELETED TASKS (DENGAN EVENT LISTENER) ===
 function renderDeletedTasksInDrawer() {
     const tasks = getDeletedTasksFromStorage();
 
@@ -649,8 +649,7 @@ function renderDeletedTasksInDrawer() {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'deleted-empty';
         emptyDiv.innerHTML = `
-            <i class="fas fa-clock"></i>
-            <p>Yay, trash is empty!</p>
+           <img src="../assets/deleted_tasks.svg" alt="No deleted tasks" style="width: 178px; height: 178px; margin-bottom: 16px;">
         `;
         deletedDrawerContent.appendChild(emptyDiv);
     } else {
@@ -663,7 +662,7 @@ function renderDeletedTasksInDrawer() {
             dateDiv.textContent = group.date;
             groupDiv.appendChild(dateDiv);
 
-            group.tasks.forEach((taskName, index) => {
+            group.tasks.forEach((taskName) => {
                 // Dapatkan task ID dari deletedTasks localStorage
                 const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
                 const taskObj = deletedTasks.find(t => t.title === taskName);
@@ -676,7 +675,7 @@ function renderDeletedTasksInDrawer() {
                     <button class="restore-btn" data-task-id="${taskId}">Restore</button>
                 `;
                 
-                // Event listener untuk restore
+                // ✅ EVENT LISTENER UNTUK RESTORE
                 itemDiv.querySelector('.restore-btn').addEventListener('click', async () => {
                     if (taskId) {
                         await restoreDeletedTask(taskId);
@@ -693,7 +692,9 @@ function renderDeletedTasksInDrawer() {
     }
 }
 
-// === FUNGSI RESTORE DELETED TASK ===
+// === UPDATE FUNGSI RESTORE DAN RESCHEDULE ===
+// Ganti fungsi yang lama dengan ini:
+
 async function restoreDeletedTask(taskId) {
     const user = firebase.auth().currentUser;
     if (!user) return alert('Please log in first.');
@@ -702,21 +703,18 @@ async function restoreDeletedTask(taskId) {
     const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
     
     try {
-        // Get task data
         const taskDoc = await tasksRef.doc(taskId).get();
         if (!taskDoc.exists) {
-            alert('Task not found.');
-            return;
+            return alert('Task not found.');
         }
         
         const taskData = { id: taskId, ...taskDoc.data() };
         
-        // Open drawer untuk edit dengan mode restore
-        window.TaskApp.editMode = 'restore';
-        window.TaskApp.openDrawerForEdit(taskData);
-        
         // Close deleted drawer
         document.getElementById('deletedDrawer').classList.remove('active');
+        
+        // Open task edit drawer
+        openTaskEditDrawer(taskData, 'restore');
         
     } catch (err) {
         console.error("Error restoring task:", err);
@@ -724,7 +722,6 @@ async function restoreDeletedTask(taskId) {
     }
 }
 
-// === FUNGSI RESCHEDULE MISSED TASK ===
 async function rescheduleMissedTask(taskId) {
     const user = firebase.auth().currentUser;
     if (!user) return alert('Please log in first.');
@@ -733,21 +730,18 @@ async function rescheduleMissedTask(taskId) {
     const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
     
     try {
-        // Get task data
         const taskDoc = await tasksRef.doc(taskId).get();
         if (!taskDoc.exists) {
-            alert('Task not found.');
-            return;
+            return alert('Task not found.');
         }
         
         const taskData = { id: taskId, ...taskDoc.data() };
         
-        // Open drawer untuk edit dengan mode reschedule
-        window.TaskApp.editMode = 'reschedule';
-        window.TaskApp.openDrawerForEdit(taskData);
-        
         // Close missed drawer
         document.getElementById('missedDrawer').classList.remove('active');
+        
+        // Open task edit drawer
+        openTaskEditDrawer(taskData, 'reschedule');
         
     } catch (err) {
         console.error("Error rescheduling task:", err);
@@ -782,6 +776,7 @@ if (missedDrawerOverlay) {
     });
 }
 
+// === UPDATE RENDER MISSED TASKS (DENGAN EVENT LISTENER) ===
 function renderMissedTasksInDrawer() {
     const tasks = getMissedTasksFromStorage();
 
@@ -812,7 +807,7 @@ function renderMissedTasksInDrawer() {
                     <button class="reschedule-btn" data-task-id="${task.id}">Reschedule</button>
                 `;
                 
-                // Event listener untuk reschedule
+                // ✅ EVENT LISTENER UNTUK RESCHEDULE
                 itemDiv.querySelector('.reschedule-btn').addEventListener('click', async () => {
                     await rescheduleMissedTask(task.id);
                 });
@@ -823,4 +818,239 @@ function renderMissedTasksInDrawer() {
             missedDrawerContent.appendChild(groupDiv);
         });
     }
+}
+
+// ===================================================
+// TASK EDIT DRAWER (UNTUK RESTORE/RESCHEDULE)
+// ===================================================
+
+const taskEditDrawer = document.getElementById('taskEditDrawer');
+const taskEditDrawerOverlay = document.getElementById('taskEditDrawerOverlay');
+const closeTaskEditDrawer = document.getElementById('closeTaskEditDrawer');
+const taskEditForm = document.getElementById('task-edit-form');
+const taskActivityInput = document.getElementById('task-activity-input');
+const taskDateInput = document.getElementById('task-date-input');
+const taskTimeInput = document.getElementById('task-time-input');
+const taskLocationInput = document.getElementById('task-location-input');
+const taskSaveBtn = document.getElementById('task-save-btn');
+const taskEditDrawerTitle = document.getElementById('taskEditDrawerTitle');
+
+let currentEditTaskId = null;
+let currentEditMode = null; // 'restore' atau 'reschedule'
+
+// Priority Dropdown Logic
+const taskPrioritySelector = document.getElementById('task-priority-selector');
+const taskPrioritySection = document.getElementById('task-priority-section');
+const taskPriorityWrapper = document.createElement('div');
+taskPriorityWrapper.classList.add('priority-dropdown-wrapper');
+taskPriorityWrapper.id = 'taskPriorityDropdownWrapper';
+
+if (taskPrioritySection) {
+    taskPrioritySection.appendChild(taskPriorityWrapper);
+}
+
+const priorityLevels = ['None', 'Low', 'Medium', 'High'];
+
+function createTaskPriorityDropdown() {
+    if (!taskPriorityWrapper || !taskPrioritySelector) return;
+    
+    const currentLevel = taskPrioritySelector.querySelector('span').textContent;
+    let dropdownHtml = '<div class="priority-dropdown">';
+    
+    priorityLevels.forEach(level => {
+        const isSelected = currentLevel === level;
+        const checkIconHtml = isSelected 
+            ? '<i class="fa-solid fa-check"></i>' 
+            : '<i class="fa-solid fa-check" style="visibility: hidden;"></i>';
+        
+        dropdownHtml += `<div class="priority-option" data-value="${level}">${checkIconHtml} ${level}</div>`;
+    });
+    
+    dropdownHtml += '</div>';
+    taskPriorityWrapper.innerHTML = dropdownHtml;
+}
+
+if (taskPrioritySelector) {
+    taskPrioritySelector.addEventListener('click', function(e) {
+        e.stopPropagation();
+        createTaskPriorityDropdown();
+        taskPriorityWrapper.classList.toggle('open');
+    });
+}
+
+if (taskPriorityWrapper) {
+    taskPriorityWrapper.addEventListener('click', function(e) {
+        const option = e.target.closest('.priority-option');
+        if (option) {
+            const selectedLevel = option.getAttribute('data-value');
+            const selectorSpan = taskPrioritySelector.querySelector('span');
+            if (selectorSpan) {
+                selectorSpan.textContent = selectedLevel;
+            }
+            taskPriorityWrapper.classList.remove('open');
+        }
+    });
+}
+
+document.addEventListener('click', function(e) {
+    if (taskPriorityWrapper && taskPriorityWrapper.classList.contains('open') && 
+        !taskPrioritySelector.contains(e.target) && 
+        !taskPriorityWrapper.contains(e.target)) {
+        taskPriorityWrapper.classList.remove('open');
+    }
+});
+
+// Add Details Logic
+const taskAddDetailsBtn = document.getElementById('task-add-details-btn');
+const taskDescriptionInput = document.getElementById('task-description-input');
+
+// Ganti dengan kode ini untuk memastikan description field selalu tampil:
+if (taskDescriptionInput) {
+    taskDescriptionInput.style.display = 'block';
+}
+
+function openTaskEditDrawer(taskData, mode) {
+    currentEditTaskId = taskData.id;
+    currentEditMode = mode;
+    
+    // Isi form
+    taskActivityInput.value = taskData.title || '';
+    taskTimeInput.value = taskData.time || '';
+    taskLocationInput.value = taskData.location || '';
+    
+    // Set priority
+    const taskPriority = taskData.priority || 'None';
+    const taskSelectorSpan = taskPrioritySelector?.querySelector('span');
+    if (taskSelectorSpan) {
+        taskSelectorSpan.textContent = taskPriority;
+    }
+    
+    // Set tanggal - untuk restore/reschedule, minimal hari ini
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const taskDate = new Date(taskData.date + ' 00:00:00');
+    taskDate.setHours(0, 0, 0, 0);
+    
+    if (taskDate < today) {
+        taskDateInput.value = formatDateForInput(today);
+    } else {
+        taskDateInput.value = taskData.date;
+    }
+    
+    // Set min date
+    taskDateInput.min = formatDateForInput(today);
+    
+    // Update title dan button
+    if (mode === 'restore') {
+        taskEditDrawerTitle.textContent = 'Restore Task';
+        taskSaveBtn.textContent = 'Restore & Reschedule';
+    } else if (mode === 'reschedule') {
+        taskEditDrawerTitle.textContent = 'Reschedule Task';
+        taskSaveBtn.textContent = 'Reschedule';
+    }
+    
+    // Buka drawer
+    taskEditDrawer.classList.add('active');
+}
+
+function closeTaskEditDrawerFunc() {
+    taskEditDrawer.classList.remove('active');
+    currentEditTaskId = null;
+    currentEditMode = null;
+    taskEditForm.reset();
+    taskDateInput.removeAttribute('min');
+}
+
+function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Event Listeners
+if (closeTaskEditDrawer) {
+    closeTaskEditDrawer.addEventListener('click', closeTaskEditDrawerFunc);
+}
+
+if (taskEditDrawerOverlay) {
+    taskEditDrawerOverlay.addEventListener('click', closeTaskEditDrawerFunc);
+}
+
+if (taskEditForm) {
+    taskEditForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const user = firebase.auth().currentUser;
+        if (!user) return alert('Please log in first.');
+        
+        const activity = taskActivityInput.value.trim();
+        const date = taskDateInput.value;
+        const time = taskTimeInput.value.trim();
+        const location = taskLocationInput.value.trim();
+        
+        if (!activity || !date) {
+            return alert('Activity and Date are required!');
+        }
+        
+        // Validasi tanggal tidak boleh lampau
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(date + ' 00:00:00');
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+            return alert('Cannot restore/reschedule to past dates. Please select today or a future date.');
+        }
+        
+        const db = firebase.firestore();
+        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+        
+        try {
+            // Update task
+            await tasksRef.doc(currentEditTaskId).update({
+                title: activity,
+                date: date,
+                time: time,
+                location: location,
+                status: 'pending',
+                done: false,
+                deletedAt: firebase.firestore.FieldValue.delete(),
+                missedAt: firebase.firestore.FieldValue.delete(),
+                completedAt: firebase.firestore.FieldValue.delete(),
+                dueDate: firebase.firestore.Timestamp.fromDate(new Date(date + ' 23:59:59'))
+            });
+            
+            // Hapus dari localStorage
+            if (currentEditMode === 'restore') {
+                let deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+                deletedTasks = deletedTasks.filter(t => t.id !== currentEditTaskId);
+                localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
+            } else if (currentEditMode === 'reschedule') {
+                let missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
+                missedTasks = missedTasks.filter(t => t.id !== currentEditTaskId);
+                localStorage.setItem('missedTasks', JSON.stringify(missedTasks));
+            }
+            
+            // Update counts
+            updateTaskCounts();
+            
+            // Close drawer
+            closeTaskEditDrawerFunc();
+            
+            // Show success message
+            alert('Task successfully restored!');
+            
+            // Reload drawer yang terbuka
+            if (currentEditMode === 'restore') {
+                renderDeletedTasksInDrawer();
+            } else if (currentEditMode === 'reschedule') {
+                renderMissedTasksInDrawer();
+            }
+            
+        } catch (err) {
+            console.error('Error updating task:', err);
+            alert('Failed to update task. Please try again.');
+        }
+    });
 }

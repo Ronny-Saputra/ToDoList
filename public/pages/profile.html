@@ -12,6 +12,262 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../styles/profile.css">
     <link rel="stylesheet" href="../styles/navbar.css">
+    <style>
+
+/* ============================================= */
+/* DRAWER TASK (UNTUK RESTORE/RESCHEDULE)       */
+/* ID UNIK: taskEditDrawer                       */
+/* ============================================= */
+
+.task-edit-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1200; /* Lebih tinggi dari edit profile */
+    pointer-events: none;
+}
+
+.task-edit-drawer.active {
+    pointer-events: auto;
+}
+
+.task-edit-drawer .drawer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.task-edit-drawer.active .drawer-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.task-edit-drawer .drawer-content {
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 90%;
+    max-width: 400px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+    transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-edit-drawer.active .drawer-content {
+    right: 0;
+}
+
+/* HEADER TASK DRAWER */
+.task-edit-drawer .drawer-header {
+    background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
+    padding: 20px 50px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #14142A;
+    flex-shrink: 0;
+    border-radius: 0 0 25px 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.task-edit-drawer .drawer-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #14142A;
+    margin: 0;
+}
+
+.task-edit-drawer .drawer-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* FORM TASK DRAWER */
+.task-edit-drawer .reminder-form {
+    padding: 20px 24px 30px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.task-edit-drawer .form-section {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.task-edit-drawer .form-section label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.task-edit-drawer .input-field {
+    width: 100%;
+    padding: 15px 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    transition: border-color 0.2s;
+}
+
+.task-edit-drawer .input-field:focus {
+    outline: none;
+    border-color: #3f67b5;
+}
+
+/* Priority Selector di Task Drawer */
+.task-edit-drawer .priority-selector {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.task-edit-drawer .priority-selector:hover {
+    border-color: #3f67b5;
+}
+
+.task-edit-drawer .priority-selector span {
+    color: #333;
+}
+
+.task-edit-drawer .priority-selector i {
+    color: #a8b0c6;
+    font-size: 14px;
+}
+
+/* Priority Dropdown untuk Task Drawer */
+.task-edit-drawer .priority-dropdown-wrapper {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.task-edit-drawer .priority-dropdown-wrapper.open {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.task-edit-drawer .priority-dropdown {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.task-edit-drawer .priority-option {
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background-color 0.1s ease;
+}
+
+.task-edit-drawer .priority-option:hover {
+    background-color: #f0f4f9;
+}
+
+.task-edit-drawer .priority-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.task-edit-drawer .priority-option i.fa-check {
+    color: #1e2a78;
+    font-size: 14px;
+}
+
+/* Add Details Button */
+.task-edit-drawer .add-details-btn {
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    color: #3f67b5;
+    padding: 15px 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    transition: background-color 0.2s;
+}
+
+.task-edit-drawer .add-details-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.task-edit-drawer .add-details-btn i {
+    color: #3f67b5;
+    font-size: 18px;
+}
+
+.task-edit-drawer .description-field {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.task-edit-drawer .save-btn {
+    background-color: #1e2a78;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .task-edit-drawer .drawer-content {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .task-edit-drawer .drawer-header {
+        padding: 20px 24px;
+    }
+}
+    </style>
 </head>
 <body>
 
@@ -280,100 +536,88 @@
         </div>
     </div>
 </div>
-<!-- ================== TAMBAH DRAWER EDIT/REMINDER (COPY DARI task.html) ================== -->
-        <div id="newReminderDrawer" class="drawer-overlay">
-            <div class="drawer-content">
-                <header class="drawer-header">
-                    <i class="fas fa-arrow-left close-drawer-btn"></i>
-                    <h2>New Reminder</h2>
-                </header>
-                
-                <form class="reminder-form" id="reminder-form">
-                    <div class="form-section">
-                        <label>Activity</label>
-                        <input type="text" id="activity-input" placeholder="Activity Name" class="input-field">
-                    </div>
-
-                    <div class="form-section date-section-edit" style="position: relative;">
-                        <label>Date</label>
-                        <input type="date" id="date-input-edit" class="input-field">
-                        <input type="hidden" id="original-date-value">
-                    </div>
-                    <div class="form-section time-section">
-                        <label>Time</label>
-                        <input type="text" id="time-input" placeholder="Start - End Time" class="input-field" readonly>
-                        <a href="#" class="flow-timer-link">+ Add Flow Timer (30m)</a>
-                    </div>
-
-                    <div class="form-section">
-                        <label>Location</label>
-                        <input type="text" id="location-input" placeholder="Location Name" class="input-field">
-                    </div>
-
-                    <div class="form-section">
-                        <label>Priority</label>
-                        <div class="priority-selector">
-                            <span>None</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <button type="button" class="add-details-btn">
-                            <i class="fas fa-plus"></i> Add Details
-                        </button>
-                        <input type="text" placeholder="Details / Description" class="input-field description-field">
-                    </div>
-
-                    <button type="submit" class="save-btn">Save</button>
-                </form>
-            </div>
+<!-- ================== DRAWER: TASK EDIT (RESTORE/RESCHEDULE) ================== -->
+<div class="task-edit-drawer" id="taskEditDrawer">
+    <div class="drawer-overlay" id="taskEditDrawerOverlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <button class="drawer-close" id="closeTaskEditDrawer">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 id="taskEditDrawerTitle">Edit Task</h2>
         </div>
         
-        <div id="custom-dialog-overlay" class="custom-dialog-overlay">
-            <div class="custom-dialog">
-                <div id="custom-dialog-message" class="custom-dialog-message">Success Add New Reminder</div>
-                <div id="custom-dialog-actions" class="custom-dialog-actions">
-                </div>
+        <form class="reminder-form" id="task-edit-form">
+            <div class="form-section">
+                <label>Activity</label>
+                <input type="text" id="task-activity-input" placeholder="Activity Name" class="input-field">
             </div>
-        </div>
-        
-        <div id="time-picker-overlay" class="time-picker-overlay">
-            <div class="time-picker-dialog">
-                <h3>Set Time Range</h3>
-                <div class="time-inputs">
-                    <input type="time" id="start-time-input" value="10:00">
-                    <span>to</span>
-                    <input type="time" id="end-time-input" value="11:00">
-                </div>
-                <div class="time-picker-actions">
-                    <button id="time-picker-cancel" class="time-picker-btn">Cancel</button>
-                    <button id="time-picker-save" class="time-picker-btn primary">Save</button>
-                </div>
-            </div>
-        </div>
 
-        <div id="flow-timer-picker-overlay" class="time-picker-overlay">
-            <div class="time-picker-dialog">
-                <h3>Set Flow Timer Duration</h3>
-                <div class="time-inputs flow-duration-inputs">
-                    <input type="number" id="flow-timer-hours-input" value="0" min="0" max="23">
-                    <span>Hours</span>
-                    <input type="number" id="flow-timer-minutes-input" value="30" min="0" max="59">
-                    <span>Minutes</span>
-                    <input type="number" id="flow-timer-seconds-input" value="0" min="0" max="59">
-                    <span>Seconds</span>
-                </div>
-                <div class="time-picker-actions">
-                    <button id="flow-timer-cancel" class="time-picker-btn">Cancel</button>
-                    <button id="flow-timer-save" class="time-picker-btn primary">Set Duration</button>
+            <div class="form-section">
+                <label>Date</label>
+                <input type="date" id="task-date-input" class="input-field">
+            </div>
+            
+            <div class="form-section">
+                <label>Time</label>
+                <input type="text" id="task-time-input" placeholder="Start - End Time" class="input-field" readonly>
+            </div>
+
+            <div class="form-section">
+                <label>Location</label>
+                <input type="text" id="task-location-input" placeholder="Location Name" class="input-field">
+            </div>
+
+            <div class="form-section" id="task-priority-section">
+                <label>Priority</label>
+                <div class="priority-selector" id="task-priority-selector">
+                    <span>None</span>
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
-        </div>
 
+     <div class="form-section">
+    <div class="add-details-btn" id="task-add-details-btn">
+        <i class="fas fa-plus"></i> Add Details
     </div>
+    <input type="text" placeholder="Details / Description" class="input-field description-field" id="task-description-input" style="display: block;">
+</div>
 
-    <!-- Script -->
+            <button type="submit" class="save-btn" id="task-save-btn">Save</button>
+        </form>
+    </div>
+</div>
+
+<!-- ================== FIREBASE SCRIPTS (TAMBAHKAN INI) ================== -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+            authDomain: "todolist-43.firebaseapp.com",
+            projectId: "todolist-43",
+            storageBucket: "todolist-43.appspot.com",
+            messagingSenderId: "795548747542",
+            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+            measurementId: "G-67K7H7XXWW" 
+        };
+        
+        // Inisialisasi Firebase jika belum diinisialisasi
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Redirect jika pengguna tidak login
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "../pages/login.html";
+            }
+        });
+    </script>
+
+    <!-- ================== LOAD SCRIPTS (URUTAN PENTING) ================== -->
     <script src="../navbar.js"></script>
     <script src="../profile.js"></script>
 </body>
