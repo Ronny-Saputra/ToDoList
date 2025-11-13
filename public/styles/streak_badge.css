@@ -214,22 +214,28 @@ body {
 /* RESPONSIF: MOBILE (≤480px) */
 @media (max-width: 480px) {
     body {
-        padding: 60px 16px;
+        padding: 0;
+        background-color: #FFFFFF;  /* Background putih penuh */
+        overflow: hidden
     }
 
     .settings-container {
-        min-height: 500px;
-        max-height: none;
+        max-height: 200vh;       /* Tinggi penuh layar */
+        height: 100vh;   
+        border-radius: 0; 
+        box-shadow: none;        /* Hilangkan shadow */
+        max-width: 100%;         /* Lebar penuh */
+        overflow: hidden
     }
 
     .settings-header {
-        padding: 26px 18px;
-        gap: 10px;
-        border-radius: 18px 18px 20px 20px;
+        padding: 45px 18px 20px;
+        gap: 25px;
+        border-radius: 0 0 25px 25px;
     }
 
     .settings-header h1 {
-        font-size: 17px;
+        font-size: 22px;
     }
 
     .back-btn {
@@ -238,22 +244,36 @@ body {
     }
 
     .streak-main {
-        padding: 0 16px 32px;
+        padding: 0 20px 32px;
         margin-top: -50px;
         gap: 16px;
+        overflow: hidden; 
+         -webkit-overflow-scrolling: touch;
+                flex: 1;
     }
 
+    /* Aktifkan scroll saat zoom (browser akan otomatis detect) */
+            @media (min-resolution: 1.1dppx) {
+                .streak-main {
+                    overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+            }
+  /* Sembunyikan scrollbar tapi tetap bisa scroll */
+            .streak-main::-webkit-scrollbar {
+                display: none;
+            }
     .current-badge {
         margin-top: 0px;
     }
 
     .current-badge img {
-        width: 260px;
+        width: 300px;
     }
 
     .current-badge h2 {
         font-size: 20px;
-        margin-top: -20px;
+        margin-top: -70px;
     }
 
     .previous-badges h3 {
@@ -265,6 +285,6 @@ body {
     }
 
     .badge-list img {
-        width: 67px;
+        width: 80px;
     }
 }

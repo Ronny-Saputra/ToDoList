@@ -1,6 +1,79 @@
 // File: public/task.js (Kode Lengkap dengan Logic Flow Timer Text Update dan New Task Design)
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    // TAMBAHKAN FUNGSI-FUNGSI INI DI BAGIAN ATAS task.js
+// (Setelah baris: document.addEventListener('DOMContentLoaded', function() {)
+
+// Fungsi untuk menyimpan completed task ke localStorage
+function saveCompletedTask(taskData) {
+    const completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+    
+    const completedTask = {
+        id: taskData.id,
+        title: taskData.title,
+        completedAt: new Date().toISOString(),
+        date: taskData.date,
+        time: taskData.time,
+        location: taskData.location
+    };
+    
+    const existingIndex = completedTasks.findIndex(t => t.id === taskData.id);
+    if (existingIndex === -1) {
+        completedTasks.push(completedTask);
+        localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+    }
+}
+
+function removeCompletedTask(taskId) {
+    let completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+    completedTasks = completedTasks.filter(t => t.id !== taskId);
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+}
+
+function saveDeletedTask(taskData) {
+    const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+    
+    const deletedTask = {
+        id: taskData.id,
+        title: taskData.title,
+        deletedAt: new Date().toISOString(),
+        date: taskData.date,
+        time: taskData.time,
+        location: taskData.location
+    };
+    
+    const existingIndex = deletedTasks.findIndex(t => t.id === taskData.id);
+    if (existingIndex === -1) {
+        deletedTasks.push(deletedTask);
+        localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
+    }
+}
+
+// FUNGSI BARU: SIMPAN MISSED TASK
+    function saveMissedTask(taskData) {
+        const missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
+        
+        const missedTask = {
+            id: taskData.id,
+            title: taskData.title,
+            missedAt: new Date().toISOString(),
+            date: taskData.date,
+            time: taskData.time,
+            location: taskData.location
+        };
+        
+        const existingIndex = missedTasks.findIndex(t => t.id === taskData.id);
+        if (existingIndex === -1) {
+            missedTasks.push(missedTask);
+            localStorage.setItem('missedTasks', JSON.stringify(missedTasks));
+        }
+    }
+
+    function triggerProfileUpdate() {
+        localStorage.setItem('profileUpdateTrigger', new Date().getTime().toString());
+    }
+
     // === EXPOSE GLOBAL STATE & FUNCTIONS ===
     window.TaskApp = window.TaskApp || {};
     window.TaskApp.tasksData = []; 
@@ -49,6 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.TaskApp.flowTimerCancelBtn = document.getElementById('flow-timer-cancel');
     window.TaskApp.flowTimerSaveBtn = document.getElementById('flow-timer-save');
     
+    // Variable untuk menyimpan mode operasi drawer
+    window.TaskApp.editMode = null; // Bisa: null, 'edit', 'restore', 'reschedule'
     let activeDate = new Date();
     activeDate.setHours(0, 0, 0, 0); 
 
@@ -102,91 +177,132 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // --- FUNGSI TUTUP DRAWER BARU (Global) ---
-    window.TaskApp.closeDrawer = function() {
-        if (window.TaskApp.newReminderDrawer) {
-            window.TaskApp.newReminderDrawer.classList.remove('open');
-            document.body.style.overflow = '';
-            
-            // Reset state edit
-            window.TaskApp.editingTaskId = null;
-            
-            // [PERBAIKAN IKON HEADER]
-            // Hapus ikon
-            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
-            
-            if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
-            if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
-
-            // Sembunyikan task list (khusus untuk tampilan kalender)
-            const taskListForDrawer = document.getElementById('taskListForDrawer');
-            if (taskListForDrawer) {
-                taskListForDrawer.innerHTML = ''; 
-                taskListForDrawer.style.display = 'none'; 
-            }
-            
-            // Tutup priority dropdown
-            if (window.TaskApp.priorityWrapper) {
-                 window.TaskApp.priorityWrapper.classList.remove('open');
-            }
-            
-            // Hapus data-end-millis yang disimpan
-            if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
-        }
-    }
-
-    // --- FUNGSI BARU: BUKA DRAWER UNTUK EDIT (Global) ---
-    window.TaskApp.openDrawerForEdit = function(task) {
-        window.TaskApp.editingTaskId = task.id;
+window.TaskApp.closeDrawer = function() {
+    if (window.TaskApp.newReminderDrawer) {
+        window.TaskApp.newReminderDrawer.classList.remove('open');
+        document.body.style.overflow = '';
         
-        // Gunakan referensi global yang aman
-        if (window.TaskApp.activityInput) window.TaskApp.activityInput.value = task.title || '';
-        if (window.TaskApp.timeInput) {
-            window.TaskApp.timeInput.value = task.time || ''; 
-            
-            // Set data-end-millis untuk time range jika ada
-            if (task.endTimeMillis && task.endTimeMillis > 0) {
-                 window.TaskApp.timeInput.setAttribute('data-end-millis', task.endTimeMillis.toString());
-            } else {
-                 window.TaskApp.timeInput.removeAttribute('data-end-millis');
-            }
-        }
+        // Reset state edit dan mode
+        window.TaskApp.editingTaskId = null;
+        window.TaskApp.editMode = null; // TAMBAHKAN INI
         
-        if (window.TaskApp.locationInput) window.TaskApp.locationInput.value = task.location || '';
-        if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = task.date; 
-        
-        // Set Flow Timer state
-        if (task.flowDurationMillis && task.flowDurationMillis > 0) {
-             window.TaskApp.flowDurationMillis = task.flowDurationMillis;
-        } else {
-             window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
-        }
-        
-        // ✅ PERBAIKAN LOGIC 2: LOAD PRIORITAS DARI TASK YANG DIEDIT
-        const taskPriority = task.priority || 'None';
-        const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
-        if (selectorSpan) {
-            selectorSpan.textContent = taskPriority;
-            // Panggil fungsi update seleksi
-            updatePriorityDropdownSelection(taskPriority);
-        }
-        
-        // [PERBAIKAN IKON HEADER]
         // Hapus ikon
-        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'Edit Reminder';
+        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
         
-        if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Update';
-        
-        // Pastikan list disembunyikan dan form ditampilkan
+        if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
+        if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
+
+        // Sembunyikan task list
         const taskListForDrawer = document.getElementById('taskListForDrawer');
-        if (taskListForDrawer) taskListForDrawer.style.display = 'none';
-        
-        if (window.TaskApp.reminderForm) {
-            window.TaskApp.reminderForm.style.display = 'flex';
+        if (taskListForDrawer) {
+            taskListForDrawer.innerHTML = ''; 
+            taskListForDrawer.style.display = 'none'; 
         }
         
-        // Buka drawer
-        window.TaskApp.openDrawer();
+        // Tutup priority dropdown
+        if (window.TaskApp.priorityWrapper) {
+             window.TaskApp.priorityWrapper.classList.remove('open');
+        }
+        
+        // Hapus data-end-millis dan batasan min date
+        if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
+        if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.removeAttribute('min');
     }
+}
+
+    // --- FUNGSI BARU: BUKA DRAWER UNTUK EDIT/RESTORE/RESCHEDULE (Global) ---
+window.TaskApp.openDrawerForEdit = function(task) {
+    window.TaskApp.editingTaskId = task.id;
+    
+    // Tentukan mode berdasarkan window.TaskApp.editMode
+    const mode = window.TaskApp.editMode || 'edit';
+    
+    // Gunakan referensi global yang aman
+    if (window.TaskApp.activityInput) window.TaskApp.activityInput.value = task.title || '';
+    if (window.TaskApp.timeInput) {
+        window.TaskApp.timeInput.value = task.time || ''; 
+        
+        // Set data-end-millis untuk time range jika ada
+        if (task.endTimeMillis && task.endTimeMillis > 0) {
+             window.TaskApp.timeInput.setAttribute('data-end-millis', task.endTimeMillis.toString());
+        } else {
+             window.TaskApp.timeInput.removeAttribute('data-end-millis');
+        }
+    }
+    
+    if (window.TaskApp.locationInput) window.TaskApp.locationInput.value = task.location || '';
+    
+    // LOGIC TANGGAL: Untuk restore/reschedule, set ke hari ini atau lebih
+    if (mode === 'restore' || mode === 'reschedule') {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const taskDate = new Date(task.date + ' 00:00:00');
+        taskDate.setHours(0, 0, 0, 0);
+        
+        // Jika tanggal task sudah lewat, set ke hari ini
+        if (taskDate < today) {
+            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(today);
+        } else {
+            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = task.date;
+        }
+        
+        // Set min date ke hari ini agar tidak bisa pilih tanggal lampau
+        if (window.TaskApp.dateInputEdit) {
+            window.TaskApp.dateInputEdit.min = formatDate(today);
+        }
+    } else {
+        // Mode edit biasa
+        if (window.TaskApp.dateInputEdit) {
+            window.TaskApp.dateInputEdit.value = task.date;
+            window.TaskApp.dateInputEdit.removeAttribute('min'); // Hapus batasan
+        }
+    }
+    
+    // Set Flow Timer state
+    if (task.flowDurationMillis && task.flowDurationMillis > 0) {
+         window.TaskApp.flowDurationMillis = task.flowDurationMillis;
+    } else {
+         window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
+    }
+    
+    // Load prioritas dari task yang diedit
+    const taskPriority = task.priority || 'None';
+    const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+    if (selectorSpan) {
+        selectorSpan.textContent = taskPriority;
+        updatePriorityDropdownSelection(taskPriority);
+    }
+    
+    // Update Header dan Button berdasarkan mode
+    if (window.TaskApp.drawerHeaderTitle) {
+        if (mode === 'restore') {
+            window.TaskApp.drawerHeaderTitle.innerHTML = 'Restore Task';
+        } else if (mode === 'reschedule') {
+            window.TaskApp.drawerHeaderTitle.innerHTML = 'Reschedule Task';
+        } else {
+            window.TaskApp.drawerHeaderTitle.innerHTML = 'Edit Reminder';
+        }
+    }
+    
+    if (window.TaskApp.saveBtn) {
+        if (mode === 'restore' || mode === 'reschedule') {
+            window.TaskApp.saveBtn.textContent = 'Restore & Reschedule';
+        } else {
+            window.TaskApp.saveBtn.textContent = 'Update';
+        }
+    }
+    
+    // Pastikan list disembunyikan dan form ditampilkan
+    const taskListForDrawer = document.getElementById('taskListForDrawer');
+    if (taskListForDrawer) taskListForDrawer.style.display = 'none';
+    
+    if (window.TaskApp.reminderForm) {
+        window.TaskApp.reminderForm.style.display = 'flex';
+    }
+    
+    // Buka drawer
+    window.TaskApp.openDrawer();
+}
     
     // --- FUNGSI BARU: DELETE TASK (Global) ---
     /**
@@ -206,11 +322,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: 'Delete', 
                     action: async () => {
                         try {
+                            // === TAMBAHKAN BARIS INI ===
+                            const taskDoc = await tasksRef.doc(taskId).get();
+                            const taskData = { id: taskId, ...taskDoc.data() };
+                            saveDeletedTask(taskData);
                             // UPDATE status ke "deleted" (seperti di Kotlin TaskRepository.kt)
                             await tasksRef.doc(taskId).update({
                                 status: "deleted",
                                 deletedAt: firebase.firestore.Timestamp.now()
                             });
+
+                            // === TAMBAHKAN BARIS INI ===
+                            triggerProfileUpdate();
+                            // === SAMPAI SINI ===
                             
                             window.showCustomDialog(
                                 "Reminder deleted successfully!",
@@ -359,9 +483,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     .update({
                         done: newDoneStatus,
                         completedAt: newDoneStatus ? firebase.firestore.Timestamp.now() : null, // Set completedAt
+                         status: newDoneStatus ? "completed" : "pending", // Ubah status
                         // Jika selesai, pindahkan tanggalnya ke hari ini (Sesuai logic Kotlin)
                         date: newDoneStatus ? formatDate(new Date()) : taskInState.date 
                     });
+
+                    // === TAMBAHKAN BARIS INI ===
+                    if (newDoneStatus) {
+                        saveCompletedTask(taskObject);
+                    } else {
+                        removeCompletedTask(taskId);
+                    }
+                    triggerProfileUpdate();
 
                 alert(`Task marked as ${newDoneStatus ? 'done' : 'undone'}!`);
                 
@@ -394,6 +527,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 id: doc.id, 
                 ...doc.data() 
             }));
+
+            // ✨ CEK DAN PINDAHKAN MISSED TASKS
+            await checkAndMoveMissedTasks(user, window.TaskApp.tasksData);
+
         } catch (err) {
             console.error("Error loading tasks:", err);
             // Pastikan tasksData disetel ke array kosong jika gagal
@@ -411,7 +548,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
+        // ✨ FUNGSI BARU: CEK DAN PINDAHKAN MISSED TASKS
+    async function checkAndMoveMissedTasks(user, tasks) {
+        const db = firebase.firestore();
+        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Set ke awal hari untuk perbandingan tanggal
+        
+        for (const task of tasks) {
+            // Skip jika sudah selesai
+            if (task.done) continue;
+            
+            // Parse tanggal task (format: YYYY-MM-DD)
+            const taskDate = new Date(task.date + ' 00:00:00');
+            taskDate.setHours(0, 0, 0, 0);
+            
+            // Jika tanggal task sudah lewat (kemarin atau sebelumnya)
+            if (taskDate < now) {
+                try {
+                    // Update status ke "missed"
+                    await tasksRef.doc(task.id).update({
+                        status: "missed",
+                        missedAt: firebase.firestore.Timestamp.now()
+                    });
+                    
+                    // Simpan ke localStorage
+                    saveMissedTask(task);
+                    
+                    // Hapus dari tasksData lokal agar tidak ditampilkan
+                    window.TaskApp.tasksData = window.TaskApp.tasksData.filter(t => t.id !== task.id);
+                    
+                    console.log(`✅ Task "${task.title}" moved to missed (date: ${task.date})`);
+                    
+                } catch (err) {
+                    console.error("Error moving task to missed:", err);
+                }
+            }
+        }
+        
+        // Trigger update di profile jika ada yang berubah
+        triggerProfileUpdate();
+    }
+    
     // --- FUNGSI BANTUAN HALAMAN TASK ---
     function findAndActivateDateCard(dateString) {
         // Hapus hash dari URL setelah digunakan
@@ -899,186 +1077,231 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // --- MODIFIKASI: Form Submit Handler (Handle Edit/Update) ---
-    const taskPageFormSubmitHandler = async function(event, user) {
-        event.preventDefault(); 
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+    // --- MODIFIKASI: Form Submit Handler (Handle Edit/Update/Restore/Reschedule) ---
+const taskPageFormSubmitHandler = async function(event, user) {
+    event.preventDefault(); 
+    const db = firebase.firestore();
+    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+    
+    // Mengambil nilai input dengan aman
+    const activity = window.TaskApp.activityInput ? window.TaskApp.activityInput.value.trim() : '';
+    const timeInput = window.TaskApp.timeInput;
+    const location = window.TaskApp.locationInput ? window.TaskApp.locationInput.value.trim() : ''; 
+    let dateToUse = window.TaskApp.dateInputEdit ? window.TaskApp.dateInputEdit.value : '';
+    const priority = window.TaskApp.prioritySelector ? window.TaskApp.prioritySelector.querySelector('span').textContent : 'None';
+
+    if (activity && dateToUse) {
         
-        // Mengambil nilai input dengan aman
-        const activity = window.TaskApp.activityInput ? window.TaskApp.activityInput.value.trim() : '';
-        const timeInput = window.TaskApp.timeInput;
-        const location = window.TaskApp.locationInput ? window.TaskApp.locationInput.value.trim() : ''; 
-        let dateToUse = window.TaskApp.dateInputEdit ? window.TaskApp.dateInputEdit.value : '';
-        const priority = window.TaskApp.prioritySelector ? window.TaskApp.prioritySelector.querySelector('span').textContent : 'None';
-
-        if (activity && dateToUse) {
+        // Validasi tanggal untuk mode restore/reschedule
+        const mode = window.TaskApp.editMode || 'edit';
+        if (mode === 'restore' || mode === 'reschedule') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selectedDate = new Date(dateToUse + ' 00:00:00');
+            selectedDate.setHours(0, 0, 0, 0);
             
-            // --- START KOTLIN SYNC LOGIC ---
-            const inputTimeText = timeInput ? timeInput.value.trim() : '';
-            const endMillisAttr = timeInput ? timeInput.getAttribute('data-end-millis') : null;
-
-            const isTimeRangeSet = endMillisAttr && parseInt(endMillisAttr) > 0;
-            const isFlowTimerSet = window.TaskApp.flowDurationMillis > 0;
-            
-            let finalTime = inputTimeText; 
-            let finalEndTimeMillis = 0;
-            let finalFlowDurationMillis = 0;
-            
-            if (isTimeRangeSet) {
-                finalEndTimeMillis = parseInt(endMillisAttr);
-                finalFlowDurationMillis = window.TaskApp.flowDurationMillis; 
-                finalTime = inputTimeText; 
-                
-                // BARIS PENGGANTI YANG DIHAPUS: dateToUse = window.TaskApp.formatDate(activeDate);
-
-            } else if (isFlowTimerSet) {
-                finalEndTimeMillis = 0;
-                finalFlowDurationMillis = window.TaskApp.flowDurationMillis;
-                
-                if (inputTimeText.length === 0) {
-                    const durationText = window.TaskApp.formatDurationToString(finalFlowDurationMillis);
-                    finalTime = `${durationText} (Flow)`;
-                } else {
-                    finalTime = inputTimeText; 
-                }
-
-            } else {
-                finalEndTimeMillis = 0;
-                finalFlowDurationMillis = 0;
-                finalTime = inputTimeText; 
-            }
-            
-            const taskData = {
-                title: activity,
-                time: finalTime,
-                location: location, 
-                date: dateToUse, // Tanggal yang akan digunakan untuk navigasi
-                priority: priority,
-                endTimeMillis: finalEndTimeMillis,      
-                flowDurationMillis: finalFlowDurationMillis, 
-                dueDate: firebase.firestore.Timestamp.fromDate(new Date(dateToUse + (finalEndTimeMillis > 0 ? '' : ' 23:59:59'))), 
-                status: "pending"
-            };
-            // --- END KOTLIN SYNC LOGIC ---
-
-            try {
-                const isEditing = window.TaskApp.editingTaskId;
-
-                if (isEditing) {
-                    await tasksRef.doc(isEditing).update(taskData);
-                } else {
-                    taskData.done = false;
-                    await tasksRef.add(taskData);
-                }
-
-                if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset(); 
-                
-                if (timeInput) timeInput.removeAttribute('data-end-millis');
-
-                // Tentukan tombol dialog setelah Add/Edit sukses
-                const dialogButtons = [
-                    { 
-                        text: 'Add more', 
-                        action: () => {
-                            window.TaskApp.editingTaskId = null;
-                            // [PERBAIKAN IKON HEADER] - Hapus ikon
-                            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
-                            if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
-                            
-                            const taskListForDrawer = document.getElementById('taskListForDrawer');
-                            if (taskListForDrawer) taskListForDrawer.style.display = 'none';
-                            if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
-
-                            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(activeDate);
-                            
-                            // ✅ PERBAIKAN: PASTIKAN PRIORITAS KEMBALI KE NONE SAAT ADD MORE
-                            const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
-                            if (selectorSpan) {
-                                selectorSpan.textContent = 'None'; 
-                                updatePriorityDropdownSelection('None');
-                            }
-                            
-                            window.TaskApp.openDrawer();
-                        }, 
-                        isPrimary: false 
-                    },
-                    { 
-                        text: 'View', 
-                        action: () => {
-                            window.TaskApp.closeDrawer();
-                            // LOGIKA REDIREKSI KE TASK.HTML DENGAN HASH TANGGAL
-                            // dateToUse sudah berisi YYYY-MM-DD
-                            window.location.href = `../pages/task.html#date=${dateToUse}`;
-                        }, 
-                        isPrimary: true 
-                    }
-                ];
-                
+            if (selectedDate < today) {
                 window.showCustomDialog(
-                    isEditing ? "Success Update Reminder" : "Success Add New Reminder",
-                    dialogButtons
-                );
-
-                // Jika di halaman Task, refresh data lokal untuk memastikan tampilan Task sudah update
-                if (window.location.pathname.includes("task.html")) {
-                    await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
-                    displayTasksForActiveDate(activeDate);
-                } else if (window.location.pathname.includes("search.html")) {
-                    if (window.SearchApp?.reloadTasks) {
-                        await window.SearchApp.reloadTasks(user);
-                    }
-                }
-                
-            } catch (err) {
-                console.error(`Error ${isEditing ? 'updating' : 'adding'} task:`, err);
-                window.showCustomDialog(
-                    `Failed to ${isEditing ? 'update' : 'save'} task. Please try again.`,
+                    "Cannot restore/reschedule to past dates. Please select today or a future date.",
                     [{ text: 'OK', action: () => {}, isPrimary: true }]
                 );
+                return;
             }
+        }
+        
+        // START KOTLIN SYNC LOGIC
+        const inputTimeText = timeInput ? timeInput.value.trim() : '';
+        const endMillisAttr = timeInput ? timeInput.getAttribute('data-end-millis') : null;
+
+        const isTimeRangeSet = endMillisAttr && parseInt(endMillisAttr) > 0;
+        const isFlowTimerSet = window.TaskApp.flowDurationMillis > 0;
+        
+        let finalTime = inputTimeText; 
+        let finalEndTimeMillis = 0;
+        let finalFlowDurationMillis = 0;
+        
+        if (isTimeRangeSet) {
+            finalEndTimeMillis = parseInt(endMillisAttr);
+            finalFlowDurationMillis = window.TaskApp.flowDurationMillis; 
+            finalTime = inputTimeText; 
+
+        } else if (isFlowTimerSet) {
+            finalEndTimeMillis = 0;
+            finalFlowDurationMillis = window.TaskApp.flowDurationMillis;
+            
+            if (inputTimeText.length === 0) {
+                const durationText = window.TaskApp.formatDurationToString(finalFlowDurationMillis);
+                finalTime = `${durationText} (Flow)`;
+            } else {
+                finalTime = inputTimeText; 
+            }
+
         } else {
+            finalEndTimeMillis = 0;
+            finalFlowDurationMillis = 0;
+            finalTime = inputTimeText; 
+        }
+        
+        const taskData = {
+            title: activity,
+            time: finalTime,
+            location: location, 
+            date: dateToUse,
+            priority: priority,
+            endTimeMillis: finalEndTimeMillis,      
+            flowDurationMillis: finalFlowDurationMillis, 
+            dueDate: firebase.firestore.Timestamp.fromDate(new Date(dateToUse + (finalEndTimeMillis > 0 ? '' : ' 23:59:59'))), 
+            status: "pending", // SELALU SET KE PENDING saat restore/reschedule
+            done: false // RESET done status
+        };
+        
+        // Hapus field yang tidak perlu (untuk restore/reschedule)
+        if (mode === 'restore' || mode === 'reschedule') {
+            taskData.deletedAt = firebase.firestore.FieldValue.delete();
+            taskData.missedAt = firebase.firestore.FieldValue.delete();
+            taskData.completedAt = firebase.firestore.FieldValue.delete();
+        }
+        // END KOTLIN SYNC LOGIC
+
+        try {
+            const isEditing = window.TaskApp.editingTaskId;
+
+            if (isEditing) {
+                await tasksRef.doc(isEditing).update(taskData);
+                
+                // Hapus dari localStorage jika restore/reschedule
+                if (mode === 'restore') {
+                    // Hapus dari deletedTasks
+                    let deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+                    deletedTasks = deletedTasks.filter(t => t.id !== isEditing);
+                    localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
+                } else if (mode === 'reschedule') {
+                    // Hapus dari missedTasks
+                    let missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
+                    missedTasks = missedTasks.filter(t => t.id !== isEditing);
+                    localStorage.setItem('missedTasks', JSON.stringify(missedTasks));
+                }
+                
+                triggerProfileUpdate();
+            } else {
+                taskData.done = false;
+                await tasksRef.add(taskData);
+            }
+
+            if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset(); 
+            
+            if (timeInput) timeInput.removeAttribute('data-end-millis');
+            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.removeAttribute('min');
+
+            // Tentukan pesan dialog
+            let successMessage = "Success Add New Reminder";
+            if (mode === 'restore' || mode === 'reschedule') {
+                successMessage = "Task successfully restored!";
+            } else if (isEditing) {
+                successMessage = "Success Update Reminder";
+            }
+
+            // Tentukan tombol dialog
+            const dialogButtons = [
+                { 
+                    text: 'Add more', 
+                    action: () => {
+                        window.TaskApp.editingTaskId = null;
+                        window.TaskApp.editMode = null; // Reset mode
+                        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
+                        if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
+                        
+                        const taskListForDrawer = document.getElementById('taskListForDrawer');
+                        if (taskListForDrawer) taskListForDrawer.style.display = 'none';
+                        if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
+
+                        if (window.TaskApp.dateInputEdit) {
+                            window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+                            window.TaskApp.dateInputEdit.removeAttribute('min');
+                        }
+                        
+                        const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+                        if (selectorSpan) {
+                            selectorSpan.textContent = 'None'; 
+                            updatePriorityDropdownSelection('None');
+                        }
+                        
+                        window.TaskApp.openDrawer();
+                    }, 
+                    isPrimary: false 
+                },
+                { 
+                    text: 'View', 
+                    action: () => {
+                        window.TaskApp.closeDrawer();
+                        window.location.href = `../pages/task.html#date=${dateToUse}`;
+                    }, 
+                    isPrimary: true 
+                }
+            ];
+            
+            window.showCustomDialog(successMessage, dialogButtons);
+
+            // Refresh data lokal
+            if (window.location.pathname.includes("task.html")) {
+                await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+                displayTasksForActiveDate(activeDate);
+            } else if (window.location.pathname.includes("search.html")) {
+                if (window.SearchApp?.reloadTasks) {
+                    await window.SearchApp.reloadTasks(user);
+                }
+            }
+            
+        } catch (err) {
+            console.error(`Error ${isEditing ? 'updating' : 'adding'} task:`, err);
             window.showCustomDialog(
-                "Activity and Date are required!",
+                `Failed to ${isEditing ? 'update' : 'save'} task. Please try again.`,
                 [{ text: 'OK', action: () => {}, isPrimary: true }]
             );
         }
-    };
+    } else {
+        window.showCustomDialog(
+            "Activity and Date are required!",
+            [{ text: 'OK', action: () => {}, isPrimary: true }]
+        );
+    }
+};
 
     // --- Tombol New Reminder (Reset mode ke Add) ---
-    const newReminderBtn = window.TaskApp.newReminderBtn;
-    if (newReminderBtn) {
-        newReminderBtn.addEventListener('click', () => {
-            window.TaskApp.editingTaskId = null;
-            
-            // [PERBAIKAN IKON HEADER] - Hapus ikon
-            if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
-            
-            if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
-            if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
-            
-            // Tambahkan logika ini untuk memastikan form terlihat
-            const taskListForDrawer = document.getElementById('taskListForDrawer');
-            if (taskListForDrawer) taskListForDrawer.style.display = 'none';
-            if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
-            
-            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(activeDate);
-            
-            // Reset Flow Timer State
-            window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
-            updateFlowTimerLinkText();
-            if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
-            
-            // ✅ PERBAIKAN: PASTIKAN PRIORITAS KEMBALI KE NONE SAAT KLIK TOMBOL 'New Reminder'
-            const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
-            if (selectorSpan) {
-                selectorSpan.textContent = 'None'; 
-                updatePriorityDropdownSelection('None');
-            }
-            
-            window.TaskApp.openDrawer();
-        });
-    }
+const newReminderBtn = window.TaskApp.newReminderBtn;
+if (newReminderBtn) {
+    newReminderBtn.addEventListener('click', () => {
+        window.TaskApp.editingTaskId = null;
+        window.TaskApp.editMode = null; // TAMBAHKAN INI
+        
+        if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
+        
+        if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
+        if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
+        
+        const taskListForDrawer = document.getElementById('taskListForDrawer');
+        if (taskListForDrawer) taskListForDrawer.style.display = 'none';
+        if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
+        
+        if (window.TaskApp.dateInputEdit) {
+            window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+            window.TaskApp.dateInputEdit.removeAttribute('min'); // TAMBAHKAN INI
+        }
+        
+        // Reset Flow Timer State
+        window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
+        updateFlowTimerLinkText();
+        if (window.TaskApp.timeInput) window.TaskApp.timeInput.removeAttribute('data-end-millis');
+        
+        const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
+        if (selectorSpan) {
+            selectorSpan.textContent = 'None'; 
+            updatePriorityDropdownSelection('None');
+        }
+        
+        window.TaskApp.openDrawer();
+    });
+}
 
     // Listener untuk tombol panah kembali
     const closeDrawerBtn = window.TaskApp.closeDrawerBtn;

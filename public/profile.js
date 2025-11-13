@@ -21,7 +21,6 @@ const chartData = {
             { height: '25%', label: '2', highlight: false },
             { height: '85%', label: '3', highlight: true },
             { height: '10%', label: '4', highlight: false },
-            { height: '5%', label: '5', highlight: false }
         ]
     },
     monthly: {
@@ -38,6 +37,107 @@ const chartData = {
         ]
     }
 };
+
+// === FUNGSI UNTUK LOAD DATA DARI LOCALSTORAGE ===
+function getCompletedTasksFromStorage() {
+    const tasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+    
+    // Group by date
+    const tasksByDate = {};
+    tasks.forEach(task => {
+        const completedDate = new Date(task.completedAt);
+        const dateStr = completedDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        if (!tasksByDate[dateStr]) {
+            tasksByDate[dateStr] = [];
+        }
+        tasksByDate[dateStr].push(task.title);
+    });
+    
+    // Convert to array format
+    return Object.entries(tasksByDate).map(([date, tasks]) => ({
+        date,
+        tasks
+    }));
+}
+
+function getDeletedTasksFromStorage() {
+    const tasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+    
+    // Group by date
+    const tasksByDate = {};
+    tasks.forEach(task => {
+        const deletedDate = new Date(task.deletedAt);
+        const dateStr = deletedDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        if (!tasksByDate[dateStr]) {
+            tasksByDate[dateStr] = [];
+        }
+        tasksByDate[dateStr].push({
+            id: task.id,
+            name: task.title
+        });
+    });
+    
+    return Object.entries(tasksByDate).map(([date, tasks]) => ({
+        date,
+        tasks: tasks.map(t => t.name)
+    }));
+}
+
+function getMissedTasksFromStorage() {
+    const tasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
+    
+    // Group by date
+    const tasksByDate = {};
+    tasks.forEach(task => {
+        const missedDate = new Date(task.missedAt);
+        const dateStr = missedDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        if (!tasksByDate[dateStr]) {
+            tasksByDate[dateStr] = [];
+        }
+        tasksByDate[dateStr].push({
+            id: task.id,
+            name: task.title
+        });
+    });
+    
+    return Object.entries(tasksByDate).map(([date, tasks]) => ({
+        date,
+        tasks
+    }));
+}
+
+// === UPDATE TASK COUNTS ===
+function updateTaskCounts() {
+    const completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+    const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+    const missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
+    
+    const completedBox = document.querySelector('.summary-box.completed span');
+    const missedBox = document.querySelector('.summary-box.missed span');
+    const deletedBox = document.querySelector('.summary-box.deleted span');
+    
+    if (completedBox) completedBox.textContent = `Completed Tasks (${completedTasks.length})`;
+    if (missedBox) missedBox.textContent = `Missed Tasks (${missedTasks.length})`;
+    if (deletedBox) deletedBox.textContent = `Deleted Tasks (${deletedTasks.length})`;
+}
 
 // === UPDATE CHART ===
 function updateChart(tabType) {
@@ -70,6 +170,21 @@ function updateChart(tabType) {
 
 // === INISIALISASI ===
 document.addEventListener('DOMContentLoaded', function() {
+
+    // Update counts saat page load
+    updateTaskCounts();
+    
+    // Listen untuk update dari task page
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'profileUpdateTrigger') {
+            updateTaskCounts();
+        }
+    });
+    
+    // Update ketika window focus (user kembali ke tab)
+    window.addEventListener('focus', () => {
+        updateTaskCounts();
+    });
 
     // === TAB SWITCHING ===
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -117,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFacingMode = 'user';
     let hasBackCamera = false;
 
-    // === DETEKSI KAMERA BELAKANG ===
     async function checkBackCamera() {
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
@@ -128,58 +242,65 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // === BUKA MODAL PILIHAN ===
-    cameraIcon.addEventListener('click', () => {
-        choiceModal.style.display = 'flex';
-    });
+    if (cameraIcon) {
+        cameraIcon.addEventListener('click', () => {
+            choiceModal.style.display = 'flex';
+        });
+    }
 
-    // === TUTUP MODAL PILIHAN ===
-    closeChoiceModal.addEventListener('click', () => {
-        choiceModal.style.display = 'none';
-    });
-    choiceModal.addEventListener('click', e => {
-        if (e.target === choiceModal) choiceModal.style.display = 'none';
-    });
+    if (closeChoiceModal) {
+        closeChoiceModal.addEventListener('click', () => {
+            choiceModal.style.display = 'none';
+        });
+    }
+    
+    if (choiceModal) {
+        choiceModal.addEventListener('click', e => {
+            if (e.target === choiceModal) choiceModal.style.display = 'none';
+        });
+    }
 
-    // === AMBIL FOTO ===
-    openCameraBtn.addEventListener('click', async () => {
-        choiceModal.style.display = 'none';
-        cameraModal.style.display = 'flex';
-        video.style.display = 'block';
-        preview.style.display = 'none';
-        currentFacingMode = 'user';
-        
-        await checkBackCamera();
-        switchCameraBtn.style.display = hasBackCamera ? 'inline-flex' : 'none';
-        switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Ganti ke Belakang';
-        
-        await startCamera('user');
-        previewControls.style.display = 'none';
-        captureControls.style.display = 'flex';
-    });
+    if (openCameraBtn) {
+        openCameraBtn.addEventListener('click', async () => {
+            choiceModal.style.display = 'none';
+            cameraModal.style.display = 'flex';
+            video.style.display = 'block';
+            preview.style.display = 'none';
+            currentFacingMode = 'user';
+            
+            await checkBackCamera();
+            switchCameraBtn.style.display = hasBackCamera ? 'inline-flex' : 'none';
+            switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Ganti ke Belakang';
+            
+            await startCamera('user');
+            previewControls.style.display = 'none';
+            captureControls.style.display = 'flex';
+        });
+    }
 
-    // === UPLOAD FOTO ===
-    uploadPhotoBtn.addEventListener('click', () => {
-        choiceModal.style.display = 'none';
-        fileInput.click();
-    });
+    if (uploadPhotoBtn) {
+        uploadPhotoBtn.addEventListener('click', () => {
+            choiceModal.style.display = 'none';
+            fileInput.click();
+        });
+    }
 
-    fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
-        if (!file) return;
+    if (fileInput) {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            // BARU: Crop otomatis ke square sebelum preview
-            cropToSquare(e.target.result, (croppedData) => {
-                photoData = croppedData;
-                openPreview(photoData);
-            });
-        };
-        reader.readAsDataURL(file);
-    });
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                cropToSquare(e.target.result, (croppedData) => {
+                    photoData = croppedData;
+                    openPreview(photoData);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
-    // === FUNGSI KAMERA ===
     async function startCamera(facingMode) {
         if (stream) stream.getTracks().forEach(track => track.stop());
         try {
@@ -210,22 +331,24 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', closeCamera);
     });
 
-    switchCameraBtn.addEventListener('click', async () => {
-        currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-        await startCamera(currentFacingMode);
-        switchCameraBtn.innerHTML = currentFacingMode === 'user' 
-            ? '<i class="fas fa-sync-alt"></i> Ganti ke Belakang' 
-            : '<i class="fas fa-sync-alt"></i> Ganti ke Depan';
-    });
+    if (switchCameraBtn) {
+        switchCameraBtn.addEventListener('click', async () => {
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            await startCamera(currentFacingMode);
+            switchCameraBtn.innerHTML = currentFacingMode === 'user' 
+                ? '<i class="fas fa-sync-alt"></i> Ganti ke Belakang' 
+                : '<i class="fas fa-sync-alt"></i> Ganti ke Depan';
+        });
+    }
 
-    captureBtn.addEventListener('click', () => {
+    if (captureBtn) {
+        captureBtn.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0);
             const tempPhotoData = canvas.toDataURL('image/png');
             
-            // BARU: Crop otomatis ke square setelah capture
             cropToSquare(tempPhotoData, (croppedData) => {
                 photoData = croppedData;
                 if (stream) {
@@ -235,8 +358,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 openPreview(photoData);
             });
         });
+    }
 
-       // BARU: Fungsi untuk crop gambar ke square (center crop)
     function cropToSquare(imageSrc, callback) {
         const img = new Image();
         img.onload = () => {
@@ -263,25 +386,28 @@ document.addEventListener('DOMContentLoaded', function() {
         previewControls.style.display = 'flex';
     }
 
-    setPhotoBtn.addEventListener('click', () => {
-        if (photoData) {
-            updateAvatarGlobally(photoData);
-            closeCamera();
-            alert("Foto profil berhasil diperbarui!");
-        } else {
-            alert("Tidak ada foto yang dipilih!");
-        }
-    });
+    if (setPhotoBtn) {
+        setPhotoBtn.addEventListener('click', () => {
+            if (photoData) {
+                updateAvatarGlobally(photoData);
+                closeCamera();
+                alert("Foto profil berhasil diperbarui!");
+            } else {
+                alert("Tidak ada foto yang dipilih!");
+            }
+        });
+    }
 
-    retakeBtn.addEventListener('click', () => {
-        previewControls.style.display = 'none';
-        captureControls.style.display = 'flex';
-        preview.style.display = 'none';
-        video.style.display = 'block';
-        startCamera(currentFacingMode);
-    });
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', () => {
+            previewControls.style.display = 'none';
+            captureControls.style.display = 'flex';
+            preview.style.display = 'none';
+            video.style.display = 'block';
+            startCamera(currentFacingMode);
+        });
+    }
 
-    // === UPDATE AVATAR GLOBALLY ===
     function updateAvatarGlobally(photoData) {
         if (mainAvatar) mainAvatar.src = photoData;
         if (drawerAvatar) drawerAvatar.src = photoData;
@@ -302,33 +428,41 @@ document.addEventListener('DOMContentLoaded', function() {
         editProfileDrawer.classList.remove('active');
     }
 
-    openEditDrawerBtn.addEventListener('click', (e) => {
-        e.preventDefault();
+    if (openEditDrawerBtn) {
+        openEditDrawerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
 
-        const savedName = localStorage.getItem('userName') || '';
-        const savedUsername = localStorage.getItem('userUsername') || '';
-        const savedAvatar = localStorage.getItem('userAvatar');
+            const savedName = localStorage.getItem('userName') || '';
+            const savedUsername = localStorage.getItem('userUsername') || '';
+            const savedAvatar = localStorage.getItem('userAvatar');
 
-        nameInput.value = savedName;
-        usernameInput.value = savedUsername;
+            nameInput.value = savedName;
+            usernameInput.value = savedUsername;
 
-        profileUsername.textContent = savedUsername || 'Username';
+            if (profileUsername) {
+                profileUsername.textContent = savedUsername || 'Username';
+            }
 
-        if (savedAvatar) {
-            if (mainAvatar) mainAvatar.src = savedAvatar;
-            if (drawerAvatar) drawerAvatar.src = savedAvatar;
-        }
+            if (savedAvatar) {
+                if (mainAvatar) mainAvatar.src = savedAvatar;
+                if (drawerAvatar) drawerAvatar.src = savedAvatar;
+            }
 
-        updateInputColor(nameInput);
-        updateInputColor(usernameInput);
+            updateInputColor(nameInput);
+            updateInputColor(usernameInput);
 
-        editProfileDrawer.classList.add('active');
-    });
+            editProfileDrawer.classList.add('active');
+        });
+    }
 
-    closeDrawerBtn.addEventListener('click', closeDrawer);
-    drawerOverlay.addEventListener('click', closeDrawer);
+    if (closeDrawerBtn) {
+        closeDrawerBtn.addEventListener('click', closeDrawer);
+    }
+    
+    if (drawerOverlay) {
+        drawerOverlay.addEventListener('click', closeDrawer);
+    }
 
-    // === WARNA INPUT BERUBAH SAAT DIISI ===
     function updateInputColor(input) {
         if (input.value.trim() !== '') {
             input.style.color = '#14142A';
@@ -338,24 +472,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     [nameInput, usernameInput].forEach(input => {
-        input.addEventListener('input', () => updateInputColor(input));
+        if (input) {
+            input.addEventListener('input', () => updateInputColor(input));
+        }
     });
 
-    // === SAVE PROFILE ===
-    saveBtn.addEventListener('click', (e) => {
-        e.preventDefault();
+    if (saveBtn) {
+        saveBtn.addEventListener('click', (e) => {
+            e.preventDefault();
 
-        const newName = nameInput.value.trim();
-        const newUsername = usernameInput.value.trim() || 'Username';
+            const newName = nameInput.value.trim();
+            const newUsername = usernameInput.value.trim() || 'Username';
 
-        localStorage.setItem('userName', newName);
-        localStorage.setItem('userUsername', newUsername);
+            localStorage.setItem('userName', newName);
+            localStorage.setItem('userUsername', newUsername);
 
-        profileUsername.textContent = newUsername;
+            if (profileUsername) {
+                profileUsername.textContent = newUsername;
+            }
 
-        closeDrawer();
-        alert('Profil berhasil diperbarui!');
-    });
+            closeDrawer();
+            alert('Profil berhasil diperbarui!');
+        });
+    }
 
     // === GENDER DROPDOWN ===
     const genderInput = document.getElementById('genderInput');
@@ -363,16 +502,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const genderOptions = document.querySelectorAll('.gender-option');
     const selectedGenderSpan = document.getElementById('selectedGender');
 
-    genderInput.addEventListener('click', () => {
-        const isOpen = genderDropdown.classList.contains('open');
-        genderDropdown.classList.toggle('open', !isOpen);
-        genderInput.classList.toggle('open', !isOpen);
-    });
+    if (genderInput) {
+        genderInput.addEventListener('click', () => {
+            const isOpen = genderDropdown.classList.contains('open');
+            genderDropdown.classList.toggle('open', !isOpen);
+            genderInput.classList.toggle('open', !isOpen);
+        });
+    }
 
     genderOptions.forEach(option => {
         option.addEventListener('click', () => {
             const value = option.dataset.value;
-            selectedGenderSpan.textContent = value;
+            if (selectedGenderSpan) {
+                selectedGenderSpan.textContent = value;
+            }
             document.querySelectorAll('.gender-option i').forEach(icon => {
                 icon.classList.add('hidden');
             });
@@ -383,23 +526,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.addEventListener('click', (e) => {
-        if (!genderInput.contains(e.target) && !genderDropdown.contains(e.target)) {
+        if (genderInput && genderDropdown && !genderInput.contains(e.target) && !genderDropdown.contains(e.target)) {
             genderDropdown.classList.remove('open');
             genderInput.classList.remove('open');
         }
     });
 
-    // === EDIT AVATAR DI DRAWER ===
     const editAvatarBtn = document.getElementById('editAvatarBtn');
-    editAvatarBtn.addEventListener('click', () => {
-        document.getElementById('cameraChoiceModal').style.display = 'flex';
-        closeDrawer();
-    });
-
-    // === LOAD DATA SAAT HALAMAN DIMUAT ===
+    if (editAvatarBtn) {
+        editAvatarBtn.addEventListener('click', () => {
+            document.getElementById('cameraChoiceModal').style.display = 'flex';
+            closeDrawer();
+        });
+    }
+    
+    // Load saved data
     const savedUsername = localStorage.getItem('userUsername');
     const savedAvatar = localStorage.getItem('userAvatar');
-    if (savedUsername && savedUsername !== 'Username') {
+    if (savedUsername && savedUsername !== 'Username' && profileUsername) {
         profileUsername.textContent = savedUsername;
     }
     if (savedAvatar && mainAvatar) {
@@ -412,34 +556,39 @@ const completedDrawer = document.getElementById('completedDrawer');
 const completedDrawerContent = document.getElementById('completedDrawerContent');
 const closeCompletedDrawer = document.getElementById('closeCompletedDrawer');
 const completedDrawerOverlay = document.getElementById('completedDrawerOverlay');
-
 const completedBox = document.querySelector('.summary-box.completed');
 
-completedBox.style.cursor = 'pointer';
+if (completedBox) {
+    completedBox.style.cursor = 'pointer';
+    completedBox.addEventListener('click', () => {
+        renderCompletedTasksInDrawer();
+        completedDrawer.classList.add('active');
+    });
+}
 
-completedBox.addEventListener('click', () => {
-    renderCompletedTasksInDrawer();
-    completedDrawer.classList.add('active');
-});
+if (closeCompletedDrawer) {
+    closeCompletedDrawer.addEventListener('click', () => {
+        completedDrawer.classList.remove('active');
+    });
+}
 
-closeCompletedDrawer.addEventListener('click', () => {
-    completedDrawer.classList.remove('active');
-});
-
-completedDrawerOverlay.addEventListener('click', () => {
-    completedDrawer.classList.remove('active');
-});
+if (completedDrawerOverlay) {
+    completedDrawerOverlay.addEventListener('click', () => {
+        completedDrawer.classList.remove('active');
+    });
+}
 
 function renderCompletedTasksInDrawer() {
-    completedDrawerContent.innerHTML = '';
-    const tasks = getCompletedTasks();
+    const tasks = getCompletedTasksFromStorage();
 
+    completedDrawerContent.innerHTML = '';
+    
     if (tasks.length === 0) {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'completed-empty';
         emptyDiv.innerHTML = `
             <i class="fas fa-clock"></i>
-            <p>Yay, all tasks completed!</p>
+            <p>No completed tasks yet!</p>
         `;
         completedDrawerContent.appendChild(emptyDiv);
     } else {
@@ -464,44 +613,38 @@ function renderCompletedTasksInDrawer() {
     }
 }
 
-// Data dummy (ganti dengan real data jika ada)
-function getCompletedTasks() {
-    return [
-        { date: 'Wednesday, 22 October 2025', tasks: ['Dinner Date', 'Movie Night', 'Zoom Meeting', 'Gym'] },
-        { date: 'Tuesday, 21 October 2025', tasks: ['Pay Electricity Bill', 'Doctor Appointment'] },
-        { date: 'Monday, 20 October 2025', tasks: ['Study Group Session', 'Clean the Room', 'Morning Run'] },
-        { date: 'Sunday, 19 October 2025', tasks: ['Weekend Picnic'] }
-    ];
-    // return []; // Uncomment untuk uji empty state
-}
-
 // === DRAWER: DELETED TASKS ===
 const deletedDrawer = document.getElementById('deletedDrawer');
 const deletedDrawerContent = document.getElementById('deletedDrawerContent');
 const closeDeletedDrawer = document.getElementById('closeDeletedDrawer');
 const deletedDrawerOverlay = document.getElementById('deletedDrawerOverlay');
-
 const deletedBox = document.querySelector('.summary-box.deleted');
 
-deletedBox.style.cursor = 'pointer';
+if (deletedBox) {
+    deletedBox.style.cursor = 'pointer';
+    deletedBox.addEventListener('click', () => {
+        renderDeletedTasksInDrawer();
+        deletedDrawer.classList.add('active');
+    });
+}
 
-deletedBox.addEventListener('click', () => {
-    renderDeletedTasksInDrawer();
-    deletedDrawer.classList.add('active');
-});
+if (closeDeletedDrawer) {
+    closeDeletedDrawer.addEventListener('click', () => {
+        deletedDrawer.classList.remove('active');
+    });
+}
 
-closeDeletedDrawer.addEventListener('click', () => {
-    deletedDrawer.classList.remove('active');
-});
-
-deletedDrawerOverlay.addEventListener('click', () => {
-    deletedDrawer.classList.remove('active');
-});
+if (deletedDrawerOverlay) {
+    deletedDrawerOverlay.addEventListener('click', () => {
+        deletedDrawer.classList.remove('active');
+    });
+}
 
 function renderDeletedTasksInDrawer() {
-    deletedDrawerContent.innerHTML = '';
-    const tasks = getDeletedTasks();
+    const tasks = getDeletedTasksFromStorage();
 
+    deletedDrawerContent.innerHTML = '';
+    
     if (tasks.length === 0) {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'deleted-empty';
@@ -520,18 +663,28 @@ function renderDeletedTasksInDrawer() {
             dateDiv.textContent = group.date;
             groupDiv.appendChild(dateDiv);
 
-            group.tasks.forEach(task => {
+            group.tasks.forEach((taskName, index) => {
+                // Dapatkan task ID dari deletedTasks localStorage
+                const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+                const taskObj = deletedTasks.find(t => t.title === taskName);
+                const taskId = taskObj ? taskObj.id : null;
+                
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'deleted-task-item';
                 itemDiv.innerHTML = `
-                    <span>${task}</span>
-                    <button class="restore-btn">Restore</button>
+                    <span>${taskName}</span>
+                    <button class="restore-btn" data-task-id="${taskId}">Restore</button>
                 `;
-                // Tambahkan event untuk restore (placeholder)
-                itemDiv.querySelector('.restore-btn').addEventListener('click', () => {
-                    alert(`Restoring task: ${task}`);
-                    // Di sini bisa tambah logika real: hapus dari deleted, tambah ke list aktif, update UI
+                
+                // Event listener untuk restore
+                itemDiv.querySelector('.restore-btn').addEventListener('click', async () => {
+                    if (taskId) {
+                        await restoreDeletedTask(taskId);
+                    } else {
+                        alert('Task ID not found.');
+                    }
                 });
+                
                 groupDiv.appendChild(itemDiv);
             });
 
@@ -540,16 +693,66 @@ function renderDeletedTasksInDrawer() {
     }
 }
 
-// Data dummy (ganti dengan real data jika ada)
-function getDeletedTasks() {
-    return [
-        { date: 'Wednesday, 23 October 2025', tasks: ['Practice Guitar'] },
-        { date: 'Tuesday, 21 October 2025', tasks: ['Read a Chapter of Book', 'Wash the Car', 'Organize Bookshelf'] },
-        { date: 'Monday, 20 October 2025', tasks: ['Watch Online Lecture'] },
-        { date: 'Sunday, 19 October 2025', tasks: ['Coffee with Friend'] },
-        { date: 'Saturday, 18 October 2025', tasks: ['Call Grandma', 'Yoga Class'] }
-    ];
-    // return []; // Uncomment untuk uji empty state
+// === FUNGSI RESTORE DELETED TASK ===
+async function restoreDeletedTask(taskId) {
+    const user = firebase.auth().currentUser;
+    if (!user) return alert('Please log in first.');
+    
+    const db = firebase.firestore();
+    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+    
+    try {
+        // Get task data
+        const taskDoc = await tasksRef.doc(taskId).get();
+        if (!taskDoc.exists) {
+            alert('Task not found.');
+            return;
+        }
+        
+        const taskData = { id: taskId, ...taskDoc.data() };
+        
+        // Open drawer untuk edit dengan mode restore
+        window.TaskApp.editMode = 'restore';
+        window.TaskApp.openDrawerForEdit(taskData);
+        
+        // Close deleted drawer
+        document.getElementById('deletedDrawer').classList.remove('active');
+        
+    } catch (err) {
+        console.error("Error restoring task:", err);
+        alert('Failed to restore task. Please try again.');
+    }
+}
+
+// === FUNGSI RESCHEDULE MISSED TASK ===
+async function rescheduleMissedTask(taskId) {
+    const user = firebase.auth().currentUser;
+    if (!user) return alert('Please log in first.');
+    
+    const db = firebase.firestore();
+    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
+    
+    try {
+        // Get task data
+        const taskDoc = await tasksRef.doc(taskId).get();
+        if (!taskDoc.exists) {
+            alert('Task not found.');
+            return;
+        }
+        
+        const taskData = { id: taskId, ...taskDoc.data() };
+        
+        // Open drawer untuk edit dengan mode reschedule
+        window.TaskApp.editMode = 'reschedule';
+        window.TaskApp.openDrawerForEdit(taskData);
+        
+        // Close missed drawer
+        document.getElementById('missedDrawer').classList.remove('active');
+        
+    } catch (err) {
+        console.error("Error rescheduling task:", err);
+        alert('Failed to reschedule task. Please try again.');
+    }
 }
 
 // === DRAWER: MISSED TASKS ===
@@ -557,28 +760,33 @@ const missedDrawer = document.getElementById('missedDrawer');
 const missedDrawerContent = document.getElementById('missedDrawerContent');
 const closeMissedDrawer = document.getElementById('closeMissedDrawer');
 const missedDrawerOverlay = document.getElementById('missedDrawerOverlay');
-
 const missedBox = document.querySelector('.summary-box.missed');
 
-missedBox.style.cursor = 'pointer';
+if (missedBox) {
+    missedBox.style.cursor = 'pointer';
+    missedBox.addEventListener('click', () => {
+        renderMissedTasksInDrawer();
+        missedDrawer.classList.add('active');
+    });
+}
 
-missedBox.addEventListener('click', () => {
-    renderMissedTasksInDrawer();
-    missedDrawer.classList.add('active');
-});
+if (closeMissedDrawer) {
+    closeMissedDrawer.addEventListener('click', () => {
+        missedDrawer.classList.remove('active');
+    });
+}
 
-closeMissedDrawer.addEventListener('click', () => {
-    missedDrawer.classList.remove('active');
-});
-
-missedDrawerOverlay.addEventListener('click', () => {
-    missedDrawer.classList.remove('active');
-});
+if (missedDrawerOverlay) {
+    missedDrawerOverlay.addEventListener('click', () => {
+        missedDrawer.classList.remove('active');
+    });
+}
 
 function renderMissedTasksInDrawer() {
-    missedDrawerContent.innerHTML = '';
-    const tasks = getMissedTasks();
+    const tasks = getMissedTasksFromStorage();
 
+    missedDrawerContent.innerHTML = '';
+    
     if (tasks.length === 0) {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'missed-empty';
@@ -598,76 +806,22 @@ function renderMissedTasksInDrawer() {
             groupDiv.appendChild(dateDiv);
 
             group.tasks.forEach(task => {
-                if (task.subTasks) {
-                    // Tugas dengan sub-tasks (dropdown)
-                    const headerDiv = document.createElement('div');
-                    headerDiv.className = 'missed-task-header';
-                    headerDiv.innerHTML = `
-                        <span>${task.name}</span>
-                        <i class="fas fa-chevron-down"></i>
-                    `;
-
-                    const subTasksDiv = document.createElement('div');
-                    subTasksDiv.className = 'missed-sub-tasks';
-
-                    task.subTasks.forEach((sub, index) => {
-                        const subDiv = document.createElement('div');
-                        subDiv.className = `missed-sub-task ${index === 0 ? 'orange' : 'gray'}`;
-                        subDiv.innerHTML = `
-                            <span>${sub}</span>
-                            <button class="reschedule-btn">Reschedule</button>
-                        `;
-                        subDiv.querySelector('.reschedule-btn').addEventListener('click', () => {
-                            alert(`Rescheduling sub-task: ${sub}`);
-                            // Logika real: pindah ke tanggal baru, update UI
-                        });
-                        subTasksDiv.appendChild(subDiv);
-                    });
-
-                    headerDiv.addEventListener('click', () => {
-                        headerDiv.classList.toggle('open');
-                        subTasksDiv.classList.toggle('open');
-                    });
-
-                    groupDiv.appendChild(headerDiv);
-                    groupDiv.appendChild(subTasksDiv);
-                } else {
-                    // Tugas standalone
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'missed-task-item';
-                    itemDiv.innerHTML = `
-                        <span>${task.name}</span>
-                        <button class="reschedule-btn">Reschedule</button>
-                    `;
-                    itemDiv.querySelector('.reschedule-btn').addEventListener('click', () => {
-                        alert(`Rescheduling task: ${task.name}`);
-                        // Logika real: pindah ke tanggal baru, update UI
-                    });
-                    groupDiv.appendChild(itemDiv);
-                }
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'missed-task-item';
+                itemDiv.innerHTML = `
+                    <span>${task.name}</span>
+                    <button class="reschedule-btn" data-task-id="${task.id}">Reschedule</button>
+                `;
+                
+                // Event listener untuk reschedule
+                itemDiv.querySelector('.reschedule-btn').addEventListener('click', async () => {
+                    await rescheduleMissedTask(task.id);
+                });
+                
+                groupDiv.appendChild(itemDiv);
             });
 
             missedDrawerContent.appendChild(groupDiv);
         });
     }
-}
-
-// Data dummy (ganti dengan real data jika ada; filtered berdasarkan current date Nov 10 2025)
-function getMissedTasks() {
-    return [
-        { date: 'Wednesday, 22 October 2025', tasks: [
-            { name: 'Do Science Project', subTasks: ['Elephant Toothpaste Experiment', 'Analysis Report', 'Oral Presentation'] }
-        ] },
-        { date: 'Tuesday, 21 October 2025', tasks: [
-            { name: 'Laundry' },
-            { name: 'Grocery Shopping' },
-            { name: 'Math Homework' }
-        ] },
-        { date: 'Monday, 20 October 2025', tasks: [
-            { name: 'Laptop Repair' },
-            { name: 'Mom\'s Birthday' },
-            { name: 'Cake Baking' }
-        ] }
-    ];
-    // return []; // Uncomment untuk uji empty state
 }

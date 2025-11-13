@@ -216,24 +216,31 @@
             }
         }
 
-        /* RESPONSIF: MOBILE (≤480px) */
+/* RESPONSIF: MOBILE (≤480px) - FULLSCREEN */
         @media (max-width: 480px) {
             body {
-                padding: 60px 16px;
+                padding: 0;              /* Hilangkan padding body */
+                background-color: #FFFFFF;  /* Background putih penuh */
+                overflow: hidden
             }
 
             .settings-container {
-                max-height: 92vh;
+                max-height: 200vh;       /* Tinggi penuh layar */
+                height: 100vh;           /* Force tinggi 100% */
+                border-radius: 0;        /* Hilangkan border radius */
+                box-shadow: none;        /* Hilangkan shadow */
+                max-width: 100%;         /* Lebar penuh */
+                overflow: hidden
             }
 
             .settings-header {
-                padding: 26px 18px;
-                gap: 10px;
-                border-radius: 18px 18px 20px 20px;
+                padding: 45px 18px 20px;
+                gap: 25px;
+                border-radius: 0 0 25px 25px;  /* Hanya bawah rounded */
             }
 
             .settings-header h1 {
-                font-size: 17px;
+                font-size: 22px;
             }
 
             .back-btn {
@@ -242,33 +249,67 @@
             }
 
             .settings-menu {
-                padding: 10px 14px 14px;
+                padding: 20px 14px 14px;
                 gap: 12px;
+                height: calc(100vh - 95px);
+                overflow: hidden;     /* Enable scroll untuk konten */
+                -webkit-overflow-scrolling: touch;
+                flex: 1;
             }
 
+             /* Aktifkan scroll saat zoom (browser akan otomatis detect) */
+            @media (min-resolution: 1.6dppx) {
+                .settings-menu {
+                    overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+            }
+            
+            /* Sembunyikan scrollbar tapi tetap bisa scroll */
+            .settings-menu::-webkit-scrollbar {
+                display: none;
+            }
+
+            .settings-menu {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            /* Background biru lebih panjang + gap dengan robot */
             .menu-content-wrapper {
-                padding: 14px;
+                padding: 20px 18px 50px;     /* Padding bawah lebih besar = kotak lebih panjang */
                 border-radius: 14px;
                 gap: 12px;
-                margin-bottom: 60px;
+                margin-bottom: 80px;         /* Gap antara kotak biru dan robot */
+                box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+                min-height: min-content;
+            }
+
+            .menu-section {
+                margin-bottom: 10px;         /* Spacing antar section lebih besar */
             }
 
             .menu-section h3 {
-                font-size: 11px;
-                margin-bottom: 5px;
+                font-size: 12px;             /* Header lebih besar */
+                margin-bottom: 8px;          /* Spacing lebih besar */
+            }
+
+            .menu-section li {
+                margin-bottom: 8px;          /* Spacing antar item lebih besar */
             }
 
             .menu-section a {
-                padding: 9px 12px;
-                font-size: 12.5px;
-                border-radius: 9px;
+                padding: 10px 14px;          /* Padding lebih besar = item lebih tinggi */
+                font-size: 13px;             /* Font lebih besar */
+                border-radius: 18px;
             }
 
             .robot-illustration {
-                width: 150px;
-                bottom: -4px;
+                width: 200px;
+                bottom: -4px;                /* Naik sedikit dari bawah */
             }
         }
+
 
 /* POPUP LOGOUT - PERSIS SEPERTI GAMBAR */
 .logout-popup-overlay {

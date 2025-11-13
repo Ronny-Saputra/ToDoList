@@ -220,19 +220,34 @@ body {
 
 /* RESPONSIF: MOBILE */
 @media (max-width: 480px) {
-    body { padding: 60px 16px; }
-    .settings-container { max-height: 92vh; }
-    .settings-header {
-        padding: 26px 18px;
-        gap: 10px;
-        border-radius: 18px 18px 0 0;
+    body { 
+        padding: 0; 
+        background-color: #FFFFFF;  /* Background putih penuh */
+        overflow: hidden
     }
-    .settings-header h1 { font-size: 17px; }
+
+    .settings-container { 
+        max-height: 200vh;       /* Tinggi penuh layar */
+        height: 100vh;           /* Force tinggi 100% */
+        border-radius: 0;        /* Hilangkan border radius */
+        box-shadow: none;        /* Hilangkan shadow */
+        max-width: 100%;         /* Lebar penuh */
+        overflow: hidden
+    }
+
+    .settings-header {
+        padding: 45px 18px 20px;
+        gap: 25px;
+        border-radius: 0 0 25px 25px; 
+    }
+
+    .settings-header h1 { font-size: 22px; }
     .back-btn { font-size: 20px; padding: 6px; }
-    .report-main { padding: 16px; gap: 12px; }
-    .report-form label { font-size: 12px; }
+    .report-main { padding: 20px; gap: 15px; }
+    .report-form label { font-size: 15px; margin-top: 10px; }
+    
     .report-form input,
-    .report-form textarea { padding: 10px 12px; font-size: 12.5px; border-radius: 10px; }
+    .report-form textarea { padding: 10px 12px; font-size: 12.5px; border-radius: 13px; }
     .screenshot-info { font-size: 11px; }
     .upload-btn { padding: 18px 12px; font-size: 13px; border-radius: 10px; }
     .upload-btn i { font-size: 26px; }

@@ -138,6 +138,7 @@ body,
     align-items: center;
     gap: 10px;
     font-weight: 1000;
+    font-size: 20px;
 }
 
 .streak .fa-fire {
@@ -493,41 +494,34 @@ body,
     }
     
     .content-wrapper {
-        flex-direction: column;
-        align-items: center;
-        gap: 24px;
+        gap: 30px;
         padding: 0 20px;
+        /* Tetap row-reverse, tidak berubah jadi column */
     }
 
     .stats-section {
         max-width: 100%;
-        width: 100%;
-        margin-right: 0;
-        margin-left: 0;
-        align-items: center;
+        flex: 1;
+        margin-left: 30px;
     }
     
     .tabs {
-        max-width: 500px;
+        max-width: 100%;
     }
     
     .stats-card {
-        max-width: 500px;
+        max-width: 100%;
     }
 
     .task-summary {
-        flex-direction: row;
-        justify-content: space-between;
-        width: 100%;
-        max-width: 500px;
-        margin-left: 0;
-        margin-right: 0;
-        margin-top: 0;
+        /* Tetap vertikal seperti biasa */
+        margin-left: 20px;
+        width: 120px;
     }
 
     .summary-box {
-        width: 29%;
-        height: 120px;
+        width: 100%;
+        height: 100px;
     }
 }
 
@@ -536,60 +530,75 @@ body,
 /* ==================================================== */
 @media (max-width: 768px) {
     .profile-header {
-        padding: 30px 30px;
+        padding: 6.5px 20px;           /* Kurangi padding untuk header lebih rendah */
         border-radius: 0 0 24px 24px;
     }
     
     .profile-left {
-        margin-left: 15px;
-        gap: 10px;
+        margin-left: 20px;
+        gap: 20px;
     }
 
-    .profile-avatar {
-        width: 100px;
-        height: 100px;
+  .profile-header .profile-avatar {
+        width: 90px !important;        /* Kecilkan dari 100px */
+        height: 90px !important;
+        min-width: 90px !important;
+        min-height: 90px !important;
     }
 
-    .camera-icon {
-        width: 20px;
-        height: 20px;
-        bottom: 0;
-        right: 0;
+    /* Image di dalam avatar */
+    .profile-avatar > img:first-child {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    .profile-header .camera-icon {
+        bottom: 1px;
+        right: 5px;
+    }
+
+    .camera-icon img {
+        width: 25px !important;
+        height: 25px !important;
     }
 
     .username {
-        font-size: 18px;
+        font-size: 25px;               /* Kecilkan dari 20px */
     }
     
     .user-streak-wrapper {
         margin-left: 0;
-        gap: 10px;
+        gap: 20px;
     }
     
     .streak {
-        font-size: 14px;
+        font-size: 19px;               /* Kecilkan dari 12px */
     }
 
     .edit-profile-btn {
-        padding: 4px 8px;
-        font-size: 11px;
+        padding: 5px 10px;              /* Kecilkan padding */
+        font-size: 13px;               /* Kecilkan dari 11px */
         margin-left: 0;
     }
 
     .settings-btn {
-        margin-right: 40px;
-        font-size: 20px;
+        margin-right: 20px;            /* Kurangi margin */
+    }
+
+    .settings-icon {
+        width: 25px !important;        /* Kecilkan dari default */
+        height: 25px !important;
     }
 
     .main-content {
         padding: 15px 10px;
         padding-bottom: 80px;
-        height: calc(100vh - 140px);
+        height: calc(100vh - 120px);   /* Sesuaikan dengan header yang lebih kecil */
     }
 
     .content-wrapper {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
         gap: 20px;
         padding: 0 10px;
     }
@@ -599,6 +608,7 @@ body,
         width: 100%;
         margin-right: 0;
         margin-left: 0;
+        align-items: center
     }
     
     .tabs {
@@ -607,14 +617,14 @@ body,
     }
     
     .tab-btn {
-        padding: 6px 12px;
-        font-size: 12px;
+        padding: 5px 12px;
+        font-size: 15px;
     }
 
     .stats-card {
         max-width: 100%;
-        min-height: 300px;
-        padding: 12px;
+        min-height: 20px;
+        padding: 10px;
     }
     
     .card-header h3 {
@@ -630,7 +640,7 @@ body,
     }
 
     .chart-container {
-        height: 180px;
+        height: 140px;
     }
     
     .bar {
@@ -647,6 +657,7 @@ body,
         width: 100%;
         max-width: 100%;
         margin-right: 0;
+        margin-left: 0;
         gap: 8px;
     }
 
@@ -666,82 +677,103 @@ body,
 }
 
 /* ==================================================== */
-/* RESPONSIVE UNTUK MOBILE KECIL */
+/* RESPONSIVE MOBILE KECIL - MUAT 1 LAYAR PENUH */
 /* ==================================================== */
 @media (max-width: 480px) {
+    /* --- HEADER GRADASI BIRU --- */
     .profile-header {
-        padding: 15px 10px;
-    }
-    
-    .profile-avatar {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .camera-icon {
-        width: 16px;
-        height: 16px;
+        padding: 7px;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .username {
-        font-size: 16px;
-    }
-    
-    .streak {
-        font-size: 12px;
-    }
-    
-    .edit-profile-btn {
-        font-size: 10px;
-        padding: 3px 6px;
+    /* FORCE avatar di header jadi kecil */
+    .profile-header .profile-avatar {
+        width: 90px !important;
+        height: 90px !important;
+        min-width: 90px !important;
+        min-height: 90px !important;
+        flex-shrink: 0;
     }
 
-    .main-content {
-        height: calc(100vh - 120px);
+    /* Image di dalam avatar header */
+    .profile-header .profile-avatar > img:first-child {
+        width: 90px !important;
+        height: 90px !important;
     }
 
-    .stats-card {
-        min-height: 280px;
-        padding: 10px;
+    /* Camera icon di header */
+    .profile-header .camera-icon {
+        width: 20px !important;
+        height: 20px !important;
+        bottom: 5px;
+        right: 5px;
+    }
+
+    .settings-icon {
+    width: 22px !important;     /* ← Ubah angka ini */
+    height: 22px !important;    /* ← Ubah angka ini */
+    }
+
+    .settings-btn {
+    margin-right: 10px;            /* ← Tambah nilai untuk geser ke kiri (contoh: 10px) */
+    margin-left: auto;    /* ← Tambahkan ini untuk dorong ke kanan */
+    margin-top: -40px;
     }
     
-    .card-header h3 {
-        font-size: 13px;
+    .profile-header .camera-icon img {
+        width: 25px !important;
+        height: 25px !important;
     }
-    
-    .productivity-score {
+
+    .tab-btn {
+        padding: 2px 8px;
         font-size: 14px;
+        min-width: 50px;
     }
-    
+
+    /* --- DAILY AVERAGE: TAMBAH TINGGI & SESUAIKAN --- */
+   .stats-card {
+        min-height: 35px !important;    /* Tinggi kotak lebih besar */
+        padding: 20px 16px !important;   /* Padding lebih lega */
+    }
+
+ .card-header h3 {
+        font-size: 15px !important;      /* Sedikit lebih besar */
+    }
+
+    .productivity-score {
+        font-size: 20px !important;      /* Score lebih besar */
+        margin-top: 7px;
+    }
+
     .productivity-score .fa-fire {
-        font-size: 20px;
+        font-size: 28px !important;
+    }
+
+    .productivity-score .score-value {
+        font-size: 24px !important;
+        font-weight: 800;
     }
 
     .chart-container {
-        height: 160px;
-    }
-    
-    .bar {
-        max-width: 30px;
-        border-radius: 8px;
-    }
-    
-    .label {
-        font-size: 9px;
+        height: 150px !important;        /* Chart lebih tinggi */
+        margin-top: -20px;
     }
 
     .summary-box {
         height: 90px;
-        padding: 8px;
-        border-radius: 6px;
+        border-radius: 10px;
     }
 
     .summary-box span {
-        font-size: 9px;
+        font-size: 11px;
     }
 
     .icon-wrapper {
-        font-size: 14px;
+        font-size: 13px;
     }
 }
 
