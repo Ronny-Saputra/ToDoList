@@ -81,7 +81,35 @@
         </div>
     </div>
 </div>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+            authDomain: "todolist-43.firebaseapp.com",
+            projectId: "todolist-43",
+            storageBucket: "todolist-43.appspot.com",
+            messagingSenderId: "795548747542",
+            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+            measurementId: "G-67K7H7XXWW" 
+        };
+        
+        // Inisialisasi Firebase jika belum diinisialisasi
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Redirect jika pengguna tidak login
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                // Jika tidak ada pengguna, paksa kembali ke halaman login
+                window.location.href = "../pages/login.html";
+            }
+        });
+    </script>
     <script src="../settings.js"></script>
+    
 </body>
 </html>

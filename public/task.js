@@ -311,9 +311,6 @@ window.TaskApp.openDrawerForEdit = function(task) {
      * @param {function} reloadFn - Fungsi untuk me-reload tampilan (spesifik per halaman)
      */
     window.TaskApp.deleteTask = async function(taskId, user, reloadFn) {
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-
         window.showCustomDialog(
             "Are you sure you want to delete this reminder?",
             [
@@ -322,30 +319,27 @@ window.TaskApp.openDrawerForEdit = function(task) {
                     text: 'Delete', 
                     action: async () => {
                         try {
-                            // === TAMBAHKAN BARIS INI ===
-                            const taskDoc = await tasksRef.doc(taskId).get();
-                            const taskData = { id: taskId, ...taskDoc.data() };
-                            saveDeletedTask(taskData);
-                            // UPDATE status ke "deleted" (seperti di Kotlin TaskRepository.kt)
-                            await tasksRef.doc(taskId).update({
-                                status: "deleted",
-                                deletedAt: firebase.firestore.Timestamp.now()
+                            // Panggil Backend: DELETE /api/tasks/:id
+                            await window.fetchData(`/tasks/${taskId}`, {
+                                method: 'DELETE'
                             });
 
-                            // === TAMBAHKAN BARIS INI ===
+                            // Simpan info ke localStorage (untuk riwayat deleted di profile)
+                            // Kita ambil data dari state lokal karena data di server sudah dihapus/soft-delete
+                            const taskToDelete = window.TaskApp.tasksData.find(t => t.id === taskId);
+                            if (taskToDelete) saveDeletedTask(taskToDelete);
+
                             triggerProfileUpdate();
-                            // === SAMPAI SINI ===
                             
                             window.showCustomDialog(
                                 "Reminder deleted successfully!",
                                 [
                                     { text: 'OK', action: async () => {
                                         window.TaskApp.closeDrawer();
-                                        // Panggil fungsi reload spesifik dari halaman pemanggil
                                         if (typeof reloadFn === 'function') {
                                             await reloadFn();
                                         } else {
-                                            // Fallback reload untuk halaman task.html
+                                            // Reload manual
                                             await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
                                             displayTasksForActiveDate(activeDate);
                                         }
@@ -355,7 +349,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
                         } catch (err) {
                             console.error("Error deleting task:", err);
                             window.showCustomDialog(
-                                "Failed to delete task. Please try again.",
+                                "Failed to delete task.",
                                 [{ text: 'OK', action: () => {}, isPrimary: true }]
                             );
                         }
@@ -472,32 +466,35 @@ window.TaskApp.openDrawerForEdit = function(task) {
             const user = firebase.auth().currentUser;
             if (!user) return alert('Please log in first.');
 
-            const db = firebase.firestore();
             try {
-                const taskInState = window.TaskApp.tasksData.find(t => t.id === taskId) || taskObject;
-                const currentDoneStatus = taskInState.done;
+                const currentDoneStatus = taskObject.done;
                 const newDoneStatus = !currentDoneStatus; 
                 
-                await db.collection("users").doc(user.uid)
-                    .collection("tasks").doc(taskId)
-                    .update({
-                        done: newDoneStatus,
-                        completedAt: newDoneStatus ? firebase.firestore.Timestamp.now() : null, // Set completedAt
-                         status: newDoneStatus ? "completed" : "pending", // Ubah status
-                        // Jika selesai, pindahkan tanggalnya ke hari ini (Sesuai logic Kotlin)
-                        date: newDoneStatus ? formatDate(new Date()) : taskInState.date 
-                    });
+                // Siapkan data update
+                const updateData = {
+                    done: newDoneStatus,
+                    status: newDoneStatus ? "completed" : "pending",
+                    // Jika selesai, pindahkan tanggalnya ke hari ini (opsional, sesuai selera)
+                    date: newDoneStatus ? formatDate(new Date()) : taskObject.date
+                };
 
-                    // === TAMBAHKAN BARIS INI ===
-                    if (newDoneStatus) {
-                        saveCompletedTask(taskObject);
-                    } else {
-                        removeCompletedTask(taskId);
-                    }
-                    triggerProfileUpdate();
+                // Panggil Backend: PUT /api/tasks/:id
+                await window.fetchData(`/tasks/${taskId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(updateData)
+                });
+
+                // Update localStorage (untuk statistik profile)
+                if (newDoneStatus) {
+                    saveCompletedTask(taskObject);
+                } else {
+                    removeCompletedTask(taskId);
+                }
+                triggerProfileUpdate();
 
                 alert(`Task marked as ${newDoneStatus ? 'done' : 'undone'}!`);
                 
+                // Reload tampilan
                 if (typeof reloadFn === 'function') {
                     await reloadFn();
                 } else {
@@ -507,6 +504,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
 
             } catch (err) {
                 console.error("Error updating task status:", err);
+                alert("Gagal mengupdate status tugas.");
             }
         });
         
@@ -517,30 +515,29 @@ window.TaskApp.openDrawerForEdit = function(task) {
     // --- FUNGSI UTAMA: LOAD TASKS & RENDER CALENDAR ---
     async function loadTasksAndRenderCalendar(user, startDate, numberOfDays) {
         if (!user) return;
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
 
         try {
-            // Hanya ambil task dengan status "pending"
-            const snapshot = await tasksRef.where("status", "==", "pending").get();
-            window.TaskApp.tasksData = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
+            // 1. Panggil Backend Vercel (Ganti Firestore)
+            // Ambil tugas yang statusnya 'pending'
+            const tasks = await window.fetchData('/tasks?status=pending');
+            
+            // Pastikan respons berupa array
+            window.TaskApp.tasksData = Array.isArray(tasks) ? tasks : [];
 
             // ✨ CEK DAN PINDAHKAN MISSED TASKS
+            // (Kita tetap panggil fungsi ini untuk update status jika ada yang terlewat)
             await checkAndMoveMissedTasks(user, window.TaskApp.tasksData);
 
         } catch (err) {
             console.error("Error loading tasks:", err);
-            // Pastikan tasksData disetel ke array kosong jika gagal
             window.TaskApp.tasksData = []; 
         }
         
+        // Reset active date ke hari ini saat load awal
         activeDate = new Date();
         activeDate.setHours(0, 0, 0, 0);
         
-        // Memindahkan rendering ke luar try/catch agar kalender selalu muncul
+        // Render Kalender
         if (calendarContainer) {
             generateCalendar(startDate, numberOfDays, window.TaskApp.tasksData);
             setupCalendarScroll(calendarContainer); 
@@ -550,35 +547,33 @@ window.TaskApp.openDrawerForEdit = function(task) {
 
         // ✨ FUNGSI BARU: CEK DAN PINDAHKAN MISSED TASKS
     async function checkAndMoveMissedTasks(user, tasks) {
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
         const now = new Date();
-        now.setHours(0, 0, 0, 0); // Set ke awal hari untuk perbandingan tanggal
+        now.setHours(0, 0, 0, 0); // Set ke awal hari ini
         
         for (const task of tasks) {
-            // Skip jika sudah selesai
             if (task.done) continue;
             
-            // Parse tanggal task (format: YYYY-MM-DD)
+            // Parse tanggal task
             const taskDate = new Date(task.date + ' 00:00:00');
             taskDate.setHours(0, 0, 0, 0);
             
-            // Jika tanggal task sudah lewat (kemarin atau sebelumnya)
+            // Jika tanggal task < hari ini, tandai sebagai missed
             if (taskDate < now) {
                 try {
-                    // Update status ke "missed"
-                    await tasksRef.doc(task.id).update({
-                        status: "missed",
-                        missedAt: firebase.firestore.Timestamp.now()
+                    console.log(`Moving task ${task.title} to missed...`);
+                    
+                    // Panggil Backend: PUT /api/tasks/:id
+                    await window.fetchData(`/tasks/${task.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ status: "missed" })
                     });
                     
-                    // Simpan ke localStorage
+                    // Simpan ke localStorage (untuk keperluan profile.js yang masih baca storage)
+                    // (Opsional: Jika profile.js nanti sudah full API, ini bisa dihapus)
                     saveMissedTask(task);
                     
-                    // Hapus dari tasksData lokal agar tidak ditampilkan
+                    // Hapus dari list lokal agar hilang dari tampilan
                     window.TaskApp.tasksData = window.TaskApp.tasksData.filter(t => t.id !== task.id);
-                    
-                    console.log(`✅ Task "${task.title}" moved to missed (date: ${task.date})`);
                     
                 } catch (err) {
                     console.error("Error moving task to missed:", err);
@@ -586,7 +581,6 @@ window.TaskApp.openDrawerForEdit = function(task) {
             }
         }
         
-        // Trigger update di profile jika ada yang berubah
         triggerProfileUpdate();
     }
     
@@ -1080,151 +1074,146 @@ window.TaskApp.openDrawerForEdit = function(task) {
     // --- MODIFIKASI: Form Submit Handler (Handle Edit/Update/Restore/Reschedule) ---
 const taskPageFormSubmitHandler = async function(event, user) {
     event.preventDefault(); 
-    const db = firebase.firestore();
-    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
     
-    // Mengambil nilai input dengan aman
-    const activity = window.TaskApp.activityInput ? window.TaskApp.activityInput.value.trim() : '';
+    // 1. Ambil Referensi Input
+    const activityInput = window.TaskApp.activityInput;
     const timeInput = window.TaskApp.timeInput;
-    const location = window.TaskApp.locationInput ? window.TaskApp.locationInput.value.trim() : ''; 
-    let dateToUse = window.TaskApp.dateInputEdit ? window.TaskApp.dateInputEdit.value : '';
-    const priority = window.TaskApp.prioritySelector ? window.TaskApp.prioritySelector.querySelector('span').textContent : 'None';
+    const locationInput = window.TaskApp.locationInput; 
+    const dateInput = window.TaskApp.dateInputEdit;
+    const detailsInput = window.TaskApp.reminderForm.querySelector('.description-field');
+    const prioritySelector = window.TaskApp.prioritySelector;
+
+    // 2. Ambil Nilai (Value)
+    const activity = activityInput ? activityInput.value.trim() : '';
+    const location = locationInput ? locationInput.value.trim() : ''; 
+    const details = detailsInput ? detailsInput.value.trim() : '';
+    const dateToUse = dateInput ? dateInput.value : ''; // Format YYYY-MM-DD
+    const priority = prioritySelector ? prioritySelector.querySelector('span').textContent : 'None';
 
     if (activity && dateToUse) {
         
-        // Validasi tanggal untuk mode restore/reschedule
+        // Validasi Tanggal (Hanya untuk Restore/Reschedule)
         const mode = window.TaskApp.editMode || 'edit';
         if (mode === 'restore' || mode === 'reschedule') {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const selectedDate = new Date(dateToUse + ' 00:00:00');
-            selectedDate.setHours(0, 0, 0, 0);
-            
-            if (selectedDate < today) {
-                window.showCustomDialog(
-                    "Cannot restore/reschedule to past dates. Please select today or a future date.",
-                    [{ text: 'OK', action: () => {}, isPrimary: true }]
-                );
-                return;
-            }
+             const today = new Date();
+             today.setHours(0, 0, 0, 0);
+             const selectedDate = new Date(dateToUse + ' 00:00:00');
+             if (selectedDate < today) {
+                 window.showCustomDialog("Cannot restore/reschedule to past dates.", [{ text: 'OK', action: () => {}, isPrimary: true }]);
+                 return;
+             }
         }
         
-        // START KOTLIN SYNC LOGIC
+        // === LOGIKA WAKTU ===
         const inputTimeText = timeInput ? timeInput.value.trim() : '';
         const endMillisAttr = timeInput ? timeInput.getAttribute('data-end-millis') : null;
-
+        
         const isTimeRangeSet = endMillisAttr && parseInt(endMillisAttr) > 0;
-        const isFlowTimerSet = window.TaskApp.flowDurationMillis > 0;
+        const flowDurationMillis = window.TaskApp.flowDurationMillis; 
         
-        let finalTime = inputTimeText; 
+        let finalTimeStr = inputTimeText;
         let finalEndTimeMillis = 0;
-        let finalFlowDurationMillis = 0;
-        
-        if (isTimeRangeSet) {
-            finalEndTimeMillis = parseInt(endMillisAttr);
-            finalFlowDurationMillis = window.TaskApp.flowDurationMillis; 
-            finalTime = inputTimeText; 
+        let finalFlowDuration = 0;
+        let finalDueDateObj = null;
 
-        } else if (isFlowTimerSet) {
-            finalEndTimeMillis = 0;
-            finalFlowDurationMillis = window.TaskApp.flowDurationMillis;
-            
-            if (inputTimeText.length === 0) {
-                const durationText = window.TaskApp.formatDurationToString(finalFlowDurationMillis);
-                finalTime = `${durationText} (Flow)`;
-            } else {
-                finalTime = inputTimeText; 
-            }
+        const [year, month, day] = dateToUse.split('-').map(Number);
+
+        if (isTimeRangeSet) {
+            const endTimeFromAttr = new Date(parseInt(endMillisAttr));
+            finalDueDateObj = new Date(year, month - 1, day, endTimeFromAttr.getHours(), endTimeFromAttr.getMinutes(), 0, 0);
+            finalEndTimeMillis = finalDueDateObj.getTime();
+            finalFlowDuration = flowDurationMillis;
+            finalTimeStr = inputTimeText; 
 
         } else {
+            finalDueDateObj = new Date(year, month - 1, day, 23, 59, 59, 999);
             finalEndTimeMillis = 0;
-            finalFlowDurationMillis = 0;
-            finalTime = inputTimeText; 
+            finalFlowDuration = flowDurationMillis;
+
+            if (inputTimeText.length === 0 && flowDurationMillis > 0) {
+                 const durationText = window.TaskApp.formatDurationToString(flowDurationMillis);
+                 finalTimeStr = `${durationText} (Flow)`;
+            }
         }
-        
+
+        // === DATA UNTUK DIKIRIM KE BACKEND ===
         const taskData = {
             title: activity,
-            time: finalTime,
-            location: location, 
-            date: dateToUse,
-            priority: priority,
-            endTimeMillis: finalEndTimeMillis,      
-            flowDurationMillis: finalFlowDurationMillis, 
-            dueDate: firebase.firestore.Timestamp.fromDate(new Date(dateToUse + (finalEndTimeMillis > 0 ? '' : ' 23:59:59'))), 
-            status: "pending", // SELALU SET KE PENDING saat restore/reschedule
-            done: false // RESET done status
+            details: details,          
+            category: location,       
+            priority: priority,        
+            dueDate: finalDueDateObj.toISOString(), 
+            
+            time: finalTimeStr,        
+            endTimeMillis: Math.floor(Number(finalEndTimeMillis)),      
+            flowDurationMillis: Math.floor(Number(finalFlowDuration)),
+            
+            // Saat Restore/Reschedule/Create, status selalu kembali ke 'pending'
+            status: "pending",
+            
+            // Saat Restore, kita perlu mereset field sampah agar bersih
+            // Backend akan otomatis mengabaikan field ini jika null, tapi kita kirim eksplisit null
+            // agar logika backend (jika ada) tahu untuk menghapusnya.
+            // Catatan: Di Firestore, untuk menghapus field, biasanya butuh FieldValue.delete()
+            // Tapi endpoint PUT Anda hanya mengupdate field yang dikirim.
+            // Untuk kasus ini, status='pending' sudah cukup untuk memunculkannya kembali di list aktif.
         };
-        
-        // Hapus field yang tidak perlu (untuk restore/reschedule)
-        if (mode === 'restore' || mode === 'reschedule') {
-            taskData.deletedAt = firebase.firestore.FieldValue.delete();
-            taskData.missedAt = firebase.firestore.FieldValue.delete();
-            taskData.completedAt = firebase.firestore.FieldValue.delete();
-        }
-        // END KOTLIN SYNC LOGIC
 
         try {
             const isEditing = window.TaskApp.editingTaskId;
-
+            
             if (isEditing) {
-                await tasksRef.doc(isEditing).update(taskData);
+                // UPDATE (PUT)
+                await window.fetchData(`/tasks/${isEditing}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(taskData)
+                });
                 
-                // Hapus dari localStorage jika restore/reschedule
-                if (mode === 'restore') {
-                    // Hapus dari deletedTasks
-                    let deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
-                    deletedTasks = deletedTasks.filter(t => t.id !== isEditing);
-                    localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
-                } else if (mode === 'reschedule') {
-                    // Hapus dari missedTasks
-                    let missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
-                    missedTasks = missedTasks.filter(t => t.id !== isEditing);
-                    localStorage.setItem('missedTasks', JSON.stringify(missedTasks));
-                }
+                // --- PERUBAHAN DISINI: LOCALSTORAGE DIHAPUS ---
+                // Kita tidak perlu lagi menghapus item dari localStorage manual.
+                // Karena saat kita memanggil reloadFn (renderDeletedTasksInDrawer),
+                // dia akan fetch ulang dari API /api/tasks?status=deleted.
+                // Karena status task ini sudah jadi "pending" di database,
+                // dia otomatis tidak akan muncul lagi di list deleted/missed saat refresh.
                 
-                triggerProfileUpdate();
             } else {
-                taskData.done = false;
-                await tasksRef.add(taskData);
+                // CREATE (POST)
+                await window.fetchData('/tasks', {
+                    method: 'POST',
+                    body: JSON.stringify(taskData)
+                });
             }
 
+            // Update UI Statistik (Profile) jika diperlukan
+            // Fungsi ini bisa dimodifikasi nanti untuk fetch API stats
+            triggerProfileUpdate(); 
+
+            // Reset UI Form
             if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset(); 
-            
             if (timeInput) timeInput.removeAttribute('data-end-millis');
             if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.removeAttribute('min');
+            window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
 
-            // Tentukan pesan dialog
-            let successMessage = "Success Add New Reminder";
-            if (mode === 'restore' || mode === 'reschedule') {
-                successMessage = "Task successfully restored!";
-            } else if (isEditing) {
-                successMessage = "Success Update Reminder";
-            }
+            // Pesan Sukses
+            let successMessage = isEditing ? "Success Update Reminder" : "Success Add New Reminder";
+            if (mode === 'restore' || mode === 'reschedule') successMessage = "Task successfully restored!";
 
-            // Tentukan tombol dialog
-            const dialogButtons = [
+            window.showCustomDialog(successMessage, [
                 { 
                     text: 'Add more', 
                     action: () => {
                         window.TaskApp.editingTaskId = null;
-                        window.TaskApp.editMode = null; // Reset mode
+                        window.TaskApp.editMode = null;
                         if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
                         if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
                         
                         const taskListForDrawer = document.getElementById('taskListForDrawer');
                         if (taskListForDrawer) taskListForDrawer.style.display = 'none';
                         if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
-
-                        if (window.TaskApp.dateInputEdit) {
-                            window.TaskApp.dateInputEdit.value = formatDate(activeDate);
-                            window.TaskApp.dateInputEdit.removeAttribute('min');
-                        }
                         
+                        if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = dateToUse;
                         const selectorSpan = window.TaskApp.prioritySelector?.querySelector('span');
-                        if (selectorSpan) {
-                            selectorSpan.textContent = 'None'; 
-                            updatePriorityDropdownSelection('None');
-                        }
+                        if (selectorSpan) selectorSpan.textContent = 'None';
                         
                         window.TaskApp.openDrawer();
                     }, 
@@ -1232,38 +1221,40 @@ const taskPageFormSubmitHandler = async function(event, user) {
                 },
                 { 
                     text: 'View', 
-                    action: () => {
+                    action: async () => {
                         window.TaskApp.closeDrawer();
-                        window.location.href = `../pages/task.html#date=${dateToUse}`;
+                        
+                        // REFRESH LOGIC (Penting agar UI Sinkron)
+                        if (window.location.pathname.includes("task.html")) {
+                             await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+                             const dateParts = dateToUse.split('-');
+                             const newActiveDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                             displayTasksForActiveDate(newActiveDate);
+                        } else if (window.location.pathname.includes("profile.html")) {
+                             // Jika di halaman profile, refresh drawer yang sedang terbuka
+                             if (mode === 'restore') {
+                                 // Fungsi ini harus sudah menggunakan API (lihat diskusi sebelumnya)
+                                 if(typeof renderDeletedTasksInDrawer === 'function') await renderDeletedTasksInDrawer();
+                             } else if (mode === 'reschedule') {
+                                 if(typeof renderMissedTasksInDrawer === 'function') await renderMissedTasksInDrawer();
+                             }
+                        } else if (window.location.pathname.includes("search.html")) {
+                             if (window.SearchApp?.reloadTasks) await window.SearchApp.reloadTasks(user);
+                        }
                     }, 
                     isPrimary: true 
                 }
-            ];
-            
-            window.showCustomDialog(successMessage, dialogButtons);
+            ]);
 
-            // Refresh data lokal
-            if (window.location.pathname.includes("task.html")) {
-                await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
-                displayTasksForActiveDate(activeDate);
-            } else if (window.location.pathname.includes("search.html")) {
-                if (window.SearchApp?.reloadTasks) {
-                    await window.SearchApp.reloadTasks(user);
-                }
-            }
-            
         } catch (err) {
-            console.error(`Error ${isEditing ? 'updating' : 'adding'} task:`, err);
+            console.error(`Error ${window.TaskApp.editingTaskId ? 'updating' : 'adding'} task:`, err);
             window.showCustomDialog(
-                `Failed to ${isEditing ? 'update' : 'save'} task. Please try again.`,
+                `Failed to save task.`,
                 [{ text: 'OK', action: () => {}, isPrimary: true }]
             );
         }
     } else {
-        window.showCustomDialog(
-            "Activity and Date are required!",
-            [{ text: 'OK', action: () => {}, isPrimary: true }]
-        );
+        window.showCustomDialog("Activity and Date are required!", [{ text: 'OK', action: () => {}, isPrimary: true }]);
     }
 };
 

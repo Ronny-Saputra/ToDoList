@@ -125,18 +125,26 @@ function getMissedTasksFromStorage() {
 }
 
 // === UPDATE TASK COUNTS ===
-function updateTaskCounts() {
-    const completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
-    const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
-    const missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
-    
-    const completedBox = document.querySelector('.summary-box.completed span');
-    const missedBox = document.querySelector('.summary-box.missed span');
-    const deletedBox = document.querySelector('.summary-box.deleted span');
-    
-    if (completedBox) completedBox.textContent = `Completed Tasks (${completedTasks.length})`;
-    if (missedBox) missedBox.textContent = `Missed Tasks (${missedTasks.length})`;
-    if (deletedBox) deletedBox.textContent = `Deleted Tasks (${deletedTasks.length})`;
+async function updateTaskCounts() {
+    try {
+        // Panggil endpoint stats dari Backend
+        // Endpoint ini mengembalikan: { completed: number, missed: number, deleted: number }
+        const stats = await window.fetchData('/stats/tasks');
+        
+        if (!stats) return;
+
+        const completedBox = document.querySelector('.summary-box.completed span');
+        const missedBox = document.querySelector('.summary-box.missed span');
+        const deletedBox = document.querySelector('.summary-box.deleted span');
+        
+        // Update UI dengan data dari server
+        if (completedBox) completedBox.textContent = `Completed Tasks (${stats.completed})`;
+        if (missedBox) missedBox.textContent = `Missed Tasks (${stats.missed})`;
+        if (deletedBox) deletedBox.textContent = `Deleted Tasks (${stats.deleted})`;
+
+    } catch (error) {
+        console.error('Gagal memperbarui jumlah tugas:', error);
+    }
 }
 
 // === UPDATE CHART ===
@@ -408,10 +416,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function updateAvatarGlobally(photoData) {
+async function updateAvatarGlobally(photoData) {
+        // 1. Update tampilan UI langsung (biar terasa cepat)
         if (mainAvatar) mainAvatar.src = photoData;
         if (drawerAvatar) drawerAvatar.src = photoData;
-        localStorage.setItem('userAvatar', photoData);
+
+        // 2. Kirim data gambar ke Backend
+        try {
+            await window.fetchData('/profile/image', {
+                method: 'POST',
+                body: JSON.stringify({ image: photoData })
+            });
+            console.log("Avatar berhasil disimpan di server.");
+        } catch (error) {
+            console.error("Gagal upload avatar:", error);
+            alert("Gagal menyimpan foto profil ke server.");
+        }
     }
 
     // === DRAWER: EDIT PROFILE ===
@@ -432,24 +452,12 @@ document.addEventListener('DOMContentLoaded', function() {
         openEditDrawerBtn.addEventListener('click', (e) => {
             e.preventDefault();
 
-            const savedName = localStorage.getItem('userName') || '';
-            const savedUsername = localStorage.getItem('userUsername') || '';
-            const savedAvatar = localStorage.getItem('userAvatar');
-
-            nameInput.value = savedName;
-            usernameInput.value = savedUsername;
-
-            if (profileUsername) {
-                profileUsername.textContent = savedUsername || 'Username';
+            // Data form sudah diisi otomatis oleh loadProfileData() saat halaman dimuat
+            // Kita hanya perlu memastikan warna inputnya benar
+            if (typeof updateInputColor === 'function') {
+                updateInputColor(nameInput);
+                updateInputColor(usernameInput);
             }
-
-            if (savedAvatar) {
-                if (mainAvatar) mainAvatar.src = savedAvatar;
-                if (drawerAvatar) drawerAvatar.src = savedAvatar;
-            }
-
-            updateInputColor(nameInput);
-            updateInputColor(usernameInput);
 
             editProfileDrawer.classList.add('active');
         });
@@ -478,21 +486,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     if (saveBtn) {
-        saveBtn.addEventListener('click', (e) => {
+        saveBtn.addEventListener('click', async (e) => {
             e.preventDefault();
 
+            // 1. Ambil data dari input
             const newName = nameInput.value.trim();
-            const newUsername = usernameInput.value.trim() || 'Username';
+            const newUsername = usernameInput.value.trim();
+            // Ambil text gender dari span, default ke 'Male' jika kosong
+            const gender = selectedGenderSpan ? selectedGenderSpan.textContent : 'Male';
 
-            localStorage.setItem('userName', newName);
-            localStorage.setItem('userUsername', newUsername);
+            // 2. Siapkan data JSON
+            const profileData = {
+                name: newName,
+                username: newUsername,
+                gender: gender
+            };
 
-            if (profileUsername) {
-                profileUsername.textContent = newUsername;
+            try {
+                // 3. Kirim ke Backend (PUT /api/profile)
+                await window.fetchData('/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify(profileData)
+                });
+
+                // 4. Update tampilan UI
+                if (profileUsername) {
+                    profileUsername.textContent = newUsername || 'Username';
+                }
+
+                closeDrawer();
+                alert('Profil berhasil diperbarui dan disimpan ke server!');
+            } catch (error) {
+                console.error("Error menyimpan profil:", error);
+                alert('Gagal menyimpan profil. Cek koneksi internet.');
             }
-
-            closeDrawer();
-            alert('Profil berhasil diperbarui!');
         });
     }
 
@@ -541,13 +568,53 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Load saved data
-    const savedUsername = localStorage.getItem('userUsername');
-    const savedAvatar = localStorage.getItem('userAvatar');
-    if (savedUsername && savedUsername !== 'Username' && profileUsername) {
-        profileUsername.textContent = savedUsername;
+    async function loadProfileData() {
+        try {
+            // Panggil GET /api/profile
+            const data = await window.fetchData('/profile');
+            
+            if (!data) return; // Stop jika tidak ada data/belum login
+
+            // 1. Isi Tampilan Header
+            if (profileUsername) profileUsername.textContent = data.username || 'Username';
+            
+            // 2. Isi Avatar
+            if (data.profileImageUrl) {
+                if (mainAvatar) mainAvatar.src = data.profileImageUrl;
+                if (drawerAvatar) drawerAvatar.src = data.profileImageUrl;
+            }
+
+            // 3. Isi Form di dalam Drawer (walaupun belum dibuka)
+            if (nameInput) {
+                nameInput.value = data.name || '';
+                if(typeof updateInputColor === 'function') updateInputColor(nameInput);
+            }
+            if (usernameInput) {
+                usernameInput.value = data.username || '';
+                if(typeof updateInputColor === 'function') updateInputColor(usernameInput);
+            }
+
+            // 4. Set Gender
+            if (data.gender && selectedGenderSpan) {
+                selectedGenderSpan.textContent = data.gender;
+                // Update checklist di dropdown
+                document.querySelectorAll('.gender-option i').forEach(icon => icon.classList.add('hidden'));
+                const activeOption = document.querySelector(`.gender-option[data-value="${data.gender}"] i`);
+                if (activeOption) activeOption.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error("Gagal memuat profil:", error);
+        }
     }
-    if (savedAvatar && mainAvatar) {
-        mainAvatar.src = savedAvatar;
+
+    // Panggil loadProfileData saat user login
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                loadProfileData();
+            }
+        });
     }
 });
 

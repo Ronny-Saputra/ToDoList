@@ -1,3 +1,4 @@
+const API_BASE_URL = 'https://api-backend-delta.vercel.app/api';
 document.addEventListener('DOMContentLoaded', function() {
   // BAGIAN INI HANYA AKAN BERJALAN JIKA ADA ELEMEN DENGAN CLASS .splash-container
   const splash = document.querySelector(".splash-container");
@@ -151,3 +152,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log('Navbar delegation listener ready!');
 });
+
+async function fetchData(endpoint, options = {}) {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        console.error('Pengguna tidak login, membatalkan permintaan.');
+        return;
+    }
+
+    try {
+        const token = await user.getIdToken();
+
+        const headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        };
+
+        if (options.body) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers: headers
+        });
+
+        if (!response.ok) {
+            // ... (logika penanganan error)
+            console.error(`Error ${response.status}: ${await response.text()}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Cek jika respons memiliki konten sebelum parsing JSON
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            return await response.json();
+        } else {
+            return await response.text(); // Untuk respons non-JSON (misal: 'OK')
+        }
+
+    } catch (error) {
+        console.error('Gagal mengambil data:', error);
+        throw error;
+    }
+}

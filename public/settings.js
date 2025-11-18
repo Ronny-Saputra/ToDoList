@@ -2,8 +2,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     // === ELEMEN UMUM ===
     const backBtn = document.querySelector('.back-btn');
-    const logoutLink = document.querySelector('a.danger'); // Log Out (yang pertama)
-    const deleteLink = document.querySelectorAll('a.danger')[1]; // Delete Account (yang kedua)
+    // Ambil tautan Log Out (link pertama dengan kelas .danger)
+    const logoutLink = document.querySelector('a.danger'); 
+    // Ambil tautan Delete Account (link kedua dengan kelas .danger)
+    const deleteLink = document.querySelectorAll('a.danger')[1]; 
 
     // === POPUP LOG OUT ===
     const logoutPopup = document.getElementById('logoutPopup');
@@ -26,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 2. POPUP LOG OUT
+    // 2. LOGIKA LOG OUT (TERHUBUNG FIREBASE)
     // ========================================
     if (logoutLink && logoutPopup) {
         logoutLink.addEventListener('click', function (e) {
@@ -41,16 +43,25 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (confirmLogoutBtn) {
-        confirmLogoutBtn.addEventListener('click', function () {
+    // *** INI LOGIKA BARU UNTUK LOGOUT ***
+if (confirmLogoutBtn) {
+    confirmLogoutBtn.addEventListener('click', function () {
+        // 1. Logout dari Firebase dulu
+        localStorage.clear();
+        firebase.auth().signOut().then(() => {
+            console.log('User signed out.');
             logoutPopup.classList.remove('show');
+            
+            // 2. Baru pindah halaman setelah sukses logout
             setTimeout(() => {
-                window.location.href = 'login.html'; // Arahkan ke login
+                window.location.href = 'login.html'; 
             }, 300);
+        }).catch((error) => {
+            console.error('Sign Out Error', error);
         });
-    }
+    });
+}
 
-    // Tutup popup saat klik luar
     if (logoutPopup) {
         logoutPopup.addEventListener('click', function (e) {
             if (e.target === logoutPopup) {
@@ -60,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 3. POPUP DELETE ACCOUNT
+    // 3. LOGIKA DELETE ACCOUNT (TERHUBUNG FIREBASE)
     // ========================================
     if (deleteLink && deletePopup) {
         deleteLink.addEventListener('click', function (e) {
@@ -75,17 +86,46 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // *** INI LOGIKA BARU UNTUK DELETE ACCOUNT ***
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', function () {
-            deletePopup.classList.remove('show');
-            setTimeout(() => {
-                alert('Akun telah dihapus.'); // Ganti nanti dengan API
-                // window.location.href = 'login.html'; // Uncomment saat sudah siap
-            }, 300);
+            // Cek apakah firebase sudah dimuat
+            if (typeof firebase === 'undefined' || !firebase.auth) {
+                alert('Error: Firebase belum dimuat. Cek Langkah 1.');
+                return;
+            }
+            
+            const user = firebase.auth().currentUser;
+
+            if (user) {
+                // Panggil fungsi delete dari Firebase Auth
+                user.delete().then(() => {
+                    // Sukses delete
+                    console.log('User account deleted.');
+                    deletePopup.classList.remove('show');
+                    alert('Akun Anda telah berhasil dihapus.');
+                    // Arahkan ke login SETELAH sukses delete
+                    setTimeout(() => {
+                        window.location.href = 'login.html'; 
+                    }, 300);
+                }).catch((error) => {
+                    // Gagal delete
+                    console.error('Delete account error', error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        // Error paling umum: pengguna harus login ulang
+                        alert('Gagal menghapus akun. Sesi Anda sudah terlalu lama.\n\nSilakan Log Out, lalu Log In kembali, dan coba hapus akun lagi.');
+                    } else {
+                        alert('Gagal menghapus akun: ' + error.message);
+                    }
+                    deletePopup.classList.remove('show');
+                });
+            } else {
+                alert('Tidak ada pengguna yang login.');
+                deletePopup.classList.remove('show');
+            }
         });
     }
 
-    // Tutup popup delete saat klik luar
     if (deletePopup) {
         deletePopup.addEventListener('click', function (e) {
             if (e.target === deletePopup) {
