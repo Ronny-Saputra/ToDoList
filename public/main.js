@@ -196,3 +196,22 @@ async function fetchData(endpoint, options = {}) {
         throw error;
     }
 }
+
+// NEW UTILITY: Format ISO Date to YYYY-MM-DD
+function formatIsoToYyyyMmDd(isoString) {
+    if (!isoString) return '';
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date)) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        return '';
+    }
+}
+window.TaskApp = window.TaskApp || {};
+// Expose secara global via TaskApp untuk digunakan di search.js, dll.
+window.TaskApp.formatIsoToYyyyMmDd = formatIsoToYyyyMmDd;

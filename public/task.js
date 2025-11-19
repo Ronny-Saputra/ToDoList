@@ -152,18 +152,6 @@ function saveDeletedTask(taskData) {
     }
     window.TaskApp.formatDate = formatDate;
     
-    // --- UTILITY: Format ISO String ke string YYYY-MM-DD (New) ---
-    function formatIsoToYyyyMmDd(isoString) {
-        if (!isoString) return '';
-        const date = new Date(isoString);
-        if (isNaN(date.getTime())) return '';
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    window.TaskApp.formatIsoToYyyyMmDd = formatIsoToYyyyMmDd;
-    
     // --- UTILITY: Format Durasi Milis ke String (Kotlin parity) ---
     window.TaskApp.formatDurationToString = function(millis) {
         const MILLIS_IN_HOUR = 3600000;
@@ -275,15 +263,11 @@ window.TaskApp.openDrawerForEdit = function(task) {
             const taskDate = new Date(taskDateValue + ' 00:00:00');
             taskDate.setHours(0, 0, 0, 0);
             
-            // Jika tanggal task sudah lewat, set ke hari ini
-            if (taskDate < today) {
-                dateInput.value = formatDate(today);
-            } else {
-                dateInput.value = taskDateValue; // Gunakan tanggal yang tersimpan
-            }
-            
-            // Set min date ke hari ini agar tidak bisa pilih tanggal lampau
-            dateInput.min = formatDate(today);
+            // Karena sekarang logika Missed Tasks ditangani di submit handler, 
+            // kita HANYA perlu memastikan tanggal ditampilkan DENGAN BENAR.
+            // Biarkan user memilih tanggal lampau; submit handler yang akan menentukan statusnya.
+            dateInput.value = taskDateValue; 
+            dateInput.removeAttribute('min'); 
             
         } else {
             // Mode edit biasa (Task, Calendar, Search: Edit)
@@ -559,11 +543,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             const tasks = await window.fetchData('/tasks?status=pending');
             
             // Pastikan respons berupa array
-            window.TaskApp.tasksData = Array.isArray(tasks) ? tasks.map(task => ({
-                ...task,
-                // [FIX PENTING]: Memastikan task.date sesuai dengan task.dueDate dari Firebase
-                date: formatIsoToYyyyMmDd(task.dueDate), // Menggunakan dueDate dari server
-            })) : [];
+            window.TaskApp.tasksData = Array.isArray(tasks) ? tasks : [];
 
             // ✨ CEK DAN PINDAHKAN MISSED TASKS
             // (Kita tetap panggil fungsi ini untuk update status jika ada yang terlewat)
@@ -576,7 +556,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
         
         // Reset active date ke hari ini saat load awal
         activeDate = new Date();
-        activeDate.setHours(0, 0, 0, 0);
+        activeDate.setHours(0, 0, 0, 0); 
         window.TaskApp.activeDate = activeDate;
         
         // Render Kalender
@@ -647,7 +627,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             activeDate = newActiveDate;
             window.TaskApp.activeDate = newActiveDate; // Set global activeDate
 
-            updateMonthYearDisplay(monthYearDisplay, activeDate);
+            updateMonthYearDisplay(monthYearDisplay, newActiveDate);
             
             // Gulir ke kartu yang ditemukan
             const scrollPos = card.offsetLeft - (calendarContainer.offsetWidth / 2) + (card.offsetWidth / 2);
@@ -1139,17 +1119,20 @@ const taskPageFormSubmitHandler = async function(event, user) {
 
     if (activity && dateToUse) {
         
-        // Validasi Tanggal (Hanya untuk Restore/Reschedule)
-        const mode = window.TaskApp.editMode || 'edit';
-        if (mode === 'restore' || mode === 'reschedule') {
-             const today = new Date();
-             today.setHours(0, 0, 0, 0);
-             const selectedDate = new Date(dateToUse + ' 00:00:00');
-             if (selectedDate < today) {
-                 window.showCustomDialog("Cannot restore/reschedule to past dates.", [{ text: 'OK', action: () => {}, isPrimary: true }]);
-                 return;
-             }
+        // 1. Penentuan Status BARU
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize today to midnight
+        const selectedDate = new Date(dateToUse + ' 00:00:00');
+        selectedDate.setHours(0, 0, 0, 0); // Normalize selected date to midnight
+        
+        let finalStatus = "pending";
+        
+        // Cek apakah tanggal yang dipilih adalah masa lalu
+        if (selectedDate < today) {
+            finalStatus = "missed"; // <-- JIKA MASA LALU, SET KE MISSED
         }
+        
+        // ... (time and dueDate calculation)
         
         // === LOGIKA WAKTU ===
         const inputTimeText = timeInput ? timeInput.value.trim() : '';
@@ -1167,12 +1150,16 @@ const taskPageFormSubmitHandler = async function(event, user) {
 
         if (isTimeRangeSet) {
             const endTimeFromAttr = new Date(parseInt(endMillisAttr));
-            finalDueDateObj = new Date(year, month - 1, day, endTimeFromAttr.getHours(), endTimeFromAttr.getMinutes(), 0, 0);
+            // Perhatian: Karena dateToUse sudah fix YYYY-MM-DD (tanggal yang dipilih), 
+            // kita harus memastikan endTimeMillis memiliki tanggal yang sama atau +1 hari jika roll-over.
+            // Saat ini, logik time picker sudah menyimpan endMillis yang benar.
+            finalDueDateObj = endTimeFromAttr; 
             finalEndTimeMillis = finalDueDateObj.getTime();
             finalFlowDuration = flowDurationMillis;
             finalTimeStr = inputTimeText; 
 
         } else {
+            // Gunakan akhir hari sebagai DueDate jika tidak ada Time Range
             finalDueDateObj = new Date(year, month - 1, day, 23, 59, 59, 999);
             finalEndTimeMillis = 0;
             finalFlowDuration = flowDurationMillis;
@@ -1182,6 +1169,14 @@ const taskPageFormSubmitHandler = async function(event, user) {
                  finalTimeStr = `${durationText} (Flow)`;
             }
         }
+        
+        // Tambahkan cek jika status missed, atur date dan time sesuai tanggal yang dipilih
+        // (Walaupun backend seharusnya mengelola ini, kita kirim data bersih)
+        if (finalStatus === "missed") {
+             finalTimeStr = finalTimeStr.includes('(Flow)') ? finalTimeStr : ''; // Kosongkan waktu untuk missed task jika bukan flow timer
+             finalEndTimeMillis = 0;
+             finalFlowDuration = 0;
+        }
 
         // === DATA UNTUK DIKIRIM KE BACKEND ===
         const taskData = {
@@ -1190,23 +1185,13 @@ const taskPageFormSubmitHandler = async function(event, user) {
             category: location,       
             priority: priority,        
             dueDate: finalDueDateObj.toISOString(), 
-            
-            // [FIX PENTING]: Kirim field date ke backend agar backend punya string YYYY-MM-DD yang benar
-            date: dateToUse, // Menambahkan field date ke payload
+            date: dateToUse, // <--- PENTING: Gunakan dateToUse untuk tanggal task
             
             time: finalTimeStr,        
             endTimeMillis: Math.floor(Number(finalEndTimeMillis)),      
             flowDurationMillis: Math.floor(Number(finalFlowDuration)),
             
-            // Saat Restore/Reschedule/Create, status selalu kembali ke 'pending'
-            status: "pending",
-            
-            // Saat Restore, kita perlu mereset field sampah agar bersih
-            // Backend akan otomatis mengabaikan field ini jika null, tapi kita kirim eksplisit null
-            // agar logika backend (jika ada) tahu untuk menghapusnya.
-            // Catatan: Di Firestore, untuk menghapus field, biasanya butuh FieldValue.delete()
-            // Tapi endpoint PUT Anda hanya mengupdate field yang dikirim.
-            // Untuk kasus ini, status='pending' sudah cukup untuk memunculkannya kembali di list aktif.
+            status: finalStatus, // <--- MENGGUNAKAN STATUS DINAMIS
         };
 
         try {
@@ -1218,13 +1203,6 @@ const taskPageFormSubmitHandler = async function(event, user) {
                     method: 'PUT',
                     body: JSON.stringify(taskData)
                 });
-                
-                // --- PERUBAHAN DISINI: LOCALSTORAGE DIHAPUS ---
-                // Kita tidak perlu lagi menghapus item dari localStorage manual.
-                // Karena saat kita memanggil reloadFn (renderDeletedTasksInDrawer),
-                // dia akan fetch ulang dari API /api/tasks?status=deleted.
-                // Karena status task ini sudah jadi "pending" di database,
-                // dia otomatis tidak akan muncul lagi di list deleted/missed saat refresh.
                 
             } else {
                 // CREATE (POST)
@@ -1246,7 +1224,8 @@ const taskPageFormSubmitHandler = async function(event, user) {
 
             // Pesan Sukses
             let successMessage = isEditing ? "Success Update Reminder" : "Success Add New Reminder";
-            if (mode === 'restore' || mode === 'reschedule') successMessage = "Task successfully restored!";
+            if (finalStatus === 'missed') successMessage = "Task moved to Missed Tasks!";
+            else if (window.TaskApp.editMode === 'restore' || window.TaskApp.editMode === 'reschedule') successMessage = "Task successfully restored!";
 
             window.showCustomDialog(successMessage, [
                 { 
@@ -1291,9 +1270,10 @@ const taskPageFormSubmitHandler = async function(event, user) {
                              displayTasksForActiveDate(newActiveDate);
                         } else if (window.location.pathname.includes("profile.html")) {
                              // Jika di halaman profile, refresh drawer yang sedang terbuka
-                             if (mode === 'restore') {
+                             if (window.TaskApp.editMode === 'restore') {
                                  if(typeof renderDeletedTasksInDrawer === 'function') await renderDeletedTasksInDrawer();
-                             } else if (mode === 'reschedule') {
+                             } else if (window.TaskApp.editMode === 'reschedule' || finalStatus === 'missed') {
+                                 // Jika mode reschedule, atau task pindah ke missed
                                  if(typeof renderMissedTasksInDrawer === 'function') await renderMissedTasksInDrawer();
                              }
                         } else if (window.location.pathname.includes("search.html")) {

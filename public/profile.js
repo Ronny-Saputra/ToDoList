@@ -1,624 +1,237 @@
-// === DATA CHART ===
-const chartData = {
-    daily: {
-        title: 'Daily Average Productivity',
-        score: 5,
-        bars: [
-            { height: '30%', label: 'S', highlight: false },
-            { height: '50%', label: 'M', highlight: false },
-            { height: '70%', label: 'T', highlight: true },
-            { height: '20%', label: 'W', highlight: false },
-            { height: '40%', label: 'T', highlight: false },
-            { height: '15%', label: 'F', highlight: false },
-            { height: '10%', label: 'S', highlight: false }
-        ]
-    },
-    weekly: {
-        title: 'Weekly Productivity Statistics',
-        score: 17,
-        bars: [
-            { height: '40%', label: '1', highlight: false },
-            { height: '25%', label: '2', highlight: false },
-            { height: '85%', label: '3', highlight: true },
-            { height: '10%', label: '4', highlight: false },
-        ]
-    },
-    monthly: {
-        title: 'Monthly Productivity Statistics',
-        score: 23,
-        bars: [
-            { height: '50%', label: 'Sept', highlight: false },
-            { height: '80%', label: 'Oct', highlight: true },
-            { height: '15%', label: 'Nov', highlight: false },
-            { height: '20%', label: 'Dec', highlight: false },
-            { height: '18%', label: 'Jan', highlight: false },
-            { height: '22%', label: 'Feb', highlight: false },
-            { height: '25%', label: 'Mar', highlight: false }
-        ]
-    }
+// File: public/profile.js
+// Logika untuk Task Counters, Tab Switching, dan Task Drawers (Completed, Deleted, Missed)
+
+// === CACHE UNTUK MENYIMPAN DATA TASK COUNTS ===
+let taskCountsCache = {
+    completed: 0,
+    missed: 0,
+    deleted: 0,
+    lastFetch: 0
 };
 
-// === FUNGSI UNTUK LOAD DATA DARI LOCALSTORAGE ===
-function getCompletedTasksFromStorage() {
-    const tasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
-    
-    // Group by date
-    const tasksByDate = {};
-    tasks.forEach(task => {
-        const completedDate = new Date(task.completedAt);
-        const dateStr = completedDate.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-        
-        if (!tasksByDate[dateStr]) {
-            tasksByDate[dateStr] = [];
-        }
-        tasksByDate[dateStr].push(task.title);
-    });
-    
-    // Convert to array format
-    return Object.entries(tasksByDate).map(([date, tasks]) => ({
-        date,
-        tasks
-    }));
-}
+const CACHE_DURATION = 5000; // 5 detik
+window.TaskApp = window.TaskApp || {}; 
 
-function getDeletedTasksFromStorage() {
-    const tasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
-    
-    // Group by date
-    const tasksByDate = {};
-    tasks.forEach(task => {
-        const deletedDate = new Date(task.deletedAt);
-        const dateStr = deletedDate.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-        
-        if (!tasksByDate[dateStr]) {
-            tasksByDate[dateStr] = [];
-        }
-        tasksByDate[dateStr].push({
-            id: task.id,
-            name: task.title
-        });
-    });
-    
-    return Object.entries(tasksByDate).map(([date, tasks]) => ({
-        date,
-        tasks: tasks.map(t => t.name)
-    }));
-}
-
-function getMissedTasksFromStorage() {
-    const tasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
-    
-    // Group by date
-    const tasksByDate = {};
-    tasks.forEach(task => {
-        const missedDate = new Date(task.missedAt);
-        const dateStr = missedDate.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-        
-        if (!tasksByDate[dateStr]) {
-            tasksByDate[dateStr] = [];
-        }
-        tasksByDate[dateStr].push({
-            id: task.id,
-            name: task.title
-        });
-    });
-    
-    return Object.entries(tasksByDate).map(([date, tasks]) => ({
-        date,
-        tasks
-    }));
-}
-
-// === UPDATE TASK COUNTS ===
-async function updateTaskCounts() {
+// === UPDATE TASK COUNTS (OPTIMIZED WITH CACHE) ===
+async function updateTaskCounts(forceRefresh = false) {
     try {
-        // Panggil endpoint stats dari Backend
-        // Endpoint ini mengembalikan: { completed: number, missed: number, deleted: number }
+        const now = Date.now();
+        
+        // Gunakan cache jika masih valid dan tidak force refresh
+        if (!forceRefresh && (now - taskCountsCache.lastFetch) < CACHE_DURATION) {
+            updateTaskCountsUI(taskCountsCache);
+            return taskCountsCache;
+        }
+
+        // Fetch data dari server
         const stats = await window.fetchData('/stats/tasks');
         
-        if (!stats) return;
+        if (!stats) return taskCountsCache;
 
-        const completedBox = document.querySelector('.summary-box.completed span');
-        const missedBox = document.querySelector('.summary-box.missed span');
-        const deletedBox = document.querySelector('.summary-box.deleted span');
+        // Update cache
+        taskCountsCache = {
+            completed: stats.completed || 0,
+            missed: stats.missed || 0,
+            deleted: stats.deleted || 0,
+            lastFetch: now
+        };
+
+        // Update UI
+        updateTaskCountsUI(taskCountsCache); 
         
-        // Update UI dengan data dari server
-        if (completedBox) completedBox.textContent = `Completed Tasks (${stats.completed})`;
-        if (missedBox) missedBox.textContent = `Missed Tasks (${stats.missed})`;
-        if (deletedBox) deletedBox.textContent = `Deleted Tasks (${stats.deleted})`;
+        return taskCountsCache;
 
     } catch (error) {
         console.error('Gagal memperbarui jumlah tugas:', error);
+        // Tetap gunakan cache yang ada jika fetch gagal
+        updateTaskCountsUI(taskCountsCache);
+        return taskCountsCache;
     }
 }
 
-// === UPDATE CHART ===
-function updateChart(tabType) {
-    const data = chartData[tabType];
-    document.querySelector('.card-header h3').textContent = data.title;
-    document.querySelector('.productivity-score span').textContent = data.score;
-
-    const chartContainer = document.querySelector('.chart-container');
-    chartContainer.innerHTML = '';
-    chartContainer.className = 'chart-container';
-    chartContainer.classList.add(`chart-${tabType}`);
-
-    data.bars.forEach(bar => {
-        const barWrapper = document.createElement('div');
-        barWrapper.className = 'bar-wrapper';
-
-        const barElement = document.createElement('div');
-        barElement.className = bar.highlight ? 'bar highlight' : 'bar';
-        barElement.style.height = bar.height;
-
-        const label = document.createElement('span');
-        label.className = 'label';
-        label.textContent = bar.label;
-
-        barWrapper.appendChild(barElement);
-        barWrapper.appendChild(label);
-        chartContainer.appendChild(barWrapper);
-    });
+// === FUNGSI HELPER UNTUK UPDATE UI ===
+function updateTaskCountsUI(stats) {
+    const completedBox = document.querySelector('.summary-box.completed span');
+    const missedBox = document.querySelector('.summary-box.missed span');
+    const deletedBox = document.querySelector('.summary-box.deleted span');
+    
+    if (completedBox) completedBox.textContent = `Completed Tasks (${stats.completed})`;
+    if (missedBox) missedBox.textContent = `Missed Tasks (${stats.missed})`;
+    if (deletedBox) deletedBox.textContent = `Deleted Tasks (${stats.deleted})`;
 }
+
+// === FUNGSI UNTUK LOAD DATA DARI API (Diperlukan oleh drawers) ===
+async function getCompletedTasksFromAPI() {
+    try {
+        const tasks = await window.fetchData('/tasks?status=completed');
+        return groupTasksByDate(tasks, 'completedAt');
+    } catch (error) {
+        console.error('Error fetching completed tasks:', error);
+        return [];
+    }
+}
+
+async function getDeletedTasksFromAPI() {
+    try {
+        const tasks = await window.fetchData('/tasks?status=deleted');
+        return groupTasksByDate(tasks, 'deletedAt');
+    } catch (error) {
+        console.error('Error fetching deleted tasks:', error);
+        return [];
+    }
+}
+
+async function getMissedTasksFromAPI() {
+    try {
+        const tasks = await window.fetchData('/tasks?status=missed');
+        return groupTasksByDate(tasks, 'missedAt');
+    } catch (error) {
+        console.error('Error fetching missed tasks:', error);
+        return [];
+    }
+}
+
+// === HELPER: GROUP TASKS BY DATE (Tetap dibutuhkan oleh drawer) ===
+function groupTasksByDate(tasks, dateField) {
+    const tasksByDate = {};
+    
+    if (!Array.isArray(tasks)) return [];
+    
+    tasks.forEach(task => {
+        const date = task[dateField]; 
+        let dateStr;
+        
+        let dateObj = null;
+
+        // 1. Coba gunakan ISO date (completedAt/deletedAt/missedAt)
+        if (date) {
+            const dateNum = Date.parse(date);
+            if (!isNaN(dateNum)) {
+                dateObj = new Date(dateNum);
+            }
+        }
+        
+        if (dateObj && !isNaN(dateObj.getTime())) { 
+            dateStr = dateObj.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        } else {
+            // 2. FALLBACK ke Tanggal Terjadwal (task.date is YYYY-MM-DD)
+            const fallbackDate = task.date; 
+            if (fallbackDate) {
+                 const dateParts = fallbackDate.split('-'); 
+                 
+                 if (dateParts.length === 3) {
+                     const dateObjFallback = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                     
+                     if (!isNaN(dateObjFallback.getTime())) { 
+                         let label = "";
+                         if (dateField === 'deletedAt' || dateField === 'missedAt') {
+                             label = " ";
+                         }
+                         
+                         dateStr = dateObjFallback.toLocaleDateString('en-US', { 
+                             weekday: 'long', 
+                             year: 'numeric', 
+                             month: 'long', 
+                             day: 'numeric' 
+                         }) + label; 
+                     } else {
+                          dateStr = 'Unknown Date (Invalid Fallback)';
+                     }
+                 } else {
+                      dateStr = 'Unknown Date (Format Error)';
+                 }
+            } else {
+                 dateStr = 'Unknown Date (No Date Field)';
+            }
+        }
+        
+        if (!tasksByDate[dateStr]) {
+            tasksByDate[dateStr] = [];
+        }
+        
+        tasksByDate[dateStr].push({
+            id: task.id,
+            title: task.title,
+            date: task.date,
+            time: task.time,
+            location: task.location || task.category,
+            priority: task.priority,
+            endTimeMillis: task.endTimeMillis,
+            flowDurationMillis: task.flowDurationMillis
+        });
+    });
+    
+    return Object.entries(tasksByDate).map(([date, tasks]) => ({
+        date,
+        tasks
+    }));
+}
+
 
 // === INISIALISASI ===
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Update counts saat page load
+    // Update counts saat page load (gunakan cache untuk render cepat)
     updateTaskCounts();
+    
+    // Force refresh setelah 100ms untuk data terbaru
+    setTimeout(() => updateTaskCounts(true), 100);
     
     // Listen untuk update dari task page
     window.addEventListener('storage', (e) => {
         if (e.key === 'profileUpdateTrigger') {
-            updateTaskCounts();
+            updateTaskCounts(true);
+            // Panggil fungsi chart dari statistic.js
+            if (window.TaskApp.updateChart) {
+                const activeTab = document.querySelector('.tab-btn.active');
+                const tabType = activeTab ? activeTab.textContent.toLowerCase() : 'daily';
+                window.TaskApp.updateChart(tabType);
+            }
         }
     });
     
     // Update ketika window focus (user kembali ke tab)
     window.addEventListener('focus', () => {
-        updateTaskCounts();
+        updateTaskCounts(true);
     });
 
     // === TAB SWITCHING ===
     const tabButtons = document.querySelectorAll('.tab-btn');
     const statsCard = document.querySelector('.stats-card');
 
+    // Initial Chart Load
+    if (window.TaskApp.updateChart) {
+         window.TaskApp.updateChart('daily');
+    }
+
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
             if (this.classList.contains('active')) return;
             tabButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            const tabText = this.textContent.toLowerCase();
+            const tabType = this.textContent.toLowerCase();
 
             statsCard.classList.add('fade-out');
             setTimeout(() => {
-                updateChart(tabText);
+                // Panggil fungsi chart dari statistic.js
+                if (window.TaskApp.updateChart) {
+                    window.TaskApp.updateChart(tabType);
+                }
                 statsCard.classList.remove('fade-out');
                 statsCard.classList.add('fade-in');
             }, 200);
         });
     });
-
-    // === FITUR KAMERA & UPLOAD ===
-    const cameraIcon = document.querySelector('.camera-icon');
-    const choiceModal = document.getElementById('cameraChoiceModal');
-    const cameraModal = document.getElementById('cameraModal');
-    const openCameraBtn = document.getElementById('openCameraBtn');
-    const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
-    const closeChoiceModal = document.getElementById('closeChoiceModal');
-    const fileInput = document.getElementById('fileInput');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureBtn = document.getElementById('captureBtn');
-    const preview = document.getElementById('preview');
-    const previewControls = document.getElementById('previewControls');
-    const captureControls = document.getElementById('captureControls');
-    const setPhotoBtn = document.getElementById('setPhoto');
-    const retakeBtn = document.getElementById('retake');
-    const switchCameraBtn = document.getElementById('switchCameraBtn');
-    const closeModalBtns = document.querySelectorAll('.close-modal');
-    const mainAvatar = document.getElementById('mainAvatar');
-    const drawerAvatar = document.getElementById('drawerAvatar');
-
-    let stream = null;
-    let photoData = null;
-    let currentFacingMode = 'user';
-    let hasBackCamera = false;
-
-    async function checkBackCamera() {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
-            hasBackCamera = videoDevices.length > 1;
-        } catch (err) {
-            hasBackCamera = false;
-        }
-    }
-
-    if (cameraIcon) {
-        cameraIcon.addEventListener('click', () => {
-            choiceModal.style.display = 'flex';
-        });
-    }
-
-    if (closeChoiceModal) {
-        closeChoiceModal.addEventListener('click', () => {
-            choiceModal.style.display = 'none';
-        });
-    }
-    
-    if (choiceModal) {
-        choiceModal.addEventListener('click', e => {
-            if (e.target === choiceModal) choiceModal.style.display = 'none';
-        });
-    }
-
-    if (openCameraBtn) {
-        openCameraBtn.addEventListener('click', async () => {
-            choiceModal.style.display = 'none';
-            cameraModal.style.display = 'flex';
-            video.style.display = 'block';
-            preview.style.display = 'none';
-            currentFacingMode = 'user';
-            
-            await checkBackCamera();
-            switchCameraBtn.style.display = hasBackCamera ? 'inline-flex' : 'none';
-            switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Ganti ke Belakang';
-            
-            await startCamera('user');
-            previewControls.style.display = 'none';
-            captureControls.style.display = 'flex';
-        });
-    }
-
-    if (uploadPhotoBtn) {
-        uploadPhotoBtn.addEventListener('click', () => {
-            choiceModal.style.display = 'none';
-            fileInput.click();
-        });
-    }
-
-    if (fileInput) {
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                cropToSquare(e.target.result, (croppedData) => {
-                    photoData = croppedData;
-                    openPreview(photoData);
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    async function startCamera(facingMode) {
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
-            video.srcObject = stream;
-        } catch (err) {
-            alert("Gagal akses kamera: " + err.message);
-            if (facingMode === 'environment') startCamera('user');
-        }
-    }
-
-    function closeCamera() {
-        cameraModal.style.display = 'none';
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-        video.srcObject = null;
-        video.style.display = 'none';
-        preview.style.display = 'none';
-        preview.src = '';
-        photoData = null;
-        previewControls.style.display = 'none';
-        captureControls.style.display = 'flex';
-    }
-
-    closeModalBtns.forEach(btn => {
-        btn.addEventListener('click', closeCamera);
-    });
-
-    if (switchCameraBtn) {
-        switchCameraBtn.addEventListener('click', async () => {
-            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-            await startCamera(currentFacingMode);
-            switchCameraBtn.innerHTML = currentFacingMode === 'user' 
-                ? '<i class="fas fa-sync-alt"></i> Ganti ke Belakang' 
-                : '<i class="fas fa-sync-alt"></i> Ganti ke Depan';
-        });
-    }
-
-    if (captureBtn) {
-        captureBtn.addEventListener('click', () => {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0);
-            const tempPhotoData = canvas.toDataURL('image/png');
-            
-            cropToSquare(tempPhotoData, (croppedData) => {
-                photoData = croppedData;
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    stream = null;
-                }
-                openPreview(photoData);
-            });
-        });
-    }
-
-    function cropToSquare(imageSrc, callback) {
-        const img = new Image();
-        img.onload = () => {
-            const size = Math.min(img.width, img.height);
-            const x = (img.width - size) / 2;
-            const y = (img.height - size) / 2;
-
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, x, y, size, size, 0, 0, size, size);
-            const croppedData = canvas.toDataURL('image/png');
-            callback(croppedData);
-        };
-        img.src = imageSrc;
-    }
-
-    function openPreview(src) {
-        cameraModal.style.display = 'flex';
-        preview.src = src;
-        video.style.display = 'none';
-        preview.style.display = 'block';
-        captureControls.style.display = 'none';
-        previewControls.style.display = 'flex';
-    }
-
-    if (setPhotoBtn) {
-        setPhotoBtn.addEventListener('click', () => {
-            if (photoData) {
-                updateAvatarGlobally(photoData);
-                closeCamera();
-                alert("Foto profil berhasil diperbarui!");
-            } else {
-                alert("Tidak ada foto yang dipilih!");
-            }
-        });
-    }
-
-    if (retakeBtn) {
-        retakeBtn.addEventListener('click', () => {
-            previewControls.style.display = 'none';
-            captureControls.style.display = 'flex';
-            preview.style.display = 'none';
-            video.style.display = 'block';
-            startCamera(currentFacingMode);
-        });
-    }
-
-async function updateAvatarGlobally(photoData) {
-        // 1. Update tampilan UI langsung (biar terasa cepat)
-        if (mainAvatar) mainAvatar.src = photoData;
-        if (drawerAvatar) drawerAvatar.src = photoData;
-
-        // 2. Kirim data gambar ke Backend
-        try {
-            await window.fetchData('/profile/image', {
-                method: 'POST',
-                body: JSON.stringify({ image: photoData })
-            });
-            console.log("Avatar berhasil disimpan di server.");
-        } catch (error) {
-            console.error("Gagal upload avatar:", error);
-            alert("Gagal menyimpan foto profil ke server.");
-        }
-    }
-
-    // === DRAWER: EDIT PROFILE ===
-    const openEditDrawerBtn = document.getElementById('openEditDrawer');
-    const editProfileDrawer = document.getElementById('editProfileDrawer');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    const closeDrawerBtn = document.getElementById('closeDrawer');
-    const saveBtn = document.querySelector('.save-btn');
-    const nameInput = document.getElementById('name');
-    const usernameInput = document.getElementById('username');
-    const profileUsername = document.getElementById('profileUsername');
-
-    function closeDrawer() {
-        editProfileDrawer.classList.remove('active');
-    }
-
-    if (openEditDrawerBtn) {
-        openEditDrawerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            // Data form sudah diisi otomatis oleh loadProfileData() saat halaman dimuat
-            // Kita hanya perlu memastikan warna inputnya benar
-            if (typeof updateInputColor === 'function') {
-                updateInputColor(nameInput);
-                updateInputColor(usernameInput);
-            }
-
-            editProfileDrawer.classList.add('active');
-        });
-    }
-
-    if (closeDrawerBtn) {
-        closeDrawerBtn.addEventListener('click', closeDrawer);
-    }
-    
-    if (drawerOverlay) {
-        drawerOverlay.addEventListener('click', closeDrawer);
-    }
-
-    function updateInputColor(input) {
-        if (input.value.trim() !== '') {
-            input.style.color = '#14142A';
-        } else {
-            input.style.color = '#aaa';
-        }
-    }
-
-    [nameInput, usernameInput].forEach(input => {
-        if (input) {
-            input.addEventListener('input', () => updateInputColor(input));
-        }
-    });
-
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-
-            // 1. Ambil data dari input
-            const newName = nameInput.value.trim();
-            const newUsername = usernameInput.value.trim();
-            // Ambil text gender dari span, default ke 'Male' jika kosong
-            const gender = selectedGenderSpan ? selectedGenderSpan.textContent : 'Male';
-
-            // 2. Siapkan data JSON
-            const profileData = {
-                name: newName,
-                username: newUsername,
-                gender: gender
-            };
-
-            try {
-                // 3. Kirim ke Backend (PUT /api/profile)
-                await window.fetchData('/profile', {
-                    method: 'PUT',
-                    body: JSON.stringify(profileData)
-                });
-
-                // 4. Update tampilan UI
-                if (profileUsername) {
-                    profileUsername.textContent = newUsername || 'Username';
-                }
-
-                closeDrawer();
-                alert('Profil berhasil diperbarui dan disimpan ke server!');
-            } catch (error) {
-                console.error("Error menyimpan profil:", error);
-                alert('Gagal menyimpan profil. Cek koneksi internet.');
-            }
-        });
-    }
-
-    // === GENDER DROPDOWN ===
-    const genderInput = document.getElementById('genderInput');
-    const genderDropdown = document.getElementById('genderDropdown');
-    const genderOptions = document.querySelectorAll('.gender-option');
-    const selectedGenderSpan = document.getElementById('selectedGender');
-
-    if (genderInput) {
-        genderInput.addEventListener('click', () => {
-            const isOpen = genderDropdown.classList.contains('open');
-            genderDropdown.classList.toggle('open', !isOpen);
-            genderInput.classList.toggle('open', !isOpen);
-        });
-    }
-
-    genderOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const value = option.dataset.value;
-            if (selectedGenderSpan) {
-                selectedGenderSpan.textContent = value;
-            }
-            document.querySelectorAll('.gender-option i').forEach(icon => {
-                icon.classList.add('hidden');
-            });
-            option.querySelector('i').classList.remove('hidden');
-            genderDropdown.classList.remove('open');
-            genderInput.classList.remove('open');
-        });
-    });
-
-    document.addEventListener('click', (e) => {
-        if (genderInput && genderDropdown && !genderInput.contains(e.target) && !genderDropdown.contains(e.target)) {
-            genderDropdown.classList.remove('open');
-            genderInput.classList.remove('open');
-        }
-    });
-
-    const editAvatarBtn = document.getElementById('editAvatarBtn');
-    if (editAvatarBtn) {
-        editAvatarBtn.addEventListener('click', () => {
-            document.getElementById('cameraChoiceModal').style.display = 'flex';
-            closeDrawer();
-        });
-    }
-    
-    // Load saved data
-    async function loadProfileData() {
-        try {
-            // Panggil GET /api/profile
-            const data = await window.fetchData('/profile');
-            
-            if (!data) return; // Stop jika tidak ada data/belum login
-
-            // 1. Isi Tampilan Header
-            if (profileUsername) profileUsername.textContent = data.username || 'Username';
-            
-            // 2. Isi Avatar
-            if (data.profileImageUrl) {
-                if (mainAvatar) mainAvatar.src = data.profileImageUrl;
-                if (drawerAvatar) drawerAvatar.src = data.profileImageUrl;
-            }
-
-            // 3. Isi Form di dalam Drawer (walaupun belum dibuka)
-            if (nameInput) {
-                nameInput.value = data.name || '';
-                if(typeof updateInputColor === 'function') updateInputColor(nameInput);
-            }
-            if (usernameInput) {
-                usernameInput.value = data.username || '';
-                if(typeof updateInputColor === 'function') updateInputColor(usernameInput);
-            }
-
-            // 4. Set Gender
-            if (data.gender && selectedGenderSpan) {
-                selectedGenderSpan.textContent = data.gender;
-                // Update checklist di dropdown
-                document.querySelectorAll('.gender-option i').forEach(icon => icon.classList.add('hidden'));
-                const activeOption = document.querySelector(`.gender-option[data-value="${data.gender}"] i`);
-                if (activeOption) activeOption.classList.remove('hidden');
-            }
-
-        } catch (error) {
-            console.error("Gagal memuat profil:", error);
-        }
-    }
-
-    // Panggil loadProfileData saat user login
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                loadProfileData();
-            }
-        });
-    }
 });
 
-// === DRAWER: COMPLETED TASKS ===
+// ===================================================
+// DRAWER: COMPLETED TASKS
+// ===================================================
 const completedDrawer = document.getElementById('completedDrawer');
 const completedDrawerContent = document.getElementById('completedDrawerContent');
 const closeCompletedDrawer = document.getElementById('closeCompletedDrawer');
@@ -627,8 +240,8 @@ const completedBox = document.querySelector('.summary-box.completed');
 
 if (completedBox) {
     completedBox.style.cursor = 'pointer';
-    completedBox.addEventListener('click', () => {
-        renderCompletedTasksInDrawer();
+    completedBox.addEventListener('click', async () => {
+        await renderCompletedTasksInDrawer();
         completedDrawer.classList.add('active');
     });
 }
@@ -645,9 +258,11 @@ if (completedDrawerOverlay) {
     });
 }
 
-function renderCompletedTasksInDrawer() {
-    const tasks = getCompletedTasksFromStorage();
-
+async function renderCompletedTasksInDrawer() {
+    completedDrawerContent.innerHTML = '<div class="loading-spinner"></div>';
+    
+    const tasks = await getCompletedTasksFromAPI();
+    
     completedDrawerContent.innerHTML = '';
     
     if (tasks.length === 0) {
@@ -670,7 +285,7 @@ function renderCompletedTasksInDrawer() {
             group.tasks.forEach(task => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'task-item';
-                itemDiv.textContent = task;
+                itemDiv.textContent = task.title;
                 groupDiv.appendChild(itemDiv);
             });
 
@@ -679,7 +294,9 @@ function renderCompletedTasksInDrawer() {
     }
 }
 
-// === DRAWER: DELETED TASKS ===
+// ===================================================
+// DRAWER: DELETED TASKS
+// ===================================================
 const deletedDrawer = document.getElementById('deletedDrawer');
 const deletedDrawerContent = document.getElementById('deletedDrawerContent');
 const closeDeletedDrawer = document.getElementById('closeDeletedDrawer');
@@ -688,8 +305,8 @@ const deletedBox = document.querySelector('.summary-box.deleted');
 
 if (deletedBox) {
     deletedBox.style.cursor = 'pointer';
-    deletedBox.addEventListener('click', () => {
-        renderDeletedTasksInDrawer();
+    deletedBox.addEventListener('click', async () => {
+        await renderDeletedTasksInDrawer();
         deletedDrawer.classList.add('active');
     });
 }
@@ -706,10 +323,11 @@ if (deletedDrawerOverlay) {
     });
 }
 
-// === UPDATE RENDER DELETED TASKS (DENGAN EVENT LISTENER) ===
-function renderDeletedTasksInDrawer() {
-    const tasks = getDeletedTasksFromStorage();
-
+async function renderDeletedTasksInDrawer() {
+    deletedDrawerContent.innerHTML = '<div class="loading-spinner"></div>';
+    
+    const tasks = await getDeletedTasksFromAPI();
+    
     deletedDrawerContent.innerHTML = '';
     
     if (tasks.length === 0) {
@@ -729,23 +347,17 @@ function renderDeletedTasksInDrawer() {
             dateDiv.textContent = group.date;
             groupDiv.appendChild(dateDiv);
 
-            group.tasks.forEach((taskName) => {
-                // Dapatkan task ID dari deletedTasks localStorage
-                const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
-                const taskObj = deletedTasks.find(t => t.title === taskName);
-                const taskId = taskObj ? taskObj.id : null;
-                
+            group.tasks.forEach((task) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'deleted-task-item';
                 itemDiv.innerHTML = `
-                    <span>${taskName}</span>
-                    <button class="restore-btn" data-task-id="${taskId}">Restore</button>
+                    <span>${task.title}</span>
+                    <button class="restore-btn" data-task-id="${task.id}">Restore</button>
                 `;
                 
-                // ✅ EVENT LISTENER UNTUK RESTORE
                 itemDiv.querySelector('.restore-btn').addEventListener('click', async () => {
-                    if (taskId) {
-                        await restoreDeletedTask(taskId);
+                    if (task.id) {
+                        await restoreDeletedTask(task);
                     } else {
                         alert('Task ID not found.');
                     }
@@ -759,64 +371,9 @@ function renderDeletedTasksInDrawer() {
     }
 }
 
-// === UPDATE FUNGSI RESTORE DAN RESCHEDULE ===
-// Ganti fungsi yang lama dengan ini:
-
-async function restoreDeletedTask(taskId) {
-    const user = firebase.auth().currentUser;
-    if (!user) return alert('Please log in first.');
-    
-    const db = firebase.firestore();
-    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-    
-    try {
-        const taskDoc = await tasksRef.doc(taskId).get();
-        if (!taskDoc.exists) {
-            return alert('Task not found.');
-        }
-        
-        const taskData = { id: taskId, ...taskDoc.data() };
-        
-        // Close deleted drawer
-        document.getElementById('deletedDrawer').classList.remove('active');
-        
-        // Open task edit drawer
-        openTaskEditDrawer(taskData, 'restore');
-        
-    } catch (err) {
-        console.error("Error restoring task:", err);
-        alert('Failed to restore task. Please try again.');
-    }
-}
-
-async function rescheduleMissedTask(taskId) {
-    const user = firebase.auth().currentUser;
-    if (!user) return alert('Please log in first.');
-    
-    const db = firebase.firestore();
-    const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-    
-    try {
-        const taskDoc = await tasksRef.doc(taskId).get();
-        if (!taskDoc.exists) {
-            return alert('Task not found.');
-        }
-        
-        const taskData = { id: taskId, ...taskDoc.data() };
-        
-        // Close missed drawer
-        document.getElementById('missedDrawer').classList.remove('active');
-        
-        // Open task edit drawer
-        openTaskEditDrawer(taskData, 'reschedule');
-        
-    } catch (err) {
-        console.error("Error rescheduling task:", err);
-        alert('Failed to reschedule task. Please try again.');
-    }
-}
-
-// === DRAWER: MISSED TASKS ===
+// ===================================================
+// DRAWER: MISSED TASKS
+// ===================================================
 const missedDrawer = document.getElementById('missedDrawer');
 const missedDrawerContent = document.getElementById('missedDrawerContent');
 const closeMissedDrawer = document.getElementById('closeMissedDrawer');
@@ -825,8 +382,8 @@ const missedBox = document.querySelector('.summary-box.missed');
 
 if (missedBox) {
     missedBox.style.cursor = 'pointer';
-    missedBox.addEventListener('click', () => {
-        renderMissedTasksInDrawer();
+    missedBox.addEventListener('click', async () => {
+        await renderMissedTasksInDrawer();
         missedDrawer.classList.add('active');
     });
 }
@@ -843,10 +400,11 @@ if (missedDrawerOverlay) {
     });
 }
 
-// === UPDATE RENDER MISSED TASKS (DENGAN EVENT LISTENER) ===
-function renderMissedTasksInDrawer() {
-    const tasks = getMissedTasksFromStorage();
-
+async function renderMissedTasksInDrawer() {
+    missedDrawerContent.innerHTML = '<div class="loading-spinner"></div>';
+    
+    const tasks = await getMissedTasksFromAPI();
+    
     missedDrawerContent.innerHTML = '';
     
     if (tasks.length === 0) {
@@ -870,13 +428,12 @@ function renderMissedTasksInDrawer() {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'missed-task-item';
                 itemDiv.innerHTML = `
-                    <span>${task.name}</span>
+                    <span>${task.title}</span>
                     <button class="reschedule-btn" data-task-id="${task.id}">Reschedule</button>
                 `;
                 
-                // ✅ EVENT LISTENER UNTUK RESCHEDULE
                 itemDiv.querySelector('.reschedule-btn').addEventListener('click', async () => {
-                    await rescheduleMissedTask(task.id);
+                    await rescheduleMissedTask(task);
                 });
                 
                 groupDiv.appendChild(itemDiv);
@@ -888,9 +445,8 @@ function renderMissedTasksInDrawer() {
 }
 
 // ===================================================
-// TASK EDIT DRAWER (UNTUK RESTORE/RESCHEDULE)
+// TASK EDIT DRAWER (RESTORE/RESCHEDULE)
 // ===================================================
-
 const taskEditDrawer = document.getElementById('taskEditDrawer');
 const taskEditDrawerOverlay = document.getElementById('taskEditDrawerOverlay');
 const closeTaskEditDrawer = document.getElementById('closeTaskEditDrawer');
@@ -901,9 +457,11 @@ const taskTimeInput = document.getElementById('task-time-input');
 const taskLocationInput = document.getElementById('task-location-input');
 const taskSaveBtn = document.getElementById('task-save-btn');
 const taskEditDrawerTitle = document.getElementById('taskEditDrawerTitle');
+const taskDescriptionInput = document.getElementById('task-description-input');
 
 let currentEditTaskId = null;
 let currentEditMode = null; // 'restore' atau 'reschedule'
+let currentEditTaskData = null; // Simpan data task lengkap
 
 // Priority Dropdown Logic
 const taskPrioritySelector = document.getElementById('task-priority-selector');
@@ -967,50 +525,44 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Add Details Logic
-const taskAddDetailsBtn = document.getElementById('task-add-details-btn');
-const taskDescriptionInput = document.getElementById('task-description-input');
-
-// Ganti dengan kode ini untuk memastikan description field selalu tampil:
-if (taskDescriptionInput) {
-    taskDescriptionInput.style.display = 'block';
+// Helper function: Format date for input
+function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
+// Open Task Edit Drawer
 function openTaskEditDrawer(taskData, mode) {
     currentEditTaskId = taskData.id;
     currentEditMode = mode;
+    currentEditTaskData = taskData;
     
     // Isi form
     taskActivityInput.value = taskData.title || '';
     taskTimeInput.value = taskData.time || '';
     taskLocationInput.value = taskData.location || '';
+    taskDescriptionInput.value = ''; // Reset description
     
     // Set priority
     const taskPriority = taskData.priority || 'None';
     const taskSelectorSpan = taskPrioritySelector?.querySelector('span');
     if (taskSelectorSpan) {
-        taskSelectorSpan.textContent = taskPriority;
+        taskPrioritySelector.textContent = taskPriority;
     }
     
-    // Set tanggal - untuk restore/reschedule, minimal hari ini
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const taskDate = new Date(taskData.date + ' 00:00:00');
-    taskDate.setHours(0, 0, 0, 0);
+    // Set tanggal - Tampilkan tanggal yang tersimpan
+    const taskDateValue = taskData.date;
+    taskDateInput.value = taskDateValue;
     
-    if (taskDate < today) {
-        taskDateInput.value = formatDateForInput(today);
-    } else {
-        taskDateInput.value = taskData.date;
-    }
-    
-    // Set min date
-    taskDateInput.min = formatDateForInput(today);
+    // Hapus min date restriction
+    taskDateInput.removeAttribute('min');
     
     // Update title dan button
     if (mode === 'restore') {
         taskEditDrawerTitle.textContent = 'Restore Task';
-        taskSaveBtn.textContent = 'Restore & Reschedule';
+        taskSaveBtn.textContent = 'Restore';
     } else if (mode === 'reschedule') {
         taskEditDrawerTitle.textContent = 'Reschedule Task';
         taskSaveBtn.textContent = 'Reschedule';
@@ -1020,19 +572,14 @@ function openTaskEditDrawer(taskData, mode) {
     taskEditDrawer.classList.add('active');
 }
 
+// Close Task Edit Drawer
 function closeTaskEditDrawerFunc() {
     taskEditDrawer.classList.remove('active');
     currentEditTaskId = null;
     currentEditMode = null;
+    currentEditTaskData = null;
     taskEditForm.reset();
     taskDateInput.removeAttribute('min');
-}
-
-function formatDateForInput(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
 }
 
 // Event Listeners
@@ -1044,6 +591,7 @@ if (taskEditDrawerOverlay) {
     taskEditDrawerOverlay.addEventListener('click', closeTaskEditDrawerFunc);
 }
 
+// Form Submit Handler
 if (taskEditForm) {
     taskEditForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1055,69 +603,85 @@ if (taskEditForm) {
         const date = taskDateInput.value;
         const time = taskTimeInput.value.trim();
         const location = taskLocationInput.value.trim();
+        const priority = taskPrioritySelector?.querySelector('span').textContent || 'None';
         
         if (!activity || !date) {
             return alert('Activity and Date are required!');
         }
         
-        // Validasi tanggal tidak boleh lampau
+        // 1. Tentukan status berdasarkan perbandingan tanggal
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const selectedDate = new Date(date + ' 00:00:00');
         selectedDate.setHours(0, 0, 0, 0);
         
+        let finalStatus = 'pending';
+        
         if (selectedDate < today) {
-            return alert('Cannot restore/reschedule to past dates. Please select today or a future date.');
+            // Jika tanggal yang dipilih adalah masa lalu, paksa status menjadi "missed"
+            finalStatus = 'missed';
         }
-        
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-        
+
         try {
-            // Update task
-            await tasksRef.doc(currentEditTaskId).update({
+            // Siapkan data update
+            const updateData = {
                 title: activity,
                 date: date,
                 time: time,
-                location: location,
-                status: 'pending',
+                category: location,
+                priority: priority,
+                status: finalStatus,
                 done: false,
-                deletedAt: firebase.firestore.FieldValue.delete(),
-                missedAt: firebase.firestore.FieldValue.delete(),
-                completedAt: firebase.firestore.FieldValue.delete(),
-                dueDate: firebase.firestore.Timestamp.fromDate(new Date(date + ' 23:59:59'))
+                // Pertahankan endTimeMillis dan flowDurationMillis jika ada
+                endTimeMillis: currentEditTaskData.endTimeMillis || 0,
+                flowDurationMillis: currentEditTaskData.flowDurationMillis || 0,
+                dueDate: new Date(date + ' 23:59:59').toISOString()
+            };
+            
+            // Update task via API
+            await window.fetchData(`/tasks/${currentEditTaskId}`, {
+                method: 'PUT',
+                body: JSON.stringify(updateData)
             });
             
-            // Hapus dari localStorage
-            if (currentEditMode === 'restore') {
-                let deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
-                deletedTasks = deletedTasks.filter(t => t.id !== currentEditTaskId);
-                localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
-            } else if (currentEditMode === 'reschedule') {
-                let missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
-                missedTasks = missedTasks.filter(t => t.id !== currentEditTaskId);
-                localStorage.setItem('missedTasks', JSON.stringify(missedTasks));
-            }
-            
-            // Update counts
-            updateTaskCounts();
+            // Update counts dan refresh
+            await updateTaskCounts(true);
             
             // Close drawer
             closeTaskEditDrawerFunc();
             
-            // Show success message
-            alert('Task successfully restored!');
-            
-            // Reload drawer yang terbuka
+            // Close parent drawer (deleted/missed)
             if (currentEditMode === 'restore') {
-                renderDeletedTasksInDrawer();
-            } else if (currentEditMode === 'reschedule') {
-                renderMissedTasksInDrawer();
+                deletedDrawer.classList.remove('active');
+            } else if (currentEditMode === 'reschedule' || finalStatus === 'missed') {
+                missedDrawer.classList.remove('active');
             }
+            
+            // Show success message
+            let successMessage = finalStatus === 'missed' ? 'Task moved to Missed Tasks!' : 'Task successfully restored!';
+            alert(successMessage);
             
         } catch (err) {
             console.error('Error updating task:', err);
             alert('Failed to update task. Please try again.');
         }
     });
+}
+
+// Restore Deleted Task
+async function restoreDeletedTask(taskData) {
+    // Close deleted drawer
+    deletedDrawer.classList.remove('active');
+    
+    // Open task edit drawer
+    openTaskEditDrawer(taskData, 'restore');
+}
+
+// Reschedule Missed Task
+async function rescheduleMissedTask(taskData) {
+    // Close missed drawer
+    missedDrawer.classList.remove('active');
+    
+    // Open task edit drawer
+    openTaskEditDrawer(taskData, 'reschedule');
 }
