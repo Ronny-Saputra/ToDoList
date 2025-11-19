@@ -63,7 +63,8 @@ async function startCamera(facingMode) {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         video.srcObject = stream;
     } catch (err) {
-        alert("Gagal akses kamera: " + err.message);
+        // [FIXED] Mengganti alert dengan showCustomDialog
+        window.showCustomDialog("Failed to access camera: " + err.message);
         if (facingMode === 'environment') startCamera('user');
     }
 }
@@ -121,7 +122,8 @@ async function updateAvatarGlobally(photoData) {
         console.log("Avatar berhasil disimpan di server.");
     } catch (error) {
         console.error("Gagal upload avatar:", error);
-        alert("Gagal menyimpan foto profil ke server.");
+        // [FIXED] Mengganti alert dengan showCustomDialog
+        window.showCustomDialog("Failed to save profile photo to server.");
     }
 }
 
@@ -204,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             await checkBackCamera();
             if (switchCameraBtn) switchCameraBtn.style.display = hasBackCamera ? 'inline-flex' : 'none';
-            if (switchCameraBtn) switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Ganti ke Belakang';
+            if (switchCameraBtn) switchCameraBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Switch to Back';
             
             await startCamera('user');
             if (previewControls) previewControls.style.display = 'none';
@@ -246,8 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
             currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
             await startCamera(currentFacingMode);
             switchCameraBtn.innerHTML = currentFacingMode === 'user' 
-                ? '<i class="fas fa-sync-alt"></i> Ganti ke Belakang' 
-                : '<i class="fas fa-sync-alt"></i> Ganti ke Depan';
+                ? '<i class="fas fa-sync-alt"></i> Switch to Back' 
+                : '<i class="fas fa-sync-alt"></i> Switch to Front';
         });
     }
 
@@ -275,9 +277,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (photoData) {
                 updateAvatarGlobally(photoData);
                 closeCamera();
-                alert("Foto profil berhasil diperbarui!");
+                // [FIXED] Mengganti alert dengan showCustomDialog
+                window.showCustomDialog("Profile photo successfully updated!");
             } else {
-                alert("Tidak ada foto yang dipilih!");
+                // [FIXED] Mengganti alert dengan showCustomDialog
+                window.showCustomDialog("No photo selected!");
             }
         });
     }
@@ -343,10 +347,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 closeDrawer();
-                alert('Profil berhasil diperbarui dan disimpan ke server!');
+                // [FIXED] Mengganti alert dengan showCustomDialog
+                window.showCustomDialog("Profile successfully updated and saved!");
             } catch (error) {
-                console.error("Error menyimpan profil:", error);
-                alert('Gagal menyimpan profil. Cek koneksi internet.');
+                console.error("Error saving profile:", error);
+                // [FIXED] Mengganti alert dengan showCustomDialog
+                window.showCustomDialog("Failed to save profile. Check your internet connection.");
             }
         });
     }

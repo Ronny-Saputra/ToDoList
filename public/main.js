@@ -13,7 +13,43 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// SEMUA FUNGSI DI BAWAH INI TETAP ADA UNTUK DIGUNAKAN DI HALAMAN LAIN
+// --- UTILITY: SHOW CUSTOM DIALOG (Implemented here for global use) ---
+// Perubahan: Menghapus alert(message) fallback.
+window.showCustomDialog = function(message, buttons = [{ text: 'OK', action: () => {}, isPrimary: true }]) {
+    const dialogOverlay = document.getElementById('custom-dialog-overlay');
+    const dialogMessage = dialogOverlay ? dialogOverlay.querySelector('#custom-dialog-message') : null;
+    const dialogActions = dialogOverlay ? dialogOverlay.querySelector('#custom-dialog-actions') : null;
+    
+    if (!dialogOverlay || !dialogMessage || !dialogActions) {
+        console.error("Custom dialog elements not found. Cannot display dialog with message: " + message);
+        return;
+    }
+
+    dialogMessage.textContent = message;
+    dialogActions.innerHTML = '';
+    
+    buttons.forEach((btn) => {
+        const buttonElement = document.createElement('button');
+        buttonElement.textContent = btn.text;
+        buttonElement.classList.add('dialog-btn');
+        
+        if (btn.isPrimary) {
+            buttonElement.classList.add('primary');
+        }
+        
+        buttonElement.addEventListener('click', () => {
+            dialogOverlay.classList.remove('open');
+            if (btn.action) {
+                btn.action();
+            }
+        });
+        
+        dialogActions.appendChild(buttonElement);
+    });
+    
+    dialogOverlay.classList.add('open');
+}
+
 
 // ✅ PERBAIKAN: EVENT DELEGATION UNTUK TASK CARD (.task-card-item) DIKEMBALIKAN
 document.body.addEventListener("click", (e) => {
@@ -51,15 +87,15 @@ document.body.addEventListener("click", (e) => {
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider)
-    .then(result => alert(`Welcome, ${result.user.displayName}`))
-    .catch(error => alert(`Error: ${error.message}`));
+    .then(result => window.showCustomDialog(`Welcome, ${result.user.displayName}!`))
+    .catch(error => window.showCustomDialog(`Error: ${error.message}`));
 }
 
 function facebookLogin() {
   const provider = new firebase.auth.FacebookAuthProvider();
   firebase.auth().signInWithPopup(provider)
-    .then(result => alert(`Welcome, ${result.user.displayName}`))
-    .catch(error => alert(`Error: ${error.message}`));
+    .then(result => window.showCustomDialog(`Welcome, ${result.user.displayName}!`))
+    .catch(error => window.showCustomDialog(`Error: ${error.message}`));
 }
 
 function emailLogin(event) {
@@ -71,7 +107,7 @@ function emailLogin(event) {
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then(userCredential => {
       const user = userCredential.user;
-      alert(`Welcome, ${user.email}!`);
+      window.showCustomDialog(`Welcome, ${user.email}!`);
       // ✅ Redirect to home after login
       setTimeout(() => {
         window.location.href = "../pages/home.html";
@@ -79,7 +115,7 @@ function emailLogin(event) {
     })
     .catch(error => {
       console.error("Login error:", error);
-      alert(`Error: ${error.message}`);
+      window.showCustomDialog(`Error: ${error.message}`);
     });
 
   return false;
@@ -92,18 +128,18 @@ function emailSignup(event) {
   const confirmPassword = document.getElementById('confirmPassword').value;
 
   if (password !== confirmPassword) {
-    alert("Password dan konfirmasi tidak cocok.");
+    window.showCustomDialog("Password and confirmation do not match.");
     return false;
   }
 
   firebase.auth().createUserWithEmailAndPassword(email, password)
     .then(userCredential => {
-      alert(`Akun berhasil dibuat untuk ${userCredential.user.email}. Silakan login.`);
+      window.showCustomDialog(`Account successfully created for ${userCredential.user.email}. Please log in.`);
       window.location.href = "login.html";
     })
     .catch(error => {
       console.error("Error during sign-up:", error);
-      alert(`Error: ${error.message}`);
+      window.showCustomDialog(`Error: ${error.message}`);
     });
   return false;
 }

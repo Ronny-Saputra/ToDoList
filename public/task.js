@@ -332,6 +332,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
      * @param {function} reloadFn - Fungsi untuk me-reload tampilan (spesifik per halaman)
      */
     window.TaskApp.deleteTask = async function(taskId, user, reloadFn) {
+        // [FIXED] Menggunakan Custom Dialog untuk Konfirmasi Delete
         window.showCustomDialog(
             "Are you sure you want to delete this reminder?",
             [
@@ -352,6 +353,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
 
                             triggerProfileUpdate();
                             
+                            // [FIXED] Menggunakan Custom Dialog untuk Pesan Sukses
                             window.showCustomDialog(
                                 "Reminder deleted successfully!",
                                 [
@@ -453,6 +455,9 @@ window.TaskApp.openDrawerForEdit = function(task) {
         flowTimerBtn.addEventListener('click', (e) => {
             e.stopPropagation(); 
             
+            const user = firebase.auth().currentUser;
+            if (!user) return window.showCustomDialog('Please log in first.');
+            
             // Gunakan flowDurationMillis dari task object atau default 30 menit
             const durationInSeconds = Math.floor((flowDurationMillis || (30 * 60 * 1000)) / 1000); 
             
@@ -474,8 +479,9 @@ window.TaskApp.openDrawerForEdit = function(task) {
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation(); 
             const user = firebase.auth().currentUser;
-            if (!user) return alert('Please log in first.');
+            if (!user) return window.showCustomDialog('Please log in first.');
             
+            // Memanggil fungsi deleteTask yang menggunakan Custom Dialog
             window.TaskApp.deleteTask(taskId, user, reloadFn);
         });
 
@@ -485,7 +491,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             e.stopPropagation(); 
             
             const user = firebase.auth().currentUser;
-            if (!user) return alert('Please log in first.');
+            if (!user) return window.showCustomDialog('Please log in first.');
 
             try {
                 const currentDoneStatus = taskObject.done;
@@ -513,19 +519,23 @@ window.TaskApp.openDrawerForEdit = function(task) {
                 }
                 triggerProfileUpdate();
 
-                alert(`Task marked as ${newDoneStatus ? 'done' : 'undone'}!`);
-                
-                // Reload tampilan
-                if (typeof reloadFn === 'function') {
-                    await reloadFn();
-                } else {
-                    await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
-                    displayTasksForActiveDate(activeDate);
-                }
+                // [FIXED] Mengganti alert dengan showCustomDialog
+                window.showCustomDialog(
+                    `Task marked as ${newDoneStatus ? 'done' : 'undone'}!`,
+                    [{ text: 'OK', action: async () => {
+                         // Reload tampilan
+                        if (typeof reloadFn === 'function') {
+                            await reloadFn();
+                        } else {
+                            await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
+                            displayTasksForActiveDate(activeDate);
+                        }
+                    }, isPrimary: true }]
+                );
 
             } catch (err) {
                 console.error("Error updating task status:", err);
-                alert("Gagal mengupdate status tugas.");
+                window.showCustomDialog("Failed to update task status.");
             }
         });
         
@@ -815,6 +825,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
     }
 
     // --- Time Picker & Custom Dialog Logic (Global) ---
+    // NOTE: Fungsi ini sekarang hanya sebagai fallback/redundansi karena main.js menyediakan definisi global.
     window.showCustomDialog = function(message, buttons) {
         const dialogOverlay = window.TaskApp.dialogOverlay;
         const dialogMessage = window.TaskApp.dialogMessage;
@@ -822,7 +833,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
         
         if (!dialogOverlay || !dialogMessage || !dialogActions) {
             console.error("Custom dialog elements not found in the DOM.");
-            alert(message); 
+            // Menghapus alert() fallback di sini
             return;
         }
 

@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
 
-    <!-- Font & Icon Library -->
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- External CSS -->
     <link rel="stylesheet" href="../styles/profile.css">
     <link rel="stylesheet" href="../styles/navbar.css">
     <style>
@@ -271,13 +269,10 @@
 </head>
 <body>
 
-    <!-- ================== CONTAINER UTAMA ================== -->
     <div class="container">
         
-        <!-- ================== HEADER PROFIL ================== -->
         <header class="profile-header">
 
-            <!-- ===== KIRI: AVATAR + DETAIL ===== -->
             <div class="profile-left">
                 <div class="profile-avatar">
                     <img src="../assets/avatar.png" alt="User Avatar" id="mainAvatar">
@@ -298,17 +293,14 @@
                 </div>
             </div>
 
-            <!-- ===== KANAN: SETTINGS ===== -->
             <a href="settings.html" class="settings-btn">
                 <img src="../assets/settings.svg" alt="Settings" class="settings-icon">
             </a>
         </header>
         
-        <!-- ================== KONTEN UTAMA ================== -->
         <main class="main-content">
             <div class="content-wrapper">
 
-                <!-- ===== STATISTIK ===== -->
                 <div class="stats-section">
                     <div class="tabs">
                         <button class="tab-btn active">Daily</button>
@@ -358,8 +350,7 @@
                     </section>
                 </div>
 
-                 <!-- ===== RINGKASAN TUGAS ===== -->
-                <aside class="task-summary">
+                 <aside class="task-summary">
                     <div class="summary-box completed">
                         <span>Completed Tasks (0)</span>
                         <div class="icon-wrapper">
@@ -384,7 +375,6 @@
         </main>
     </div>
 
-    <!-- ================== MODAL PILIHAN KAMERA / UPLOAD ================== -->
     <div id="cameraChoiceModal" class="camera-modal">
         <div class="modal-content" style="max-width: 350px; padding: 24px;">
             <div class="modal-header" style="background: none; padding: 0 0 16px; color: #1e2a78; justify-content: center;">
@@ -404,7 +394,6 @@
         </div>
     </div>
 
-    <!-- ================== MODAL KAMERA ================== -->
     <div id="cameraModal" class="camera-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -433,11 +422,9 @@
         </div>
     </div>
 
-    <!-- DRAWER: EDIT PROFILE (DARI KANAN) -->
     <div class="edit-profile-drawer" id="editProfileDrawer">
         <div class="drawer-overlay" id="drawerOverlay"></div>
         <div class="drawer-content">
-            <!-- HEADER BIRU -->
             <div class="drawer-header">
                 <button class="drawer-close" id="closeDrawer">
                     <i class="fas fa-chevron-left"></i>
@@ -445,7 +432,6 @@
                 <h2>Edit Profile</h2>
             </div>
 
-            <!-- AVATAR + EDIT -->
             <div class="profile-avatar">
                 <div class="avatar-circle">
                     <img src="../assets/avatar2.svg" alt="Avatar" class="avatar-img" id="drawerAvatar">
@@ -453,7 +439,6 @@
                 <button class="edit-avatar-btn" id="editAvatarBtn">Edit</button>
             </div>
 
-            <!-- FORM -->
             <form class="profile-form">
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -465,7 +450,6 @@
                     <input type="text" id="username" placeholder="Username" class="form-input">
                 </div>
 
-                <!-- GENDER DENGAN DROPDOWN -->
                 <div class="form-group">
                     <label>Gender</label>
                     <div class="gender-wrapper">
@@ -489,7 +473,6 @@
         </div>
     </div>
 
-<!-- ================== DRAWER: COMPLETED TASKS (DARI KANAN) ================== -->
 <div class="completed-drawer" id="completedDrawer">
     <div class="drawer-overlay" id="completedDrawerOverlay"></div>
     <div class="drawer-content">
@@ -500,12 +483,10 @@
             <h2>Completed Tasks</h2>
         </div>
         <div id="completedDrawerContent" class="drawer-body">
-            <!-- Konten akan di-render oleh JS -->
-        </div>
+            </div>
     </div>
 </div>
 
-<!-- ================== DRAWER: DELETED TASKS (DARI KANAN) ================== -->
 <div class="deleted-drawer" id="deletedDrawer">
     <div class="drawer-overlay" id="deletedDrawerOverlay"></div>
     <div class="drawer-content">
@@ -516,12 +497,10 @@
             <h2>Deleted Tasks</h2>
         </div>
         <div id="deletedDrawerContent" class="drawer-body">
-            <!-- Konten akan di-render oleh JS -->
-        </div>
+            </div>
     </div>
 </div>
 
-<!-- ================== DRAWER: MISSED TASKS (DARI KANAN) ================== -->
 <div class="missed-drawer" id="missedDrawer">
     <div class="drawer-overlay" id="missedDrawerOverlay"></div>
     <div class="drawer-content">
@@ -532,11 +511,9 @@
             <h2>Missed Tasks</h2>
         </div>
         <div id="missedDrawerContent" class="drawer-body">
-            <!-- Konten akan di-render oleh JS -->
-        </div>
+            </div>
     </div>
 </div>
-<!-- ================== DRAWER: TASK EDIT (RESTORE/RESCHEDULE) ================== -->
 <div class="task-edit-drawer" id="taskEditDrawer">
     <div class="drawer-overlay" id="taskEditDrawerOverlay"></div>
     <div class="drawer-content">
@@ -588,8 +565,13 @@
     </div>
 </div>
 
-<!-- ================== FIREBASE SCRIPTS (TAMBAHKAN INI) ================== -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<div id="custom-dialog-overlay" class="custom-dialog-overlay">
+    <div class="custom-dialog">
+        <div id="custom-dialog-message" class="custom-dialog-message"></div>
+        <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
+    </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
@@ -617,7 +599,6 @@
         });
     </script>
 
-    <!-- ================== LOAD SCRIPTS (URUTAN PENTING) ================== -->
     <script src="../navbar.js"></script>
     <script src="../statistic.js"></script>
     <script src="../edit_profile.js"></script>
