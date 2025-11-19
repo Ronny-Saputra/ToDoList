@@ -161,16 +161,16 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadTasks(user) {
         if (!user) return;
         
-        const db = firebase.firestore();
-        const tasksRef = db.collection("users").doc(user.uid).collection("tasks");
-
         try {
-            // [MODIFIKASI: PASTIKAN HANYA MEMUAT TASK PENDING UNTUK FILTER ALL]
-            const snapshot = await tasksRef.where("status", "==", "pending").get();
-            allTasksData = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
+            // ✅ PERBAIKAN: Panggil Backend API (Ganti Firestore)
+            const tasks = await window.fetchData('/tasks?status=pending');
+            
+            // Pastikan respons berupa array dan map dengan benar
+            allTasksData = Array.isArray(tasks) ? tasks.map(task => ({
+                ...task,
+                // ✅ PENTING: Pastikan task.date sesuai dengan task.dueDate dari Firebase
+                date: window.TaskApp.formatIsoToYyyyMmDd(task.dueDate), // Menggunakan dueDate dari server
+            })) : [];
             
             console.log(`[Search] Loaded ${allTasksData.length} pending tasks.`); // <-- LOG: Jumlah total task dimuat
             

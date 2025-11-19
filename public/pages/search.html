@@ -158,7 +158,10 @@
             appId: "1:795548747542:web:deb1efc52ed1aa247af237",
             measurementId: "G-67K7H7XXWW"
         };
-        firebase.initializeApp(firebaseConfig);
+        // Inisialisasi Firebase jika belum diinisialisasi
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
     </script>
 
     <script src="../main.js"></script>

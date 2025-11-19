@@ -152,6 +152,18 @@ function saveDeletedTask(taskData) {
     }
     window.TaskApp.formatDate = formatDate;
     
+    // --- UTILITY: Format ISO String ke string YYYY-MM-DD (New) ---
+    function formatIsoToYyyyMmDd(isoString) {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    window.TaskApp.formatIsoToYyyyMmDd = formatIsoToYyyyMmDd;
+    
     // --- UTILITY: Format Durasi Milis ke String (Kotlin parity) ---
     window.TaskApp.formatDurationToString = function(millis) {
         const MILLIS_IN_HOUR = 3600000;
@@ -547,7 +559,11 @@ window.TaskApp.openDrawerForEdit = function(task) {
             const tasks = await window.fetchData('/tasks?status=pending');
             
             // Pastikan respons berupa array
-            window.TaskApp.tasksData = Array.isArray(tasks) ? tasks : [];
+            window.TaskApp.tasksData = Array.isArray(tasks) ? tasks.map(task => ({
+                ...task,
+                // [FIX PENTING]: Memastikan task.date sesuai dengan task.dueDate dari Firebase
+                date: formatIsoToYyyyMmDd(task.dueDate), // Menggunakan dueDate dari server
+            })) : [];
 
             // ✨ CEK DAN PINDAHKAN MISSED TASKS
             // (Kita tetap panggil fungsi ini untuk update status jika ada yang terlewat)
@@ -1174,6 +1190,9 @@ const taskPageFormSubmitHandler = async function(event, user) {
             category: location,       
             priority: priority,        
             dueDate: finalDueDateObj.toISOString(), 
+            
+            // [FIX PENTING]: Kirim field date ke backend agar backend punya string YYYY-MM-DD yang benar
+            date: dateToUse, // Menambahkan field date ke payload
             
             time: finalTimeStr,        
             endTimeMillis: Math.floor(Number(finalEndTimeMillis)),      
