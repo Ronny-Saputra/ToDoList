@@ -156,12 +156,85 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     height: 90px; 
-    position: relative;
+    position: relative; /* DIPERLUKAN UNTUK TOMBOL AKSI */
 }
 
 .task-card-item:hover {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.10);
 }
+
+/* === STYLES UNTUK TOMBOL AKSI (DARI task.css) === */
+.task-card-item.active {
+    min-height: 140px; 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    height: auto; 
+    padding-bottom: 70px; /* Tambah padding bawah untuk memberi ruang tombol */
+}
+
+.task-actions {
+    display: none; /* Default: Sembunyikan */
+    position: absolute;
+    bottom: 10px;
+    left: 15px; 
+    right: 15px; 
+    height: 50px;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.task-card-item.active .task-actions {
+    display: flex;
+}
+
+.action-btn {
+    flex-grow: 1;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.action-btn i {
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+/* Specific button styling */
+.flow-timer-btn {
+    background-color: #f7f7f7;
+    color: #ff9800;
+    border: 1px solid #ff9800;
+}
+.flow-timer-btn:disabled {
+    background-color: #f7f7f7;
+    color: #aaaaaa;
+    border: 1px solid #aaaaaa;
+    cursor: not-allowed;
+}
+
+.edit-btn {
+    background-color: #d6eaff; 
+    color: #1e3a8a;
+}
+
+.delete-btn {
+    background-color: #ffcccc; 
+    color: #d32f2f;
+}
+
+.flow-timer-btn:hover:not(:disabled) { background-color: #fff2e6; }
+.edit-btn:hover { background-color: #bad7ff; }
+.delete-btn:hover { background-color: #ffb3b3; }
+
 
 .task-checkbox {
     width: 20px;

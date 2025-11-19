@@ -1,4 +1,4 @@
-// File: public/task.js (Kode Lengkap dengan Logic Flow Timer Text Update dan New Task Design)
+// File: public/task.js (Full Code)
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -95,6 +95,21 @@ function saveDeletedTask(taskData) {
     window.TaskApp.newReminderBtn = document.querySelector('.new-reminder-btn');
     window.TaskApp.drawerHeaderTitle = document.querySelector('.drawer-header h2');
     window.TaskApp.reminderForm = document.getElementById('reminder-form');
+
+    // === START: LOGIC BARU UNTUK TASK LIST DI DRAWER (Wajib untuk sinkronisasi) ===
+    const taskListForDrawer = document.createElement('div'); 
+    taskListForDrawer.id = 'taskListForDrawer';
+    taskListForDrawer.classList.add('scrollable-content'); 
+    taskListForDrawer.style.padding = '0 24px';
+    taskListForDrawer.style.flexGrow = '1';
+    taskListForDrawer.style.display = 'none'; 
+    
+    const drawerContent = document.querySelector('.drawer-content');
+    if (drawerContent && window.TaskApp.reminderForm) {
+        // Sisipkan taskListForDrawer tepat sebelum form
+        drawerContent.insertBefore(taskListForDrawer, window.TaskApp.reminderForm); 
+    }
+    // === END: LOGIC BARU UNTUK TASK LIST DI DRAWER ===
     
     // INISIALISASI SEMUA INPUT DRAWER KE GLOBAL
     // ✅ Memastikan semua input diakses dengan aman
@@ -126,6 +141,7 @@ function saveDeletedTask(taskData) {
     window.TaskApp.editMode = null; // Bisa: null, 'edit', 'restore', 'reschedule'
     let activeDate = new Date();
     activeDate.setHours(0, 0, 0, 0); 
+    window.TaskApp.activeDate = activeDate; // Expose to global scope for the drawer
 
     // --- UTILITY: Format Date ke string YYYY-MM-DD (Global) ---
     function formatDate(date) {
@@ -232,31 +248,40 @@ window.TaskApp.openDrawerForEdit = function(task) {
     
     if (window.TaskApp.locationInput) window.TaskApp.locationInput.value = task.location || '';
     
-    // LOGIC TANGGAL: Untuk restore/reschedule, set ke hari ini atau lebih
-    if (mode === 'restore' || mode === 'reschedule') {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const taskDate = new Date(task.date + ' 00:00:00');
-        taskDate.setHours(0, 0, 0, 0);
+    // ----------------------------------------------------
+    // LOGIC TANGGAL: SAMA PERSIS DENGAN TASK DAN CALENDAR
+    // ----------------------------------------------------
+    const dateInput = window.TaskApp.dateInputEdit;
+    
+    if (dateInput) {
+        const taskDateValue = task.date || ''; // Dapatkan YYYY-MM-DD string
         
-        // Jika tanggal task sudah lewat, set ke hari ini
-        if (taskDate < today) {
-            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = formatDate(today);
+        if (mode === 'restore' || mode === 'reschedule') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const taskDate = new Date(taskDateValue + ' 00:00:00');
+            taskDate.setHours(0, 0, 0, 0);
+            
+            // Jika tanggal task sudah lewat, set ke hari ini
+            if (taskDate < today) {
+                dateInput.value = formatDate(today);
+            } else {
+                dateInput.value = taskDateValue; // Gunakan tanggal yang tersimpan
+            }
+            
+            // Set min date ke hari ini agar tidak bisa pilih tanggal lampau
+            dateInput.min = formatDate(today);
+            
         } else {
-            if (window.TaskApp.dateInputEdit) window.TaskApp.dateInputEdit.value = task.date;
-        }
-        
-        // Set min date ke hari ini agar tidak bisa pilih tanggal lampau
-        if (window.TaskApp.dateInputEdit) {
-            window.TaskApp.dateInputEdit.min = formatDate(today);
-        }
-    } else {
-        // Mode edit biasa
-        if (window.TaskApp.dateInputEdit) {
-            window.TaskApp.dateInputEdit.value = task.date;
-            window.TaskApp.dateInputEdit.removeAttribute('min'); // Hapus batasan
+            // Mode edit biasa (Task, Calendar, Search: Edit)
+            // ✅ Mengisi input dengan YYYY-MM-DD yang tersimpan
+            dateInput.value = taskDateValue; 
+            dateInput.removeAttribute('min'); 
         }
     }
+    // ----------------------------------------------------
+
     
     // Set Flow Timer state
     if (task.flowDurationMillis && task.flowDurationMillis > 0) {
@@ -536,6 +561,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
         // Reset active date ke hari ini saat load awal
         activeDate = new Date();
         activeDate.setHours(0, 0, 0, 0);
+        window.TaskApp.activeDate = activeDate;
         
         // Render Kalender
         if (calendarContainer) {
@@ -601,7 +627,9 @@ window.TaskApp.openDrawerForEdit = function(task) {
             // Perhatikan: Bulan di Date() dimulai dari 0 (Januari = 0)
             const newActiveDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
             newActiveDate.setHours(0, 0, 0, 0);
+            
             activeDate = newActiveDate;
+            window.TaskApp.activeDate = newActiveDate; // Set global activeDate
 
             updateMonthYearDisplay(monthYearDisplay, activeDate);
             
@@ -619,6 +647,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             const newActiveDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
             newActiveDate.setHours(0, 0, 0, 0);
             activeDate = newActiveDate;
+            window.TaskApp.activeDate = newActiveDate; // Set global activeDate
             displayTasksForActiveDate(activeDate);
         }
     }
@@ -684,7 +713,9 @@ window.TaskApp.openDrawerForEdit = function(task) {
                 selectedDate.setDate(startDate.getDate() + index); 
                 selectedDate.setHours(0, 0, 0, 0); 
                 
+                // ✅ UPDATE TANGGAL AKTIF GLOBAL DI SINI
                 activeDate = selectedDate; 
+                window.TaskApp.activeDate = selectedDate;
                 
                 updateMonthYearDisplay(monthYearDisplay, selectedDate);
                 
@@ -726,7 +757,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             todayCard.classList.add('active');
 
             // 3. Gulir ke kartu hari ini (berpusat)
-            const scrollPos = todayCard.offsetLeft - (container.offsetWidth / 2) + (container.offsetWidth / 2);
+            const scrollPos = todayCard.offsetLeft - (container.offsetWidth / 2) + (todayCard.offsetWidth / 2);
             container.scrollTo({
                 left: scrollPos,
                 behavior: 'smooth'
@@ -856,7 +887,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             if (!start || !end) return;
 
             // Dapatkan activeDate sebagai base date untuk perhitungan
-            let baseDate = new Date(activeDate.getTime());
+            let baseDate = new Date(window.TaskApp.activeDate.getTime());
             
             // 1. Hitung Milis dari Waktu Mulai pada Base Date
             const [startHour, startMinute] = start.split(':').map(Number);
@@ -874,13 +905,13 @@ window.TaskApp.openDrawerForEdit = function(task) {
                 endMillis += 24 * 60 * 60 * 1000;
                 
                 // Update activeDate (Global State) untuk mencerminkan tanggal roll-over
-                let newDate = new Date(activeDate.getTime());
+                let newDate = new Date(window.TaskApp.activeDate.getTime());
                 newDate.setDate(newDate.getDate() + 1);
-                activeDate = newDate;
+                window.TaskApp.activeDate = newDate;
                 
                 // Perbarui tampilan Date Input di Drawer (agar user melihat perubahan tanggal)
                 if (window.TaskApp.dateInputEdit) {
-                    window.TaskApp.dateInputEdit.value = formatDate(activeDate);
+                    window.TaskApp.dateInputEdit.value = formatDate(window.TaskApp.activeDate);
                 }
             }
             
@@ -1225,7 +1256,16 @@ const taskPageFormSubmitHandler = async function(event, user) {
                         window.TaskApp.closeDrawer();
                         
                         // REFRESH LOGIC (Penting agar UI Sinkron)
-                        if (window.location.pathname.includes("task.html")) {
+                        if (window.location.pathname.includes("calendar.html") && window.CalendarApp?.reloadCalendarView) {
+                            // ✅ NEW LOGIC: Call immediate refresh for calendar view
+                            await window.CalendarApp.reloadCalendarView();
+                            
+                            // Find and activate the card for the current date to show the list view
+                            if (window.findAndActivateDateCard) {
+                                window.findAndActivateDateCard(dateToUse);
+                            }
+                            
+                        } else if (window.location.pathname.includes("task.html")) {
                              await loadTasksAndRenderCalendar(user, new Date('2025-01-01'), 365);
                              const dateParts = dateToUse.split('-');
                              const newActiveDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
@@ -1233,13 +1273,15 @@ const taskPageFormSubmitHandler = async function(event, user) {
                         } else if (window.location.pathname.includes("profile.html")) {
                              // Jika di halaman profile, refresh drawer yang sedang terbuka
                              if (mode === 'restore') {
-                                 // Fungsi ini harus sudah menggunakan API (lihat diskusi sebelumnya)
                                  if(typeof renderDeletedTasksInDrawer === 'function') await renderDeletedTasksInDrawer();
                              } else if (mode === 'reschedule') {
                                  if(typeof renderMissedTasksInDrawer === 'function') await renderMissedTasksInDrawer();
                              }
                         } else if (window.location.pathname.includes("search.html")) {
                              if (window.SearchApp?.reloadTasks) await window.SearchApp.reloadTasks(user);
+                        } else if (window.location.pathname.includes("calendar.html")) {
+                             // Fallback/Legacy redirect (should not be hit if new logic works)
+                             window.location.href = `calendar.html#date=${dateToUse}&view=list`;
                         }
                     }, 
                     isPrimary: true 
@@ -1258,15 +1300,17 @@ const taskPageFormSubmitHandler = async function(event, user) {
     }
 };
 
-    // --- Tombol New Reminder (Reset mode ke Add) ---
-const newReminderBtn = window.TaskApp.newReminderBtn;
-if (newReminderBtn) {
-    newReminderBtn.addEventListener('click', () => {
+    // --- FUNGSI BARU: MEMULAI ALUR NEW REMINDER (Global) ---
+    window.TaskApp.startNewReminderFlow = function(dateToPreselect) {
+        // Gunakan dateToPreselect, yang kini sudah dijamin sama dengan kartu yang diklik
+        const activeDateForNew = dateToPreselect instanceof Date && !isNaN(dateToPreselect) ? dateToPreselect : new Date();
+        activeDateForNew.setHours(0, 0, 0, 0);
+    
         window.TaskApp.editingTaskId = null;
-        window.TaskApp.editMode = null; // TAMBAHKAN INI
-        
+        window.TaskApp.editMode = null; 
+    
+        // Reset UI elements
         if (window.TaskApp.drawerHeaderTitle) window.TaskApp.drawerHeaderTitle.innerHTML = 'New Reminder';
-        
         if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = 'Save';
         if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
         
@@ -1275,8 +1319,9 @@ if (newReminderBtn) {
         if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.style.display = 'flex';
         
         if (window.TaskApp.dateInputEdit) {
-            window.TaskApp.dateInputEdit.value = formatDate(activeDate);
-            window.TaskApp.dateInputEdit.removeAttribute('min'); // TAMBAHKAN INI
+            // ✅ MENGISI INPUT TANGGAL DENGAN TANGGAL AKTIF
+            window.TaskApp.dateInputEdit.value = window.TaskApp.formatDate(activeDateForNew);
+            window.TaskApp.dateInputEdit.removeAttribute('min'); 
         }
         
         // Reset Flow Timer State
@@ -1290,9 +1335,21 @@ if (newReminderBtn) {
             updatePriorityDropdownSelection('None');
         }
         
+        // Set global activeDate for submission handler
+        window.TaskApp.activeDate = activeDateForNew;
+    
         window.TaskApp.openDrawer();
-    });
-}
+    }
+
+
+    // --- Tombol New Reminder ---
+    const newReminderBtn = window.TaskApp.newReminderBtn;
+    if (newReminderBtn) {
+        newReminderBtn.addEventListener('click', () => {
+            // ✅ MENGGUNAKAN activeDate YANG SUDAH DIUPDATE OLEH KLIK KALENDER
+            window.TaskApp.startNewReminderFlow(activeDate); 
+        });
+    }
 
     // Listener untuk tombol panah kembali
     const closeDrawerBtn = window.TaskApp.closeDrawerBtn;
@@ -1323,7 +1380,7 @@ if (newReminderBtn) {
                 .then(() => {
                     const hash = window.location.hash;
                     if (hash.startsWith('#date=')) {
-                        const dateString = hash.substring(6); 
+                        const dateString = hash.substring(6).split('&')[0]; // Ambil hanya date
                         if (dateString) {
                             window.findAndActivateDateCard(dateString);
                         }

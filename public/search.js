@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             tasksToRender.forEach(task => {
                 // Definisikan fungsi reload spesifik untuk halaman search (memuat ulang data dari Firebase)
+                // Ini akan memicu refresh tampilan search setelah aksi (delete/complete)
                 const reloadFn = () => loadTasks(firebase.auth().currentUser);
                 
                 // Gunakan fungsi global createTaskCard dari task.js
@@ -65,22 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Hapus kelas .active secara eksplisit pada saat rendering 
                 card.classList.remove('active'); 
                 
-                // [MODIFIKASI: BUKA DRAWER EDIT SAAT KLIK KARTU]
-                // HAPUS BLOCK INI agar logika .active di main.js yang berjalan, 
-                // dan tombol Edit/Flow Timer/Delete di task.js dapat diakses.
-                /*
-                card.addEventListener('click', (e) => {
-                    const isActionButton = e.target.closest(".action-btn");
-                    const isCheckbox = e.target.closest(".task-checkbox");
-                    
-                    // Jika yang diklik bukan tombol aksi (Edit, Delete, Flow Timer) atau checkbox,
-                    // maka langsung buka drawer edit.
-                    if (!isActionButton && !isCheckbox) {
-                        e.stopPropagation(); // Hentikan propagasi ke listener body di main.js
-                        window.TaskApp.openDrawerForEdit(task);
-                    }
-                });
-                */
+                // TIDAK PERLU LISTENER LOKAL. Event delegation di main.js akan menangani
+                // klik pada kartu dan tombol aksi di dalamnya ditangani oleh task.js.
                 
                 taskListContainer.appendChild(card);
             });

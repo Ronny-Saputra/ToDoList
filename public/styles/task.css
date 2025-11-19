@@ -353,7 +353,7 @@ body {
 }
 
 .action-btn:hover {
-    background-color: #bad7ff;
+    background: #bad7ff;
 }
 /* ==================================================== */
 
@@ -441,6 +441,8 @@ body {
 }
 
 .drawer-content {
+    /* Menerapkan font Lexend ke seluruh konten drawer */
+    font-family: 'Lexend', sans-serif;
     width: 100%;
     /* Atur max-width untuk tampilan desktop */
     max-width: 450px; 
@@ -462,13 +464,14 @@ body {
     transform: translateX(0);
 }
 
+/* ✅ HEADER GRADIENT DAN PADDING YANG KONSISTEN */
 .drawer-header {
     background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 20px 50px;
+    padding: 20px 24px;
     display: flex;
     align-items: center;
-    gap: 16px; /* Menambahkan jarak antar ikon dan judul */
-    color: #14142A; /* Warna default untuk elemen di header */
+    gap: 16px; 
+    color: #14142A; 
     flex-shrink: 0;
     border-radius: 0 0 25px 25px; /* Hanya sudut bawah yang melengkung */
     box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
@@ -476,20 +479,20 @@ body {
 }
 
 .drawer-header h2 {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
-    color: #14142A; /* Menyesuaikan warna judul */
-    margin: 0; /* Menghapus margin-left lama karena ada gap */
+    color: #14142A; 
+    margin: 0; 
 }
 
 .close-drawer-btn {
-    font-size: 20px;
-    color: #333;
+    font-size: 24px;
+    color: #14142A;
     cursor: pointer;
 }
 
 .reminder-form {
-    padding: 20px 24px 30px 24px; 
+    padding: 10px 24px 30px 24px; 
     display: flex;
     flex-direction: column;
     gap: 20px; 
@@ -520,6 +523,8 @@ body {
 }
 
 .input-field {
+    /* Memastikan input field juga menggunakan Lexend, jika browser override */
+    font-family: 'Lexend', sans-serif;
     width: 100%;
     padding: 15px 12px; 
     border: 1px solid #ddd;
@@ -606,6 +611,7 @@ body {
 
 /* Tombol Save (Sekarang ikut scroll) */
 .save-btn {
+    font-family: 'Lexend', sans-serif;
     background-color: #1e2a78;
     color: #fff;
     border: none;
@@ -802,6 +808,7 @@ body {
 }
 
 .custom-dialog {
+    font-family: 'Lexend', sans-serif;
     background-color: #ffffff; 
     border-radius: 12px;
     width: 90%;
@@ -824,6 +831,7 @@ body {
 }
 
 .dialog-btn {
+    font-family: 'Lexend', sans-serif;
     flex-grow: 1;
     padding: 15px 10px;
     border: none;
@@ -877,6 +885,7 @@ body {
 }
 
 .time-picker-dialog {
+    font-family: 'Lexend', sans-serif;
     background-color: #ffffff; 
     border-radius: 12px;
     padding: 20px;
@@ -900,6 +909,7 @@ body {
 }
 
 .time-inputs input[type="time"] {
+    font-family: 'Lexend', sans-serif;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -920,6 +930,7 @@ body {
 }
 
 .time-picker-btn {
+    font-family: 'Lexend', sans-serif;
     padding: 10px 15px;
     border-radius: 8px;
     font-size: 15px;
@@ -951,6 +962,7 @@ body {
 }
 
 .time-inputs.flow-duration-inputs input[type="number"] {
+    font-family: 'Lexend', sans-serif;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -1018,6 +1030,7 @@ body {
 }
 
 .priority-option {
+    font-family: 'Lexend', sans-serif;
     padding: 12px 16px;
     font-size: 15px;
     color: #333;
