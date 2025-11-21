@@ -303,49 +303,31 @@
 
                 <div class="stats-section">
                     <div class="tabs">
-                        <button class="tab-btn active">Daily</button>
-                        <button class="tab-btn">Weekly</button>
-                        <button class="tab-btn">Monthly</button>
+                        <button class="tab-btn active" id="dailyTab">Daily</button>
+                        <button class="tab-btn" id="weeklyTab">Weekly</button>
+                        <button class="tab-btn" id="monthlyTab">Monthly</button>
                     </div>
 
                     <section class="stats-card">
                         <div class="card-header">
-                            <h3>Daily Average Productivity</h3>
+                            <h3 id="cardTitle">Daily Productivity Statistics</h3>
                             <div class="productivity-score">
                                 <i class="fas fa-fire"></i>
-                                <span>5</span>
+                                <span class="score-value" id="productivityScore">0</span>
                             </div>
                         </div>
 
-                        <div class="chart-container">
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 30%;"></div>
-                                <span class="label">S</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 50%;"></div>
-                                <span class="label">M</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar highlight" style="height: 70%;"></div>
-                                <span class="label">T</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 20%;"></div>
-                                <span class="label">W</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 40%;"></div>
-                                <span class="label">T</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 15%;"></div>
-                                <span class="label">F</span>
-                            </div>
-                            <div class="bar-wrapper">
-                                <div class="bar" style="height: 10%;"></div>
-                                <span class="label">S</span>
-                            </div>
+                        <div class="chart-container" id="chartContainer">
+                        </div>
+                        
+                        <div class="chart-labels" id="chartLabels">
+                            <span class="label">M</span>
+                            <span class="label">T</span>
+                            <span class="label">W</span>
+                            <span class="label">T</span>
+                            <span class="label">F</span>
+                            <span class="label">S</span>
+                            <span class="label">S</span>
                         </div>
                     </section>
                 </div>
@@ -600,9 +582,9 @@
     </script>
 
     <script src="../navbar.js"></script>
+    <script src="../main.js"></script>
     <script src="../statistic.js"></script>
     <script src="../edit_profile.js"></script>
     <script src="../profile.js"></script>
-    <script src="../main.js"></script>
 </body>
 </html>

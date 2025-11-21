@@ -335,7 +335,7 @@ body,
 }
 
 /* ---------------------------------------------------- */
-/* GRAFIK BATANG */
+/* GRAFIK BATANG BARU (DARI statistic.js) */
 /* ---------------------------------------------------- */
 .chart-container {
     display: flex;
@@ -343,43 +343,49 @@ body,
     align-items: flex-end;
     height: 200px;
     flex-grow: 1;
+    /* Tambahkan ruang atas agar bar tidak menyentuh header */
+    padding-top: 10px; 
 }
 
-.chart-container.chart-weekly {
-    gap: 20px;
-    justify-content: center;
+/* Container untuk label hari di bawah chart */
+.chart-labels {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px; /* Sedikit padding agar label tidak menempel di sudut */
+    margin-top: 5px;
 }
 
-.chart-container.chart-monthly {
-    gap: 10px;
-    justify-content: center;
-}
 
+/* Gaya Wrapper Bar */
 .bar-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    justify-content: flex-end; /* Memastikan bar menempel di bawah */
     height: 100%;
-    justify-content: flex-end;
-    width: 10%;
+    width: 12%; /* Memberi lebar tetap untuk 7 bar */
 }
 
+/* Gaya Bar */
 .bar {
-    width: 100%;
-    max-width: 60px;
-    background-color: #ffffff;
-    border-radius: 12px;
+    width: 90%;
+    max-width: 40px;
+    background-color: rgba(255, 255, 255, 0.5); /* Warna dasar putih/transparan */
+    border-radius: 8px 8px 0 0; /* Hanya atas yang melengkung */
     transition: height 0.3s ease;
+    cursor: pointer;
 }
 
+/* Gaya Bar Tertinggi (Highlight) */
 .bar.highlight {
-    background-color: #f5a623;
+    background: linear-gradient(to top, #f57c00, #ffc234); /* Gradien Orange/Kuning */
+    box-shadow: 0 4px 10px rgba(245, 124, 0, 0.4);
 }
 
 .label {
     font-size: 12px;
     color: #14142A;
+    margin-top: 4px; /* Jarak antara bar dan label */
 }
 
 /* ---------------------------------------------------- */
@@ -2240,4 +2246,3 @@ body,
         padding: 16px;
     }
 }
-

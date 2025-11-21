@@ -115,6 +115,10 @@ async function updateAvatarGlobally(photoData) {
     if (drawerAvatar) drawerAvatar.src = photoData;
 
     try {
+        // Tambahkan cek user
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+
         await window.fetchData('/profile/image', {
             method: 'POST',
             body: JSON.stringify({ image: photoData })
@@ -140,6 +144,10 @@ function updateInputColor(input) {
 }
 
 async function loadProfileData() {
+    // Tambahkan cek user di sini
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
     try {
         const data = await window.fetchData('/profile');
         
@@ -147,10 +155,26 @@ async function loadProfileData() {
 
         if (profileUsername) profileUsername.textContent = data.username || 'Username';
         
+        // --- LOGIKA PERBAIKAN ERROR LOADING GAMBAR ---
         if (data.profileImageUrl) {
-            if (mainAvatar) mainAvatar.src = data.profileImageUrl;
-            if (drawerAvatar) drawerAvatar.src = data.profileImageUrl;
+            const imageUrl = data.profileImageUrl;
+
+            if (mainAvatar) {
+                mainAvatar.src = imageUrl;
+                // Set fallback ke avatar.png jika gambar gagal dimuat
+                mainAvatar.onerror = () => { mainAvatar.src = '../assets/avatar.png'; }; 
+            }
+            if (drawerAvatar) {
+                drawerAvatar.src = imageUrl;
+                // Set fallback ke avatar2.svg jika gambar gagal dimuat
+                drawerAvatar.onerror = () => { drawerAvatar.src = '../assets/avatar2.svg'; }; 
+            }
+        } else {
+             // Jika tidak ada URL, set ke default
+             if (mainAvatar) mainAvatar.src = '../assets/avatar.png';
+             if (drawerAvatar) drawerAvatar.src = '../assets/avatar2.svg';
         }
+        // --- AKHIR LOGIKA PERBAIKAN ---
 
         if (nameInput) {
             nameInput.value = data.name || '';
@@ -337,6 +361,10 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             try {
+                // Tambahkan cek user
+                const user = firebase.auth().currentUser;
+                if (!user) return;
+                
                 await window.fetchData('/profile', {
                     method: 'PUT',
                     body: JSON.stringify(profileData)
@@ -395,11 +423,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- LOAD INITIAL DATA ---
+    // --- LOAD INITIAL DATA (Dipanggil setelah status login terkonfirmasi) ---
     if (typeof firebase !== 'undefined' && firebase.auth) {
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
-                loadProfileData();
+                // Panggil loadProfileData hanya setelah status login terkonfirmasi
+                loadProfileData(); 
             }
         });
     }
