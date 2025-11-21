@@ -2,55 +2,146 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // TAMBAHKAN FUNGSI-FUNGSI INI DI BAGIAN ATAS task.js
-// (Setelah baris: document.addEventListener('DOMContentLoaded', function() {)
+    // ===================================================
+    // HELPER FUNCTIONS (COPIED FROM STREAK.JS FOR TASK.JS)
+    // ===================================================
 
-// Fungsi untuk menyimpan completed task ke localStorage
-function saveCompletedTask(taskData) {
-    const completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+    /**
+     * Mengonversi objek Date menjadi string format "yyyy-MM-dd".
+     */
+    function dateToYyyyMmDd(date) {
+        const d = new Date(date.getTime());
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${d}`;
+    }
+
+    /**
+     * Normalisasi Date ke tengah malam (midnight) di zona waktu lokal.
+     */
+    function normalizeDateToMidnight(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    /**
+     * Memeriksa apakah tanggal terakhir adalah tepat satu hari sebelum tanggal hari ini.
+     */
+    function isYesterday(lastDateStr, todayStr) {
+        if (!lastDateStr || lastDateStr === "") return false;
+
+        const lastDate = normalizeDateToMidnight(new Date(lastDateStr.replace(/-/g, '/') + ' 00:00:00'));
+        const today = normalizeDateToMidnight(new Date(todayStr.replace(/-/g, '/') + ' 00:00:00'));
+        
+        const yesterday = new Date(today.getTime());
+        yesterday.setDate(today.getDate() - 1);
+
+        return lastDate.getTime() === yesterday.getTime();
+    }
+
+    /**
+     * Mengaplikasikan logika mesin status Streak.
+     */
+    function calculateNewStreakState(currentState, hasCompletedToday) {
+        const todayStr = dateToYyyyMmDd(new Date());
+
+        let oldStreak = currentState.currentStreak || 0;
+        let lastDateStr = currentState.lastCompletionDate;
+        
+        let newStreak = oldStreak;
+        let streakIncreased = false;
+
+        when: {
+            if (!lastDateStr || lastDateStr === "") {
+                if (hasCompletedToday) {
+                    newStreak = 1;
+                    streakIncreased = true;
+                }
+                break when;
+            } 
+            
+            if (lastDateStr === todayStr) {
+                // Case 2: Already updated today - no change
+                newStreak = oldStreak;
+                break when;
+            } 
+            
+            if (isYesterday(lastDateStr, todayStr)) {
+                // Case 3: Beruntun dari kemarin
+                if (hasCompletedToday) {
+                    newStreak = oldStreak + 1;
+                    streakIncreased = true;
+                }
+                break when;
+            } 
+            
+            // Case 4: Streak terputus lebih dari 1 hari yang lalu
+            if (hasCompletedToday) {
+                newStreak = 1; 
+                streakIncreased = true;
+            } else {
+                newStreak = 0;
+            }
+        }
+        
+        return { 
+            currentStreak: newStreak,
+            lastCompletionDate: newStreak > 0 && hasCompletedToday ? todayStr : null, 
+            streakIncreased: streakIncreased,
+            oldStreak: oldStreak 
+        };
+    }
     
-    const completedTask = {
-        id: taskData.id,
-        title: taskData.title,
-        completedAt: new Date().toISOString(),
-        date: taskData.date,
-        time: taskData.time,
-        location: taskData.location
-    };
-    
-    const existingIndex = completedTasks.findIndex(t => t.id === taskData.id);
-    if (existingIndex === -1) {
-        completedTasks.push(completedTask);
+    // ===================================================
+    // END: HELPER FUNCTIONS
+    // ===================================================
+
+    // Fungsi untuk menyimpan completed task ke localStorage
+    function saveCompletedTask(taskData) {
+        const completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+        
+        const completedTask = {
+            id: taskData.id,
+            title: taskData.title,
+            completedAt: new Date().toISOString(),
+            date: taskData.date,
+            time: taskData.time,
+            location: taskData.location
+        };
+        
+        const existingIndex = completedTasks.findIndex(t => t.id === taskData.id);
+        if (existingIndex === -1) {
+            completedTasks.push(completedTask);
+            localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+        }
+    }
+
+    function removeCompletedTask(taskId) {
+        let completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+        completedTasks = completedTasks.filter(t => t.id !== taskId);
         localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
     }
-}
 
-function removeCompletedTask(taskId) {
-    let completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
-    completedTasks = completedTasks.filter(t => t.id !== taskId);
-    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
-}
-
-function saveDeletedTask(taskData) {
-    const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
-    
-    const deletedTask = {
-        id: taskData.id,
-        title: taskData.title,
-        deletedAt: new Date().toISOString(),
-        date: taskData.date,
-        time: taskData.time,
-        location: taskData.location
-    };
-    
-    const existingIndex = deletedTasks.findIndex(t => t.id === taskData.id);
-    if (existingIndex === -1) {
-        deletedTasks.push(deletedTask);
-        localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
+    function saveDeletedTask(taskData) {
+        const deletedTasks = JSON.parse(localStorage.getItem('deletedTasks') || '[]');
+        
+        const deletedTask = {
+            id: taskData.id,
+            title: taskData.title,
+            deletedAt: new Date().toISOString(),
+            date: taskData.date,
+            time: taskData.time,
+            location: taskData.location
+        };
+        
+        const existingIndex = deletedTasks.findIndex(t => t.id === taskData.id);
+        if (existingIndex === -1) {
+            deletedTasks.push(deletedTask);
+            localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
+        }
     }
-}
 
-// FUNGSI BARU: SIMPAN MISSED TASK
+    // FUNGSI BARU: SIMPAN MISSED TASK
     function saveMissedTask(taskData) {
         const missedTasks = JSON.parse(localStorage.getItem('missedTasks') || '[]');
         
@@ -517,11 +608,65 @@ window.TaskApp.openDrawerForEdit = function(task) {
                 } else {
                     removeCompletedTask(taskId);
                 }
+
+                // ====================================================
+                // START: LOGIC STREAK CHECK FOR POPUP (CORRECTED)
+                // ====================================================
+                let isStreakIncreased = false;
+                let newStreakNumber = 0;
+                
+                if (newDoneStatus) {
+                    // 1. Ambil status streak saat ini
+                    const currentStreakState = await window.fetchData('/stats/streak');
+
+                    // **FIX:** Gunakan TRUE karena aksi yang dilakukan adalah menyelesaikan tugas hari ini.
+                    let hasCompletedToday = true; 
+                    
+                    // 2. Hitung status baru secara lokal
+                    const { streakIncreased: streakDidIncrease, currentStreak: newStreak } = calculateNewStreakState(
+                        { 
+                            currentStreak: currentStreakState.currentStreak || 0,
+                            lastCompletionDate: currentStreakState.lastCompletionDate || null,
+                            streakDays: currentStreakState.streakDays || ""
+                        }, 
+                        hasCompletedToday
+                    );
+
+                    // 3. Tentukan apakah perlu update di server
+                    if (streakDidIncrease) {
+                        // Panggil API POST /complete untuk menyimpan streak baru
+                        // Server (API) akan melakukan kalkulasi final dan menyimpan.
+                        await window.fetchData('/stats/streak/complete', {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify({}) // Body kosong, server menggunakan waktu server.
+                        });
+                        isStreakIncreased = true;
+                    }
+                    
+                    if (isStreakIncreased) {
+                         // Lakukan fetch lagi untuk memastikan angka yang ditampilkan di dialog akurat
+                         // NOTE: Ini opsional, tapi memastikan dialog menampilkan angka yang sudah di commit ke DB.
+                         const updatedStreakState = await window.fetchData('/stats/streak');
+                         newStreakNumber = updatedStreakState.currentStreak || 0;
+                    }
+                }
+                // ====================================================
+                // END: LOGIC STREAK CHECK FOR POPUP (CORRECTED)
+                // ====================================================
+
+
                 triggerProfileUpdate();
 
                 // [FIXED] Mengganti alert dengan showCustomDialog
+                let dialogMessage = `Task marked as ${newDoneStatus ? 'done' : 'undone'}!`;
+                
+                if (isStreakIncreased) {
+                    dialogMessage = `🎉 Selamat! Streak Anda sekarang mencapai ${newStreakNumber} hari!`;
+                }
+
                 window.showCustomDialog(
-                    `Task marked as ${newDoneStatus ? 'done' : 'undone'}!`,
+                    dialogMessage,
                     [{ text: 'OK', action: async () => {
                          // Reload tampilan
                         if (typeof reloadFn === 'function') {
@@ -763,7 +908,7 @@ window.TaskApp.openDrawerForEdit = function(task) {
             todayCard.classList.add('active');
 
             // 3. Gulir ke kartu hari ini (berpusat)
-            const scrollPos = todayCard.offsetLeft - (container.offsetWidth / 2) + (todayCard.offsetWidth / 2);
+            const scrollPos = todayCard.offsetLeft - (container.offsetWidth / 2) + (container.offsetWidth / 2);
             container.scrollTo({
                 left: scrollPos,
                 behavior: 'smooth'

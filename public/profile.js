@@ -53,6 +53,23 @@ async function updateTaskCounts(forceRefresh = false) {
     }
 }
 
+// === FUNGSI BARU: Load dan tampilkan angka streak di profile ===
+async function loadAndDisplayProfileStreak(user) {
+    if (!user) return;
+    const streakEl = document.getElementById('profileStreakNumber'); 
+    if (!streakEl) return;
+    
+    try {
+        // Menggunakan endpoint yang sama dengan home.html
+        const stats = await window.fetchData('/stats/streak'); 
+        const streakNumber = stats.currentStreak || 0;
+        streakEl.textContent = streakNumber;
+    } catch (error) {
+        console.error("Failed to load streak for profile:", error);
+    }
+}
+
+
 // === FUNGSI HELPER UNTUK UPDATE UI ===
 function updateTaskCountsUI(stats) {
     const completedBox = document.querySelector('.summary-box.completed span');
@@ -191,13 +208,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // 1. Update counts saat page load (gunakan cache untuk render cepat)
             updateTaskCounts();
             
-            // 2. Force refresh setelah 100ms untuk data terbaru
+            // 2. Load dan tampilkan angka streak di profile
+            loadAndDisplayProfileStreak(user); 
+
+            // 3. Force refresh setelah 100ms untuk data terbaru
             setTimeout(() => updateTaskCounts(true), 100);
             
-            // 3. Listen untuk update dari task page
+            // 4. Listen untuk update dari task page
             window.addEventListener('storage', (e) => {
                 if (e.key === 'profileUpdateTrigger') {
                     updateTaskCounts(true);
+                    loadAndDisplayProfileStreak(user); // Panggil lagi saat ada update
                     // Panggil fungsi chart dari statistic.js
                     if (window.TaskApp.updateChart) {
                         const activeTab = document.querySelector('.tab-btn.active');
@@ -207,12 +228,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // 4. Update ketika window focus (user kembali ke tab)
+            // 5. Update ketika window focus (user kembali ke tab)
             window.addEventListener('focus', () => {
                 updateTaskCounts(true);
+                loadAndDisplayProfileStreak(user); // Panggil lagi saat fokus
             });
 
-            // 5. === TAB SWITCHING ===
+            // 6. === TAB SWITCHING ===
             const tabButtons = document.querySelectorAll('.tab-btn');
             const statsCard = document.querySelector('.stats-card');
 
@@ -240,8 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
-            // 6. === ATTACH DRAWER LISTENERS DI SINI ===
-            // Karena drawer memerlukan fungsi get*TasksFromAPI() yang memanggil fetchData()
+            // 7. === ATTACH DRAWER LISTENERS DI SINI ===
             attachDrawerListeners();
         });
     }

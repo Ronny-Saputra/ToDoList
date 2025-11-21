@@ -11,19 +11,14 @@
 </head>
 <body>
 
-  <!-- Container -->
   <div class="container">
     
-    <!-- Header -->
     <div class="header">
       
-      <!-- Title Mobile Only -->
       <h1 class="header-title-mobile">Timy Time</h1>
       
-      <!-- Character & Speech Bubble -->
       <div class="character-wrapper">
         <div class="character">
-          <!-- Character Image -->
           <img 
             src="../assets/timy2.png" 
             alt="Timy" 
@@ -31,7 +26,6 @@
             onerror="this.style.display='none'"
           >
           
-          <!-- Speech Bubble -->
           <div class="speech-bubble">
             Hi! I'm Timy,<br>
             Your Personal Time Assistant
@@ -40,24 +34,18 @@
       </div>
     </div>
 
-    <!-- Streak Section (Overlapping) -->
     <div class="streak">
       
-      <!-- Flame Icon -->
       <div class="flame">
         <i class="fa-solid fa-fire"></i>
       </div>
       
-      <!-- Streak Number -->
       <div class="streak-number" id="streak-number">0</div>
       
-      <!-- Streak Title -->
       <div class="streak-title">Productive Streak</div>
       
-      <!-- Progress Box -->
       <div class="progress-box">
         
-        <!-- Days -->
         <div class="days">
           <span>M</span>
           <span>T</span>
@@ -68,31 +56,48 @@
           <span>S</span>
         </div>
         
-        <!-- Progress Line -->
         <div class="progress-line">
-          <!-- Progress Fill -->
           <div id="progress-fill" class="progress-fill"></div>
           
-          <!-- Runner Icon -->
           <i id="runner-icon" class="runner-icon fa-solid fa-person-running"></i>
           
-          <!-- Dot Track -->
           <div id="dot-track" class="dot-track"></div>
         </div>
       </div>
       
-      <!-- Message -->
       <div class="message">Well Done, Keep Going!</div>
     </div>
   </div>
   
   
 
-  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <!-- External scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
+            authDomain: "todolist-43.firebaseapp.com",
+            projectId: "todolist-43",
+            storageBucket: "todolist-43.appspot.com",
+            messagingSenderId: "795548747542",
+            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
+            measurementId: "G-67K7H7XXWW" 
+        };
+        
+        // Inisialisasi Firebase jika belum diinisialisasi
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Redirect jika pengguna tidak login
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "../pages/login.html";
+            }
+        });
+    </script>
   <script src="../streak.js"></script>
   <script src="../navbar.js"></script>
   <script src="../main.js"></script>
