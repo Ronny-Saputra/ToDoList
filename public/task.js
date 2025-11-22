@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${d}`;
+        return `${year}-${month}-${day}`;
     }
 
     /**
@@ -37,59 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
         yesterday.setDate(today.getDate() - 1);
 
         return lastDate.getTime() === yesterday.getTime();
-    }
-
-    /**
-     * Mengaplikasikan logika mesin status Streak.
-     */
-    function calculateNewStreakState(currentState, hasCompletedToday) {
-        const todayStr = dateToYyyyMmDd(new Date());
-
-        let oldStreak = currentState.currentStreak || 0;
-        let lastDateStr = currentState.lastCompletionDate;
-        
-        let newStreak = oldStreak;
-        let streakIncreased = false;
-
-        when: {
-            if (!lastDateStr || lastDateStr === "") {
-                if (hasCompletedToday) {
-                    newStreak = 1;
-                    streakIncreased = true;
-                }
-                break when;
-            } 
-            
-            if (lastDateStr === todayStr) {
-                // Case 2: Already updated today - no change
-                newStreak = oldStreak;
-                break when;
-            } 
-            
-            if (isYesterday(lastDateStr, todayStr)) {
-                // Case 3: Beruntun dari kemarin
-                if (hasCompletedToday) {
-                    newStreak = oldStreak + 1;
-                    streakIncreased = true;
-                }
-                break when;
-            } 
-            
-            // Case 4: Streak terputus lebih dari 1 hari yang lalu
-            if (hasCompletedToday) {
-                newStreak = 1; 
-                streakIncreased = true;
-            } else {
-                newStreak = 0;
-            }
-        }
-        
-        return { 
-            currentStreak: newStreak,
-            lastCompletionDate: newStreak > 0 && hasCompletedToday ? todayStr : null, 
-            streakIncreased: streakIncreased,
-            oldStreak: oldStreak 
-        };
     }
     
     // ===================================================
@@ -596,6 +543,17 @@ window.TaskApp.openDrawerForEdit = function(task) {
                     date: newDoneStatus ? formatDate(new Date()) : taskObject.date
                 };
 
+                // 1. Dapatkan status streak sebelum update
+                let initialStreakState = {};
+                if (newDoneStatus) {
+                    try {
+                        initialStreakState = await window.fetchData('/stats/streak');
+                        initialStreakState.currentStreak = initialStreakState.currentStreak || 0;
+                    } catch (e) {
+                        console.error("Failed to fetch initial streak state:", e);
+                    }
+                }
+
                 // Panggil Backend: PUT /api/tasks/:id
                 await window.fetchData(`/tasks/${taskId}`, {
                     method: 'PUT',
@@ -609,60 +567,33 @@ window.TaskApp.openDrawerForEdit = function(task) {
                     removeCompletedTask(taskId);
                 }
 
-                // ====================================================
-                // START: LOGIC STREAK CHECK FOR POPUP (CORRECTED)
-                // ====================================================
-                let isStreakIncreased = false;
+                // 2. Jika task selesai, panggil POST /complete untuk update streak di server
                 let newStreakNumber = 0;
+                let streakIncremented = false;
                 
                 if (newDoneStatus) {
-                    // 1. Ambil status streak saat ini
-                    const currentStreakState = await window.fetchData('/stats/streak');
-
-                    // **FIX:** Gunakan TRUE karena aksi yang dilakukan adalah menyelesaikan tugas hari ini.
-                    let hasCompletedToday = true; 
+                    // Panggil API POST /complete. Server akan menghitung ulang dan menyimpan.
+                    const updatedState = await window.fetchData('/stats/streak/complete', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({}) 
+                    });
                     
-                    // 2. Hitung status baru secara lokal
-                    const { streakIncreased: streakDidIncrease, currentStreak: newStreak } = calculateNewStreakState(
-                        { 
-                            currentStreak: currentStreakState.currentStreak || 0,
-                            lastCompletionDate: currentStreakState.lastCompletionDate || null,
-                            streakDays: currentStreakState.streakDays || ""
-                        }, 
-                        hasCompletedToday
-                    );
-
-                    // 3. Tentukan apakah perlu update di server
-                    if (streakDidIncrease) {
-                        // Panggil API POST /complete untuk menyimpan streak baru
-                        // Server (API) akan melakukan kalkulasi final dan menyimpan.
-                        await window.fetchData('/stats/streak/complete', {
-                             method: 'POST',
-                             headers: { 'Content-Type': 'application/json' },
-                             body: JSON.stringify({}) // Body kosong, server menggunakan waktu server.
-                        });
-                        isStreakIncreased = true;
-                    }
+                    newStreakNumber = updatedState.currentStreak || 0;
                     
-                    if (isStreakIncreased) {
-                         // Lakukan fetch lagi untuk memastikan angka yang ditampilkan di dialog akurat
-                         // NOTE: Ini opsional, tapi memastikan dialog menampilkan angka yang sudah di commit ke DB.
-                         const updatedStreakState = await window.fetchData('/stats/streak');
-                         newStreakNumber = updatedStreakState.currentStreak || 0;
+                    // Cek apakah streak bertambah (newStreak > oldStreak)
+                    if (newStreakNumber > initialStreakState.currentStreak) {
+                         streakIncremented = true;
                     }
                 }
-                // ====================================================
-                // END: LOGIC STREAK CHECK FOR POPUP (CORRECTED)
-                // ====================================================
-
-
+                
                 triggerProfileUpdate();
 
                 // [FIXED] Mengganti alert dengan showCustomDialog
                 let dialogMessage = `Task marked as ${newDoneStatus ? 'done' : 'undone'}!`;
                 
-                if (isStreakIncreased) {
-                    dialogMessage = `🎉 Selamat! Streak Anda sekarang mencapai ${newStreakNumber} hari!`;
+                if (newDoneStatus && streakIncremented) {
+                    dialogMessage = `🎉 YAY, you on fire ${newStreakNumber} streak!`;
                 }
 
                 window.showCustomDialog(
@@ -1369,7 +1300,6 @@ const taskPageFormSubmitHandler = async function(event, user) {
             }
 
             // Update UI Statistik (Profile) jika diperlukan
-            // Fungsi ini bisa dimodifikasi nanti untuk fetch API stats
             triggerProfileUpdate(); 
 
             // Reset UI Form

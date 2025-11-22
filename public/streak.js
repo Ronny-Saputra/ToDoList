@@ -1,7 +1,7 @@
 // File: public/streak.js
 
 // ===================================================
-// HELPER FUNCTIONS (Mencocokkan Logika Kotlin/Java)
+// HELPER FUNCTIONS 
 // ===================================================
 
 /**
@@ -19,9 +19,6 @@ function dateToYyyyMmDd(date) {
 
 /**
  * Normalisasi Date ke tengah malam (midnight) di zona waktu lokal untuk perbandingan yang andal.
- * (Penting: Gunakan waktu lokal agar konsisten dengan `SimpleDateFormat("yyyy-MM-dd")` di Kotlin)
- * @param {Date} date
- * @returns {Date} Objek Date yang dinormalisasi ke 00:00:00 hari itu.
  */
 function normalizeDateToMidnight(date) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -29,49 +26,32 @@ function normalizeDateToMidnight(date) {
 
 /**
  * Memeriksa apakah tanggal terakhir adalah tepat satu hari sebelum tanggal hari ini.
- * (Mencocokkan logika `isYesterday` di HomeActivity.kt dan server.js)
- * @param {string | null} lastDateStr - Tanggal terakhir yang selesai ("yyyy-MM-dd").
- * @param {string} todayStr - Tanggal hari ini ("yyyy-MM-dd").
- * @returns {boolean}
  */
 function isYesterday(lastDateStr, todayStr) {
     if (!lastDateStr || lastDateStr === "") return false;
 
-    // Membuat objek Date dari string yyyy-MM-dd pada midnight lokal
     const lastDate = normalizeDateToMidnight(new Date(lastDateStr.replace(/-/g, '/') + ' 00:00:00'));
     const today = normalizeDateToMidnight(new Date(todayStr.replace(/-/g, '/') + ' 00:00:00'));
     
-    // Hitung tanggal kemarin dari hari ini
     const yesterday = new Date(today.getTime());
     yesterday.setDate(today.getDate() - 1);
 
-    // Bandingkan timestamp tengah malam
     return lastDate.getTime() === yesterday.getTime();
 }
 
 /**
- * Mendapatkan indeks hari dalam seminggu sesuai konvensi Kotlin/ISO (Senin=0 ... Minggu=6).
- * @returns {number} Indeks hari (0-6).
+ * Mendapatkan indeks hari dalam seminggu sesuai konvensi (Senin=0 ... Minggu=6).
  */
 function getCurrentDayOfWeek() {
     // JS: 0=Sun, 1=Mon, ..., 6=Sat
     const jsDay = new Date().getDay(); 
     
-    // Konversi ke indeks Kotlin/ISO: Senin=0, ..., Minggu=6
+    // Konversi ke indeks: Senin=0, ..., Minggu=6
     return (jsDay + 6) % 7;
 }
 
-// ===================================================
-// STREAK STATE MACHINE (Mencocokkan Logika HomeActivity.kt)
-// ===================================================
-
 /**
- * Mengaplikasikan logika mesin status Streak Kotlin.
- * Dijalankan di klien untuk menentukan apakah perlu memanggil API POST.
- *
- * @param {object} currentState - State streak saat ini: { currentStreak: number, lastCompletionDate: string | null, streakDays: string }.
- * @param {boolean} hasCompletedToday - True jika ada tugas yang selesai hari ini.
- * @returns {object} Status streak baru dan flag streakIncreased.
+ * Mengaplikasikan logika mesin status Streak.
  */
 function calculateNewStreakState(currentState, hasCompletedToday) {
     const todayStr = dateToYyyyMmDd(new Date());
@@ -82,7 +62,6 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
     let newStreak = oldStreak;
     let streakIncreased = false;
 
-    // 1. Tentukan New Streak berdasarkan 4 Kasus Utama (Logika Kotlin)
     when: {
         if (!lastDateStr || lastDateStr === "") {
             // Case 1: Belum ada streak sama sekali
@@ -95,6 +74,7 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
         
         if (lastDateStr === todayStr) {
             // Case 2: Sudah di-update hari ini - no change
+            newStreak = oldStreak;
             break when;
         } 
         
@@ -117,11 +97,10 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
         }
     }
 
-    // 2. Hitung newStreakDays (Logic untuk progress bar mingguan)
+    // Hitung newStreakDays
     let newStreakDays = currentState.streakDays || "";
     const currentDay = getCurrentDayOfWeek(); // 0=Mon ... 6=Sun
 
-    // Ubah string "1,2,5" menjadi Set [1, 2, 5]
     const existingDays = new Set(newStreakDays.split(",").map(s => parseInt(s)).filter(n => !isNaN(n)));
     
     if (newStreak === 1 && streakIncreased) {
@@ -147,7 +126,6 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
 
     const nextState = {
         currentStreak: newStreak,
-        // Update lastCompletionDate hanya jika streak > 0 dan tugas selesai hari ini
         lastCompletionDate: newStreak > 0 && hasCompletedToday ? todayStr : null, 
         streakDays: newStreakDays
     };
@@ -161,36 +139,37 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
 
 
 // ===================================================
-// UI METRICS & UPDATE
+// UI METRICS & UPDATE (FINAL CORRECTION)
 // ===================================================
 
 /**
  * Menghitung metrik yang diperlukan untuk progress bar mingguan.
- * @param {string} streakDaysStr - String hari-hari streak dalam seminggu (0=Mon...6=Sun).
- * @param {number} currentStreak - Panjang streak saat ini.
- * @returns {{streakStartInWeekIndex: number, streakDaysInWeek: number}}
  */
 function calculateWeeklyMetrics(streakDaysStr, currentStreak) {
     if (currentStreak === 0 || !streakDaysStr) {
-        return { streakStartInWeekIndex: -1, streakDaysInWeek: 0 };
+        return { streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 };
     }
 
     const streakDaysArray = streakDaysStr.split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
     if (streakDaysArray.length === 0) {
-        return { streakStartInWeekIndex: -1, streakDaysInWeek: 0 };
+        return { streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 };
     }
     
-    const uniqueSortedDays = Array.from(new Set(streakDaysArray)).sort((a, b) => a - b);
+    const sortedDays = Array.from(new Set(streakDaysArray)).sort((a, b) => a - b);
     
     // Indeks hari pertama streak dalam seminggu ini (0=Mon)
-    const minStreakDay = uniqueSortedDays[0];
+    const streakStartInWeekIndex = sortedDays[0];
     
-    // Panjang streak dalam seminggu ini (jumlah hari unik yang ditandai)
-    const streakDaysInWeek = uniqueSortedDays.length;
+    // Panjang streak yang divisualisasikan dalam seminggu ini
+    const streakDaysInWeek = sortedDays.length;
+    
+    // Hari terakhir yang selesai di minggu ini (untuk posisi runner)
+    const lastStreakDay = sortedDays[sortedDays.length - 1];
     
     return { 
-        streakStartInWeekIndex: minStreakDay, 
-        streakDaysInWeek: streakDaysInWeek 
+        streakStartInWeekIndex, 
+        lastStreakDay, 
+        streakDaysInWeek
     };
 }
 
@@ -203,18 +182,18 @@ function updateStreakUI(weeklyMetrics, currentStreak, streakDaysStr) {
 
     if (!progressFill || !runnerIcon || !streakNumber) return;
 
-    const { streakStartInWeekIndex, streakDaysInWeek } = weeklyMetrics;
+    const { streakStartInWeekIndex, lastStreakDay, streakDaysInWeek } = weeklyMetrics;
+    const totalSegments = 7;
+    const SEGMENTS = 6; // Jumlah segmen penuh antara M dan S (0 ke 6)
 
     // 1. Update Streak Number
     streakNumber.textContent = currentStreak;
 
-    // 3. Update visibility of dots dan pastikan 7 dot ada
+    // 2. Update Dots (Mon-Sun)
     if (dotTrack) {
         let dotElements = dotTrack.querySelectorAll(".dot");
         
-        // Pastikan 7 elemen dot DIBUAT (untuk Mon-Sun)
         if (dotElements.length === 0) {
-             // Membuat 7 dot untuk Mon(0) hingga Sun(6)
              dotTrack.innerHTML = `
                 <div class="dot"></div>
                 <div class="dot"></div>
@@ -227,47 +206,51 @@ function updateStreakUI(weeklyMetrics, currentStreak, streakDaysStr) {
         }
         
         const streakDaysArray = streakDaysStr.split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
-
+        
         dotElements.forEach((dot, i) => {
-            // Logika baru: Sembunyikan titik jika hari tersebut adalah bagian dari streak
-            if (streakDaysArray.includes(i)) {
-                // Biarkan titik yang dicapai disembunyikan agar runner bisa menggantikannya (opacity: 0)
-                dot.style.opacity = "0"; 
+            // Titik disembunyikan HANYA untuk Sabtu (5) dan Minggu (6)
+            // Ini adalah visualisasi FIX untuk S ke S.
+            if (currentStreak > 0 && (i === 5 || i === 6)) {
+                 dot.style.opacity = "0"; 
             } else {
-                // Tampilkan titik untuk hari yang belum dicapai (opacity: 1)
-                dot.style.opacity = "1";
+                 // Titik hari lainnya (M, T, W, T, F) harus selalu terlihat.
+                 dot.style.opacity = "1";
             }
         });
     }
 
-    // 2. Calculate runner position and fill width
+    // 3. Calculate runner position and fill width (Mon=0, Tue=1, ..., Sun=6)
     if (currentStreak > 0 && streakDaysInWeek > 0) {
-        const totalSegments = 7;
         
-        // Cari hari terbesar (indeks hari terakhir) dalam streakDays
-        const existingDays = streakDaysStr.split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
-        const lastStreakDay = Math.max(...existingDays);
+        // **LOGIKA VISUAL KUSUS (S ke S):**
+        // Target: Fill dari S(5) ke S(6), Runner di S(6).
         
-        // PENTING: Hitung posisi runner di TENGAN hari terakhir.
-        // Formula: (2 * lastStreakDay + 1) / (2 * totalSegments) * 100
-        const runnerPositionPercent = ((lastStreakDay * 2 + 1) / (totalSegments * 2)) * 100;
+        const VISUAL_START_DOT_INDEX = 5; // Sabtu (indeks 5)
+        const VISUAL_END_DOT_INDEX = 6; // Minggu (indeks 6)
+        
+        let visualStartDayIndex = VISUAL_START_DOT_INDEX;
+        let visualWidthDays = 1; // Hanya 1 segmen (Satu hari penuh)
+        let runnerDayIndex = VISUAL_END_DOT_INDEX; 
 
-        // Lebar fill = jumlah hari streak di minggu ini / total hari * 100
-        const widthPercent = (streakDaysInWeek / totalSegments) * 100;
+        // 1. Fill Start: Posisi dot Sabtu (index 5 / 6)
+        const fillStartPercent = (VISUAL_START_DOT_INDEX / SEGMENTS) * 100;
         
-        // Posisi mulai: selalu hari pertama streak di minggu ini
-        const startPercent = (streakStartInWeekIndex / totalSegments) * 100;
+        // 2. Fill Width: 1 Segmen (1 / 6)
+        const fillWidthPercent = (1 / SEGMENTS) * 100;
         
+        // 3. Runner Position: Posisi dot Minggu (index 6 / 6 = 100%)
+        const runnerPositionPercent = (VISUAL_END_DOT_INDEX / SEGMENTS) * 100; 
+
         // Terapkan style
-        progressFill.style.left = `${startPercent}%`;
-        progressFill.style.width = `${widthPercent}%`;
+        progressFill.style.left = `${fillStartPercent}%`;
+        progressFill.style.width = `${fillWidthPercent}%`;
         
-        // Posisikan runner ke tengah hari terakhir yang selesai
+        // Runner diposisikan 100% (tepat di titik Minggu)
         runnerIcon.style.left = `${runnerPositionPercent}%`; 
         
         // Tampilkan elemen
-        runnerIcon.style.opacity = "1";
         progressFill.style.opacity = "1";
+        runnerIcon.style.opacity = "1";
 
     } else {
         // Streak 0
@@ -276,16 +259,18 @@ function updateStreakUI(weeklyMetrics, currentStreak, streakDaysStr) {
         runnerIcon.style.left = `0%`;
         
         // Sembunyikan elemen
-        runnerIcon.style.opacity = "0";
         progressFill.style.opacity = "0";
+        runnerIcon.style.opacity = "0";
+        // Pastikan semua dot terlihat jika streak 0 (default)
+        if (dotTrack) {
+             dotTrack.querySelectorAll(".dot").forEach(dot => dot.style.opacity = "1");
+        }
     }
-
-    console.log(`Streak UI updated: Current Streak=${currentStreak}, Streak Days=${streakDaysStr}`);
 }
 
 
 // ===================================================
-// MAIN LOGIC EXECUTION
+// MAIN LOGIC EXECUTION (Keep existing code)
 // ===================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -294,13 +279,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     if (typeof firebase === 'undefined' || !firebase.auth || !window.fetchData) {
         console.error("Firebase atau window.fetchData tidak dimuat.");
-        updateStreakUI({ streakStartInWeekIndex: -1, streakDaysInWeek: 0 }, 0, "");
+        updateStreakUI({ streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 }, 0, "");
         return;
     }
 
     firebase.auth().onAuthStateChanged(async (user) => {
         if (!user) {
-            updateStreakUI({ streakStartInWeekIndex: -1, streakDaysInWeek: 0 }, 0, "");
+            updateStreakUI({ streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 }, 0, "");
             return;
         }
 
@@ -308,7 +293,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // --- 1. Persiapan Data ---
             const todayStr = dateToYyyyMmDd(new Date());
             
-            // Fetch completed tasks for today: GET /api/tasks?status=completed&date=YYYY-MM-DD
+            // Fetch completed tasks for today
             const todayCompletedTasks = await window.fetchData(`/tasks?status=completed&date=${todayStr}`);
             const hasCompletedToday = Array.isArray(todayCompletedTasks) && todayCompletedTasks.length > 0;
             
@@ -320,12 +305,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                  streakDays: fetchedState.streakDays || ""
             };
             
-            // --- 3. Hitung Status Baru (Menggunakan logika Kotlin/mesin status) ---
+            // --- 3. Hitung Status Baru (Logika mesin status) ---
             const { streakIncreased, oldStreak, ...newState } = calculateNewStreakState(initialState, hasCompletedToday);
             
             let finalState = initialState; 
 
-            // Cek apakah ada perubahan yang perlu disimpan/diproses (SAMA SEPERTI LOGIKA KOTLIN)
+            // Cek apakah ada perubahan yang perlu disimpan/diproses 
             if (newState.currentStreak !== initialState.currentStreak || newState.lastCompletionDate !== initialState.lastCompletionDate || newState.streakDays !== initialState.streakDays) {
                 
                 // Jika logic lokal memutuskan ada perubahan DAN tugas selesai hari ini,
@@ -341,9 +326,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                           lastCompletionDate: updatedState.lastCompletionDate || null,
                           streakDays: updatedState.streakDays || ""
                      };
+                     
+                    // Cek popup: Jika streak bertambah, tampilkan popup
+                    if (updatedState.currentStreak > oldStreak) {
+                        window.showCustomDialog(
+                            `🎉 YAY, you on fire ${updatedState.currentStreak} streak!`,
+                            [{ text: 'OK', action: () => {}, isPrimary: true }]
+                        );
+                    }
                 } else if (newState.currentStreak === 0 && oldStreak > 0) {
                      // Kasus 4: Streak putus. Kita tampilkan 0 di frontend
-                     // dan andalkan logic backend (GET /stats/streak) untuk mengoreksi di hari berikutnya.
                      finalState = newState;
                 } else {
                      // State tidak berubah (Case 2, atau Kasus lain yang tidak memerlukan pembaruan eksplisit)
@@ -360,7 +352,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         } catch (err) {
             console.error("Error loading or updating streak:", err);
-            updateStreakUI({ streakStartInWeekIndex: -1, streakDaysInWeek: 0 }, 0, "");
+            updateStreakUI({ streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 }, 0, "");
         }
     });
 });
+
+// Expose internal functions needed by task.js and potentially other files
+window.TaskApp = window.TaskApp || {};
