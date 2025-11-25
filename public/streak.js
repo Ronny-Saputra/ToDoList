@@ -146,33 +146,49 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
  * Menghitung metrik yang diperlukan untuk progress bar mingguan.
  */
 function calculateWeeklyMetrics(streakDaysStr, currentStreak) {
-    if (currentStreak === 0 || !streakDaysStr) {
+    // 1. Pastikan angka streak valid
+    const numStreak = parseInt(currentStreak, 10) || 0;
+
+    if (numStreak === 0) {
         return { streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 };
     }
 
-    const streakDaysArray = streakDaysStr.split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
-    if (streakDaysArray.length === 0) {
-        return { streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 };
+    // 2. Tentukan Posisi Runner (Hari Terakhir / Ujung Kanan)
+    const streakDaysArray = (streakDaysStr || "").split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
+    
+    let lastStreakDay = -1;
+    if (streakDaysArray.length > 0) {
+        const sortedDays = Array.from(new Set(streakDaysArray)).sort((a, b) => a - b);
+        lastStreakDay = sortedDays[sortedDays.length - 1];
+    } else {
+        lastStreakDay = getCurrentDayOfWeek();
     }
     
-    const sortedDays = Array.from(new Set(streakDaysArray)).sort((a, b) => a - b);
+    // --- PERBAIKAN LOGIKA (BERBASIS SEGMEN) ---
+    // Rumus Lama (Hitung Titik): Akhir - (Jumlah - 1) -> Hasilnya Selasa
+    // Rumus Baru (Hitung Segmen): Akhir - Jumlah
     
-    // Indeks hari pertama streak dalam seminggu ini (0=Mon)
-    const streakStartInWeekIndex = sortedDays[0];
+    // Contoh Kasus Anda:
+    // Hari ini Rabu (Index 2), Streak 2.
+    // Start = 2 - 2 = 0 (Senin).
+    // Hasil visual: Garis dari Senin (0) sampai Rabu (2).
     
-    // Panjang streak yang divisualisasikan dalam seminggu ini
-    const streakDaysInWeek = sortedDays.length;
-    
-    // Hari terakhir yang selesai di minggu ini (untuk posisi runner)
-    const lastStreakDay = sortedDays[sortedDays.length - 1];
+    let calculatedStart = lastStreakDay - numStreak;
+
+    // Khusus jika Streak 1, kita tetap paksa mundur 1 hari agar ada ekornya
+    if (numStreak === 1) {
+        calculatedStart = lastStreakDay - 1;
+    }
+
+    // Batasi agar tidak minus (tidak tembus ke minggu lalu)
+    const streakStartInWeekIndex = Math.max(0, calculatedStart);
     
     return { 
         streakStartInWeekIndex, 
         lastStreakDay, 
-        streakDaysInWeek
+        streakDaysInWeek: numStreak
     };
 }
-
 
 function updateStreakUI(weeklyMetrics, currentStreak, streakDaysStr) {
     const progressFill = document.getElementById("progress-fill");
@@ -182,89 +198,49 @@ function updateStreakUI(weeklyMetrics, currentStreak, streakDaysStr) {
 
     if (!progressFill || !runnerIcon || !streakNumber) return;
 
-    const { streakStartInWeekIndex, lastStreakDay, streakDaysInWeek } = weeklyMetrics;
-    const totalSegments = 7;
-    const SEGMENTS = 6; // Jumlah segmen penuh antara M dan S (0 ke 6)
+    const { streakStartInWeekIndex, lastStreakDay } = weeklyMetrics;
+    const SEGMENTS = 6; // 0(Senin) sampai 6(Minggu) ada 6 segmen garis
 
-    // 1. Update Streak Number
+    // 1. Update Angka
     streakNumber.textContent = currentStreak;
 
-    // 2. Update Dots (Mon-Sun)
+    // 2. Update Dots (Pastikan semua terlihat)
     if (dotTrack) {
         let dotElements = dotTrack.querySelectorAll(".dot");
-        
         if (dotElements.length === 0) {
              dotTrack.innerHTML = `
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 <div class="dot"></div>`;
              dotElements = dotTrack.querySelectorAll(".dot");
         }
-        
-        const streakDaysArray = streakDaysStr.split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
-        
-        dotElements.forEach((dot, i) => {
-            // Titik disembunyikan HANYA untuk Sabtu (5) dan Minggu (6)
-            // Ini adalah visualisasi FIX untuk S ke S.
-            if (currentStreak > 0 && (i === 5 || i === 6)) {
-                 dot.style.opacity = "0"; 
-            } else {
-                 // Titik hari lainnya (M, T, W, T, F) harus selalu terlihat.
-                 dot.style.opacity = "1";
-            }
-        });
+        dotElements.forEach(dot => dot.style.opacity = "1");
     }
 
-    // 3. Calculate runner position and fill width (Mon=0, Tue=1, ..., Sun=6)
-    if (currentStreak > 0 && streakDaysInWeek > 0) {
+    // 3. Update Visual Bar & Runner
+    if (currentStreak > 0 && lastStreakDay >= 0) {
         
-        // **LOGIKA VISUAL KUSUS (S ke S):**
-        // Target: Fill dari S(5) ke S(6), Runner di S(6).
+        // Hitung Persentase Posisi
+        const fillStartPercent = (streakStartInWeekIndex / SEGMENTS) * 100;
+        const runnerPositionPercent = (lastStreakDay / SEGMENTS) * 100; 
         
-        const VISUAL_START_DOT_INDEX = 5; // Sabtu (indeks 5)
-        const VISUAL_END_DOT_INDEX = 6; // Minggu (indeks 6)
-        
-        let visualStartDayIndex = VISUAL_START_DOT_INDEX;
-        let visualWidthDays = 1; // Hanya 1 segmen (Satu hari penuh)
-        let runnerDayIndex = VISUAL_END_DOT_INDEX; 
+        // Hitung Lebar (Selisih Akhir - Awal)
+        // Math.max memastikan lebar tidak negatif
+        const fillWidthPercent = Math.max(0, runnerPositionPercent - fillStartPercent);
 
-        // 1. Fill Start: Posisi dot Sabtu (index 5 / 6)
-        const fillStartPercent = (VISUAL_START_DOT_INDEX / SEGMENTS) * 100;
-        
-        // 2. Fill Width: 1 Segmen (1 / 6)
-        const fillWidthPercent = (1 / SEGMENTS) * 100;
-        
-        // 3. Runner Position: Posisi dot Minggu (index 6 / 6 = 100%)
-        const runnerPositionPercent = (VISUAL_END_DOT_INDEX / SEGMENTS) * 100; 
-
-        // Terapkan style
+        // Terapkan CSS
         progressFill.style.left = `${fillStartPercent}%`;
         progressFill.style.width = `${fillWidthPercent}%`;
-        
-        // Runner diposisikan 100% (tepat di titik Minggu)
-        runnerIcon.style.left = `${runnerPositionPercent}%`; 
-        
-        // Tampilkan elemen
         progressFill.style.opacity = "1";
+        
+        runnerIcon.style.left = `${runnerPositionPercent}%`; 
         runnerIcon.style.opacity = "1";
 
     } else {
-        // Streak 0
-        progressFill.style.left = `0%`;
+        // Reset jika Streak 0
         progressFill.style.width = `0%`;
-        runnerIcon.style.left = `0%`;
-        
-        // Sembunyikan elemen
         progressFill.style.opacity = "0";
         runnerIcon.style.opacity = "0";
-        // Pastikan semua dot terlihat jika streak 0 (default)
-        if (dotTrack) {
-             dotTrack.querySelectorAll(".dot").forEach(dot => dot.style.opacity = "1");
-        }
     }
 }
 
