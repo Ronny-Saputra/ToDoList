@@ -1,44 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../styles/signup.css">
-</head>
-<body>
-  <div class="page-wrap">
-    <div class="top-section"></div>
-    <div class="bottom-section">
-      <img src="../assets/timy2.png" alt="Clock" class="avatar">
-      <a href="login.html" class="back"><i class="fa fa-arrow-left"></i> Back to login</a>
-      <h2 class="title">Sign Up</h2>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/signup.css" />
+  </head>
+  <body>
+    <div class="page-wrap">
+      <div class="top-section"></div>
+      <div class="bottom-section">
+        <img src="../assets/timy2.png" alt="Clock" class="avatar" />
+        <a href="login.html" class="back"
+          ><i class="fa fa-arrow-left"></i> Back to login</a
+        >
+        <h2 class="title">Sign Up</h2>
 
-      <form class="login-form" onsubmit="return emailSignup(event)">
-        <div class="field">
-          <i class="fa fa-envelope field-icon"></i>
-          <input type="email" id="email" class="input" placeholder="Email Address" required>
-        </div>
-        <div class="field">
-          <i class="fa fa-lock field-icon"></i>
-          <input type="password" id="password" class="input" placeholder="Password" required>
-        </div>
-        <div class="field">
-          <i class="fa fa-lock field-icon"></i>
-          <input type="password" id="confirmPassword" class="input" placeholder="Confirm Password" required>
-        </div>
-      
+        <form class="login-form" onsubmit="return emailSignup(event);">
+          <div class="field">
+            <i class="fa fa-envelope field-icon"></i>
+            <input
+              type="email"
+              id="email"
+              class="input"
+              placeholder="Email Address"
+              required
+            />
+          </div>
+          <div class="field">
+            <i class="fa fa-lock field-icon"></i>
+            <input
+              type="password"
+              id="password"
+              class="input"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <div class="field">
+            <i class="fa fa-lock field-icon"></i>
+            <input
+              type="password"
+              id="confirmPassword"
+              class="input"
+              placeholder="Confirm Password"
+              required
+            />
+          </div>
 
-        <button type="submit" class="btn-login">Sign Up</button>
-      </form>
+          <button type="submit" class="btn-login">Sign Up</button>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <script src="/__/firebase/12.2.1/firebase-app-compat.js"></script>
-  <script src="/__/firebase/12.2.1/firebase-auth-compat.js"></script>
-  <script src="/__/firebase/init.js?useEmulator=true"></script>
-  <script src="../main.js"></script>
-</body>
+    <script src="/__/firebase/12.2.1/firebase-app-compat.js"></script>
+    <script src="/__/firebase/12.2.1/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/init.js?useEmulator=true"></script>
+    <script src="../main.js"></script>
+  </body>
 </html>

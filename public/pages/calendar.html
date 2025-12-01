@@ -1,167 +1,213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../styles/calendar.css">
-    <link rel="stylesheet" href="../styles/task.css">
-</head>
-<body>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/calendar.css" />
+    <link rel="stylesheet" href="../styles/task.css" />
+  </head>
+  <body>
     <div class="calendar-page-container">
-        <div class="calendar-wrapper">
-            
-            <button class="back-btn-calendar" onclick="window.location.href='task.html'">
-                <i class="fas fa-arrow-left"></i>
-            </button>
+      <div class="calendar-wrapper">
+        <button
+          class="back-btn-calendar"
+          onclick="window.location.href = 'task.html'"
+        >
+          <i class="fas fa-arrow-left"></i>
+        </button>
 
-            <div class="month-navigation mobile-only">
-                <button class="nav-btn" id="prevMonthMobile">&#8249;</button>
-                <span class="month-year-title" id="monthYearTitle">December 2025</span>
-                <button class="nav-btn" id="nextMonthMobile">&#8250;</button>
-            </div>
-
-            <div class="year-selector desktop-only">
-                <button class="year-btn prev-year" id="prevYear">&#8249;</button>
-                <span class="current-year" id="currentYear">2025</span>
-                <button class="year-btn next-year" id="nextYear">&#8250;</button>
-            </div>
-            
-            <div class="mobile-calendar-container mobile-only" id="mobileCalendarContainer">
-                <div class="swipe-wrapper" id="swipeWrapper">
-                </div>
-            </div>
-
-            <div class="month-list-container desktop-only" id="monthListContainer">
-            </div>
+        <div class="month-navigation mobile-only">
+          <button class="nav-btn" id="prevMonthMobile">&#8249;</button>
+          <span class="month-year-title" id="monthYearTitle"
+            >December 2025</span
+          >
+          <button class="nav-btn" id="nextMonthMobile">&#8250;</button>
         </div>
 
-        <div class="calendar-footer">
-            <div class="add-reminder-box" id="add-reminder-btn">
-                Add Reminder
-            </div>
+        <div class="year-selector desktop-only">
+          <button class="year-btn prev-year" id="prevYear">&#8249;</button>
+          <span class="current-year" id="currentYear">2025</span>
+          <button class="year-btn next-year" id="nextYear">&#8250;</button>
         </div>
+
+        <div
+          class="mobile-calendar-container mobile-only"
+          id="mobileCalendarContainer"
+        >
+          <div class="swipe-wrapper" id="swipeWrapper"></div>
+        </div>
+
+        <div
+          class="month-list-container desktop-only"
+          id="monthListContainer"
+        ></div>
+      </div>
+
+      <div class="calendar-footer">
+        <div class="add-reminder-box" id="add-reminder-btn">Add Reminder</div>
+      </div>
     </div>
 
     <div id="newReminderDrawer" class="drawer-overlay">
-        <div class="drawer-content">
-            <header class="drawer-header">
-                <i class="fas fa-arrow-left close-drawer-btn"></i>
-                <h2>New Reminder</h2>
-            </header>
-            
-            <form class="reminder-form" id="reminder-form">
-                <div class="form-section">
-                    <label>Activity</label>
-                    <input type="text" id="activity-input" placeholder="Activity Name" class="input-field" required>
-                </div>
-                
-                <div class="form-section date-section-edit" style="position: relative;">
-                    <label>Date</label>
-                    <input type="date" id="date-input-edit" class="input-field" required>
-                    <input type="hidden" id="original-date-value">
-                </div>
-                <div class="form-section time-section">
-                    <label>Time</label>
-                    <input type="text" id="time-input" placeholder="Start - End Time" class="input-field" readonly>
-                    <a href="#" class="flow-timer-link">+ Add Flow Timer (30m)</a>
-                </div>
+      <div class="drawer-content">
+        <header class="drawer-header">
+          <i class="fas fa-arrow-left close-drawer-btn"></i>
+          <h2>New Reminder</h2>
+        </header>
 
-                <div class="form-section">
-                    <label>Location</label>
-                    <input type="text" id="location-input" placeholder="Location Name" class="input-field">
-                </div>
+        <form class="reminder-form" id="reminder-form">
+          <div class="form-section">
+            <label>Activity</label>
+            <input
+              type="text"
+              id="activity-input"
+              placeholder="Activity Name"
+              class="input-field"
+              required
+            />
+          </div>
 
-                <div class="form-section">
-                    <label>Priority</label>
-                    <div class="priority-selector">
-                        <span>None</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </div>
+          <div
+            class="form-section date-section-edit"
+            style="position: relative"
+          >
+            <label>Date</label>
+            <input
+              type="date"
+              id="date-input-edit"
+              class="input-field"
+              required
+            />
+            <input type="hidden" id="original-date-value" />
+          </div>
+          <div class="form-section time-section">
+            <label>Time</label>
+            <input
+              type="text"
+              id="time-input"
+              placeholder="Start - End Time"
+              class="input-field"
+              readonly
+            />
+            <a href="#" class="flow-timer-link">+ Add Flow Timer (30m)</a>
+          </div>
 
-                <div class="form-section">
-                    <button type="button" class="add-details-btn">
-                        <i class="fas fa-plus"></i> Add Details
-                    </button>
-                    <input type="text" placeholder="Details / Description" class="input-field description-field">
-                </div>
+          <div class="form-section">
+            <label>Location</label>
+            <input
+              type="text"
+              id="location-input"
+              placeholder="Location Name"
+              class="input-field"
+            />
+          </div>
 
-                <button type="submit" class="save-btn">Save</button>
-            </form>
-        </div>
+          <div class="form-section">
+            <label>Priority</label>
+            <div class="priority-selector">
+              <span>None</span>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <button type="button" class="add-details-btn">
+              <i class="fas fa-plus"></i> Add Details
+            </button>
+            <input
+              type="text"
+              placeholder="Details / Description"
+              class="input-field description-field"
+            />
+          </div>
+
+          <button type="submit" class="save-btn">Save</button>
+        </form>
+      </div>
     </div>
-    
+
     <div id="custom-dialog-overlay" class="custom-dialog-overlay">
-        <div class="custom-dialog">
-            <div id="custom-dialog-message" class="custom-dialog-message">Success Add New Reminder</div>
-            <div id="custom-dialog-actions" class="custom-dialog-actions">
-            </div>
+      <div class="custom-dialog">
+        <div id="custom-dialog-message" class="custom-dialog-message">
+          Success Add New Reminder
         </div>
+        <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
+      </div>
     </div>
-    
+
     <div id="time-picker-overlay" class="time-picker-overlay">
-        <div class="time-picker-dialog">
-            <h3>Set Time Range</h3>
-            <div class="time-inputs">
-                <input type="time" id="start-time-input" value="10:00">
-                <span>to</span>
-                <input type="time" id="end-time-input" value="11:00">
-            </div>
-            <div class="time-picker-actions">
-                <button id="time-picker-cancel" class="time-picker-btn">Cancel</button>
-                <button id="time-picker-save" class="time-picker-btn primary">Save</button>
-            </div>
+      <div class="time-picker-dialog">
+        <h3>Set Time Range</h3>
+        <div class="time-inputs">
+          <input type="time" id="start-time-input" value="10:00" />
+          <span>to</span>
+          <input type="time" id="end-time-input" value="11:00" />
         </div>
+        <div class="time-picker-actions">
+          <button id="time-picker-cancel" class="time-picker-btn">
+            Cancel
+          </button>
+          <button id="time-picker-save" class="time-picker-btn primary">
+            Save
+          </button>
+        </div>
+      </div>
     </div>
 
     <div id="flow-timer-picker-overlay" class="time-picker-overlay">
-        <div class="time-picker-dialog">
-            <h3>Set Flow Timer Duration</h3>
-            <div class="time-inputs flow-duration-inputs">
-                <input type="number" id="flow-timer-hours-input" value="0" min="0" max="23">
-                <span>Hours</span>
-                <input type="number" id="flow-timer-minutes-input" value="30" min="0" max="59">
-                <span>Minutes</span>
-                <input type="number" id="flow-timer-seconds-input" value="0" min="0" max="59">
-                <span>Seconds</span>
-            </div>
-            <div class="time-picker-actions">
-                <button id="flow-timer-cancel" class="time-picker-btn">Cancel</button>
-                <button id="flow-timer-save" class="time-picker-btn primary">Set Duration</button>
-            </div>
+      <div class="time-picker-dialog">
+        <h3>Set Flow Timer Duration</h3>
+        <div class="time-inputs flow-duration-inputs">
+          <input
+            type="number"
+            id="flow-timer-hours-input"
+            value="0"
+            min="0"
+            max="23"
+          />
+          <span>Hours</span>
+          <input
+            type="number"
+            id="flow-timer-minutes-input"
+            value="30"
+            min="0"
+            max="59"
+          />
+          <span>Minutes</span>
+          <input
+            type="number"
+            id="flow-timer-seconds-input"
+            value="0"
+            min="0"
+            max="59"
+          />
+          <span>Seconds</span>
         </div>
+        <div class="time-picker-actions">
+          <button id="flow-timer-cancel" class="time-picker-btn">Cancel</button>
+          <button id="flow-timer-save" class="time-picker-btn primary">
+            Set Duration
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
-            authDomain: "todolist-43.firebaseapp.com",
-            projectId: "todolist-43",
-            storageBucket: "todolist-43.appspot.com",
-            messagingSenderId: "795548747542",
-            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
-            measurementId: "G-67K7H7XXWW"
-        };
-        firebase.initializeApp(firebaseConfig);
-    </script>
-
-    <script>
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) {
-                window.location.href = "../pages/login.html";
-            }
-        });
-    </script>
+    <script src="../firebase-init.js"></script>
 
     <script src="../main.js"></script>
-    <script src="../task.js"></script>  
-    <script src="../calendar.js"></script> 
-</body>
+    <script src="../task.js"></script>
+    <script src="../calendar.js"></script>
+  </body>
 </html>

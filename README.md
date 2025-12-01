@@ -1,6 +1,6 @@
 # Timy Time
 
-Aplikasi *Timy Time* ini merupakan aplikasi ToDoList yang memungkinkan pengguna untuk mengelola tugas mereka dengan mudah. Pengguna dapat menambahkan, mengedit, menghapus, dan menandai tugas sebagai selesai. Aplikasi ini bertujuan untuk meningkatkan produktivitas dan membantu pengguna tetap terorganisir.
+Aplikasi _Timy Time_ ini merupakan aplikasi ToDoList yang memungkinkan pengguna untuk mengelola tugas mereka dengan mudah. Pengguna dapat menambahkan, mengedit, menghapus, dan menandai tugas sebagai selesai. Aplikasi ini bertujuan untuk meningkatkan produktivitas dan membantu pengguna tetap terorganisir.
 
 ## Fitur-fitur Timy Time
 
@@ -17,9 +17,9 @@ Aplikasi *Timy Time* ini merupakan aplikasi ToDoList yang memungkinkan pengguna 
 - **Backend**: Node.js
 - **Database**: Firebase
 
-
 ## **Clone repositori ini**:
 
-   ```bash
-   git clone https://github.com/Ronny-Saputra/ToDoList
-   cd ToDoList
+```bash
+git clone https://github.com/Ronny-Saputra/ToDoList
+cd ToDoList
+```

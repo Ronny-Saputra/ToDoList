@@ -1,67 +1,98 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flow Timer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../styles/flowtimer.css">
-    <link rel="stylesheet" href="../styles/task.css"> 
-</head>
-<body>
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/flowtimer.css" />
+    <link rel="stylesheet" href="../styles/task.css" />
+  </head>
+  <body>
     <div class="flow-timer-container">
-        
-        <header class="flow-timer-header">
-            <button class="back-btn" onclick="history.back()">
-                <i class="fas fa-chevron-left"></i> back
-            </button>
-            <h2 class="page-title">Flow Timer</h2>
-        </header>
-        
-        <main class="flow-timer-main">
-            <div class="activity-title" id="activityTitle">Casting Project</div> 
-            <div class="timer-display" id="timerDisplay">30:00</div>
-            
-            <button class="control-btn" id="controlBtn">
-                <i class="fas fa-play"></i>
-            </button>
-        </main>
-        
-        <div class="background-waves" id="backgroundWaves">
-            </div>
+      <header class="flow-timer-header">
+        <button class="back-btn" onclick="history.back()">
+          <i class="fas fa-chevron-left"></i> back
+        </button>
+        <h2 class="page-title">Flow Timer</h2>
+      </header>
+
+      <main class="flow-timer-main">
+        <div class="activity-title" id="activityTitle">Casting Project</div>
+        <div class="timer-display" id="timerDisplay">30:00</div>
+
+        <button class="control-btn" id="controlBtn">
+          <i class="fas fa-play"></i>
+        </button>
+      </main>
+
+      <div class="background-waves" id="backgroundWaves"></div>
     </div>
 
-    <div id="custom-dialog-overlay" class="custom-dialog-overlay" style="z-index: 5000;">
-        <div class="custom-dialog">
-            <div id="custom-dialog-message" class="custom-dialog-message"></div>
-            <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
-        </div>
+    <div
+      id="custom-dialog-overlay"
+      class="custom-dialog-overlay"
+      style="z-index: 5000"
+    >
+      <div class="custom-dialog">
+        <div id="custom-dialog-message" class="custom-dialog-message"></div>
+        <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
+      </div>
     </div>
-    
-    <div id="flow-timer-picker-overlay" class="time-picker-overlay" style="z-index: 6000;">
-        <div class="time-picker-dialog">
-            <h3>Set Flow Timer Duration</h3>
-            <div class="time-inputs flow-duration-inputs">
-                <input type="number" id="flow-timer-hours-input" value="0" min="0" max="23">
-                <span>Hours</span>
-                <input type="number" id="flow-timer-minutes-input" value="30" min="0" max="59">
-                <span>Minutes</span>
-                <input type="number" id="flow-timer-seconds-input" value="0" min="0" max="59">
-                <span>Seconds</span>
-            </div>
-            <div class="time-picker-actions">
-                <button id="flow-timer-cancel" class="time-picker-btn">Cancel</button>
-                <button id="flow-timer-save" class="time-picker-btn primary">Set Duration</button>
-            </div>
+
+    <div
+      id="flow-timer-picker-overlay"
+      class="time-picker-overlay"
+      style="z-index: 6000"
+    >
+      <div class="time-picker-dialog">
+        <h3>Set Flow Timer Duration</h3>
+        <div class="time-inputs flow-duration-inputs">
+          <input
+            type="number"
+            id="flow-timer-hours-input"
+            value="0"
+            min="0"
+            max="23"
+          />
+          <span>Hours</span>
+          <input
+            type="number"
+            id="flow-timer-minutes-input"
+            value="30"
+            min="0"
+            max="59"
+          />
+          <span>Minutes</span>
+          <input
+            type="number"
+            id="flow-timer-seconds-input"
+            value="0"
+            min="0"
+            max="59"
+          />
+          <span>Seconds</span>
         </div>
+        <div class="time-picker-actions">
+          <button id="flow-timer-cancel" class="time-picker-btn">Cancel</button>
+          <button id="flow-timer-save" class="time-picker-btn primary">
+            Set Duration
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script src="../main.js"></script>
-    <script src="../flowtimer.js"></script> 
-</body>
+    <script src="../flowtimer.js"></script>
+  </body>
 </html>

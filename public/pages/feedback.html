@@ -1,45 +1,54 @@
 <!-- feedback.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Send Feedback</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../styles/feedback.css">
-</head>
-<body>
-
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/feedback.css" />
+  </head>
+  <body>
     <div class="settings-container">
-        <header class="settings-header">
-            <button class="back-btn">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <h1>Send Feedback</h1>
-        </header>
+      <header class="settings-header">
+        <button class="back-btn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <h1>Send Feedback</h1>
+      </header>
 
-        <main class="feedback-main">
-            <form class="feedback-form">
-                <label for="rating">How would you rate your experience?</label>
-                <div class="rating-stars">
-                    <i class="fas fa-star" data-value="1"></i>
-                    <i class="fas fa-star" data-value="2"></i>
-                    <i class="fas fa-star" data-value="3"></i>
-                    <i class="fas fa-star" data-value="4"></i>
-                    <i class="fas fa-star" data-value="5"></i>
-                </div>
-                <input type="hidden" id="rating" name="rating" value="0">
+      <main class="feedback-main">
+        <form class="feedback-form">
+          <label for="rating">How would you rate your experience?</label>
+          <div class="rating-stars">
+            <i class="fas fa-star" data-value="1"></i>
+            <i class="fas fa-star" data-value="2"></i>
+            <i class="fas fa-star" data-value="3"></i>
+            <i class="fas fa-star" data-value="4"></i>
+            <i class="fas fa-star" data-value="5"></i>
+          </div>
+          <input type="hidden" id="rating" name="rating" value="0" />
 
-                <label for="suggestions">Got suggestions?</label>
-                <textarea id="suggestions" placeholder="Add a comment..." required></textarea>
+          <label for="suggestions">Got suggestions?</label>
+          <textarea
+            id="suggestions"
+            placeholder="Add a comment..."
+            required
+          ></textarea>
 
-                <button type="submit" class="submit-btn">Send Feedback</button>
-            </form>
-        </main>
+          <button type="submit" class="submit-btn">Send Feedback</button>
+        </form>
+      </main>
     </div>
 
     <script src="../feedback.js"></script>
-</body>
+  </body>
 </html>

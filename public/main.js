@@ -1,5 +1,5 @@
-const API_BASE_URL = 'https://api-backend-delta.vercel.app/api';
-document.addEventListener('DOMContentLoaded', function() {
+const API_BASE_URL = "https://api-backend-delta.vercel.app/api";
+document.addEventListener("DOMContentLoaded", function () {
   // BAGIAN INI HANYA AKAN BERJALAN JIKA ADA ELEMEN DENGAN CLASS .splash-container
   const splash = document.querySelector(".splash-container");
   if (splash) {
@@ -15,41 +15,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- UTILITY: SHOW CUSTOM DIALOG (Implemented here for global use) ---
 // Perubahan: Menghapus alert(message) fallback.
-window.showCustomDialog = function(message, buttons = [{ text: 'OK', action: () => {}, isPrimary: true }]) {
-    const dialogOverlay = document.getElementById('custom-dialog-overlay');
-    const dialogMessage = dialogOverlay ? dialogOverlay.querySelector('#custom-dialog-message') : null;
-    const dialogActions = dialogOverlay ? dialogOverlay.querySelector('#custom-dialog-actions') : null;
-    
-    if (!dialogOverlay || !dialogMessage || !dialogActions) {
-        console.error("Custom dialog elements not found. Cannot display dialog with message: " + message);
-        return;
+window.showCustomDialog = function (
+  message,
+  buttons = [{ text: "OK", action: () => {}, isPrimary: true }],
+) {
+  const dialogOverlay = document.getElementById("custom-dialog-overlay");
+  const dialogMessage = dialogOverlay
+    ? dialogOverlay.querySelector("#custom-dialog-message")
+    : null;
+  const dialogActions = dialogOverlay
+    ? dialogOverlay.querySelector("#custom-dialog-actions")
+    : null;
+
+  if (!dialogOverlay || !dialogMessage || !dialogActions) {
+    console.error(
+      "Custom dialog elements not found. Cannot display dialog with message: " +
+        message,
+    );
+    return;
+  }
+
+  dialogMessage.textContent = message;
+  dialogActions.innerHTML = "";
+
+  buttons.forEach((btn) => {
+    const buttonElement = document.createElement("button");
+    buttonElement.textContent = btn.text;
+    buttonElement.classList.add("dialog-btn");
+
+    if (btn.isPrimary) {
+      buttonElement.classList.add("primary");
     }
 
-    dialogMessage.textContent = message;
-    dialogActions.innerHTML = '';
-    
-    buttons.forEach((btn) => {
-        const buttonElement = document.createElement('button');
-        buttonElement.textContent = btn.text;
-        buttonElement.classList.add('dialog-btn');
-        
-        if (btn.isPrimary) {
-            buttonElement.classList.add('primary');
-        }
-        
-        buttonElement.addEventListener('click', () => {
-            dialogOverlay.classList.remove('open');
-            if (btn.action) {
-                btn.action();
-            }
-        });
-        
-        dialogActions.appendChild(buttonElement);
+    buttonElement.addEventListener("click", () => {
+      dialogOverlay.classList.remove("open");
+      if (btn.action) {
+        btn.action();
+      }
     });
-    
-    dialogOverlay.classList.add('open');
-}
 
+    dialogActions.appendChild(buttonElement);
+  });
+
+  dialogOverlay.classList.add("open");
+};
 
 // ✅ PERBAIKAN: EVENT DELEGATION UNTUK TASK CARD (.task-card-item) DIKEMBALIKAN
 document.body.addEventListener("click", (e) => {
@@ -60,18 +69,19 @@ document.body.addEventListener("click", (e) => {
   // Temukan elemen terdekat dengan kelas .task-checkbox (bulatan checklist)
   const isCheckbox = e.target.closest(".task-checkbox");
 
-
   if (clickedCard) {
     // JANGAN lakukan toggle jika yang diklik adalah Checkbox atau Tombol Aksi
     if (isActionButton || isCheckbox) {
-        return; 
+      return;
     }
-      
+
     // Cek apakah card ini sudah aktif
     const isAlreadyActive = clickedCard.classList.contains("active");
 
     // Hapus 'active' dari SEMUA card
-    document.querySelectorAll(".task-card-item").forEach(c => c.classList.remove("active"));
+    document
+      .querySelectorAll(".task-card-item")
+      .forEach((c) => c.classList.remove("active"));
 
     // Jika card belum aktif, aktifkan card yang diklik
     if (!isAlreadyActive) {
@@ -79,33 +89,44 @@ document.body.addEventListener("click", (e) => {
     }
   } else {
     // Jika mengklik di luar area task card, nonaktifkan semua task card
-    document.querySelectorAll(".task-card-item").forEach(c => c.classList.remove("active"));
+    document
+      .querySelectorAll(".task-card-item")
+      .forEach((c) => c.classList.remove("active"));
   }
 });
 
-
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
-    .then(result => window.showCustomDialog(`Welcome, ${result.user.displayName}!`))
-    .catch(error => window.showCustomDialog(`Error: ${error.message}`));
+  firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then((result) =>
+      window.showCustomDialog(`Welcome, ${result.user.displayName}!`),
+    )
+    .catch((error) => window.showCustomDialog(`Error: ${error.message}`));
 }
 
 function facebookLogin() {
   const provider = new firebase.auth.FacebookAuthProvider();
-  firebase.auth().signInWithPopup(provider)
-    .then(result => window.showCustomDialog(`Welcome, ${result.user.displayName}!`))
-    .catch(error => window.showCustomDialog(`Error: ${error.message}`));
+  firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then((result) =>
+      window.showCustomDialog(`Welcome, ${result.user.displayName}!`),
+    )
+    .catch((error) => window.showCustomDialog(`Error: ${error.message}`));
 }
 
 function emailLogin(event) {
   event.preventDefault();
 
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(userCredential => {
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
       const user = userCredential.user;
       window.showCustomDialog(`Welcome, ${user.email}!`);
       // ✅ Redirect to home after login
@@ -113,7 +134,7 @@ function emailLogin(event) {
         window.location.href = "../pages/home.html";
       }, 500);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("Login error:", error);
       window.showCustomDialog(`Error: ${error.message}`);
     });
@@ -123,130 +144,135 @@ function emailLogin(event) {
 
 function emailSignup(event) {
   event.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
 
   if (password !== confirmPassword) {
     window.showCustomDialog("Password and confirmation do not match.");
     return false;
   }
 
-  firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then(userCredential => {
-      window.showCustomDialog(`Account successfully created for ${userCredential.user.email}. Please log in.`);
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      window.showCustomDialog(
+        `Account successfully created for ${userCredential.user.email}. Please log in.`,
+      );
       window.location.href = "login.html";
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("Error during sign-up:", error);
       window.showCustomDialog(`Error: ${error.message}`);
     });
   return false;
 }
-  function isMobile() {
-    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  }
-  if (isMobile()) {
-    console.log("Mobile");
-    document.body.classList.add("mobile");
-  } else {
-    console.log("Desktop");
-    document.body.classList.add("desktop");
-  }
+function isMobile() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+if (isMobile()) {
+  console.log("Mobile");
+  document.body.classList.add("mobile");
+} else {
+  console.log("Desktop");
+  document.body.classList.add("desktop");
+}
 
 // === NAVBAR LOGIC ===
 document.addEventListener("DOMContentLoaded", () => {
-  const navbar = document.querySelector('.navbar');
+  const navbar = document.querySelector(".navbar");
   if (!navbar) {
-    console.log('Navbar not found.');
+    console.log("Navbar not found.");
     return;
   }
 
   // Use event delegation so clicks on the icon or its parent .nav-item both work
-  navbar.addEventListener('click', (e) => {
+  navbar.addEventListener("click", (e) => {
     // Prefer nav-item wrapper (new markup). If absent, fall back to the <i> element.
-    const navItem = e.target.closest('.nav-item');
+    const navItem = e.target.closest(".nav-item");
     let icon = null;
-    if (navItem) icon = navItem.querySelector('i');
-    else icon = e.target.closest('i');
+    if (navItem) icon = navItem.querySelector("i");
+    else icon = e.target.closest("i");
 
     if (!icon || !navbar.contains(icon)) return;
 
     // Toggle active class on nav-item elements (if present)
-    const allItems = navbar.querySelectorAll('.nav-item');
+    const allItems = navbar.querySelectorAll(".nav-item");
     if (allItems.length) {
-      allItems.forEach(item => item.classList.remove('active'));
-      const toActivate = icon.closest('.nav-item');
-      if (toActivate) toActivate.classList.add('active');
+      allItems.forEach((item) => item.classList.remove("active"));
+      const toActivate = icon.closest(".nav-item");
+      if (toActivate) toActivate.classList.add("active");
     }
 
-    if (icon.classList.contains('fa-home')) window.location.href = '/pages/home.html';
-    else if (icon.classList.contains('fa-list-ul')) window.location.href = '/pages/task.html';
-    else if (icon.classList.contains('fa-user')) window.location.href = '/pages/profile.html';
-
+    if (icon.classList.contains("fa-home"))
+      window.location.href = "/pages/home.html";
+    else if (icon.classList.contains("fa-list-ul"))
+      window.location.href = "/pages/task.html";
+    else if (icon.classList.contains("fa-user"))
+      window.location.href = "/pages/profile.html";
   });
 
-  console.log('Navbar delegation listener ready!');
+  console.log("Navbar delegation listener ready!");
 });
 
 async function fetchData(endpoint, options = {}) {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        console.error('Pengguna tidak login, membatalkan permintaan.');
-        return;
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    console.error("Pengguna tidak login, membatalkan permintaan.");
+    return;
+  }
+
+  try {
+    const token = await user.getIdToken();
+
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (options.body) {
+      headers["Content-Type"] = "application/json";
     }
 
-    try {
-        const token = await user.getIdToken();
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: headers,
+    });
 
-        const headers = {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`
-        };
-
-        if (options.body) {
-            headers['Content-Type'] = 'application/json';
-        }
-
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            ...options,
-            headers: headers
-        });
-
-        if (!response.ok) {
-            // ... (logika penanganan error)
-            console.error(`Error ${response.status}: ${await response.text()}`);
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // Cek jika respons memiliki konten sebelum parsing JSON
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            return await response.json();
-        } else {
-            return await response.text(); // Untuk respons non-JSON (misal: 'OK')
-        }
-
-    } catch (error) {
-        console.error('Gagal mengambil data:', error);
-        throw error;
+    if (!response.ok) {
+      // ... (logika penanganan error)
+      console.error(`Error ${response.status}: ${await response.text()}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    // Cek jika respons memiliki konten sebelum parsing JSON
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return await response.json();
+    } else {
+      return await response.text(); // Untuk respons non-JSON (misal: 'OK')
+    }
+  } catch (error) {
+    console.error("Gagal mengambil data:", error);
+    throw error;
+  }
 }
 
 // NEW UTILITY: Format ISO Date to YYYY-MM-DD
 function formatIsoToYyyyMmDd(isoString) {
-    if (!isoString) return '';
-    try {
-        const date = new Date(isoString);
-        if (isNaN(date)) return '';
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    } catch (e) {
-        console.error("Error formatting date:", e);
-        return '';
-    }
+  if (!isoString) return "";
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date)) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  } catch (e) {
+    console.error("Error formatting date:", e);
+    return "";
+  }
 }
 window.TaskApp = window.TaskApp || {};
 // Expose secara global via TaskApp untuk digunakan di search.js, dll.

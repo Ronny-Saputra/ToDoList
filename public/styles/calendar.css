@@ -1,596 +1,593 @@
 :root {
-    --light-blue-bg: #d5e7ff; 
-    --dark-blue-bg: #a8cef5; 
-    --text-color: #2c3e50;
-    --date-box-bg: #ffffff; 
-    --date-box-border: #e8f1ff;
-    --today-color: #ffd700;
-    --selected-color: #1e3a8a;
-    --hover-color: #e3f2fd;
-    --weekday-color: #5a6c7d;
+  --light-blue-bg: #d5e7ff;
+  --dark-blue-bg: #a8cef5;
+  --text-color: #2c3e50;
+  --date-box-bg: #ffffff;
+  --date-box-border: #e8f1ff;
+  --today-color: #ffd700;
+  --selected-color: #1e3a8a;
+  --hover-color: #e3f2fd;
+  --weekday-color: #5a6c7d;
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Lexend', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Lexend", sans-serif;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
+html,
+body {
+  width: 100%;
+  height: 100%;
 }
-
 
 body {
-    background-color: #f5f5f5; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; 
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
 .calendar-page-container {
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Wrapper kalender dengan latar belakang gradien biru (Desktop Default) */
 .calendar-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(180deg, #c8ddf5 0%, #9ec5f0 100%);
-    overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #c8ddf5 0%, #9ec5f0 100%);
+  overflow: hidden;
 }
 
 .mobile-only {
-    display: none;
+  display: none;
 }
 
 .desktop-only {
-    display: flex;
+  display: flex;
 }
 
 /* ========== BACK BUTTON (DESKTOP & MOBILE) ========== */
 .back-btn-calendar {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 100;
-    transition: all 0.2s ease;
-    color: var(--text-color);
-    font-size: 1.2em;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+  color: var(--text-color);
+  font-size: 1.2em;
 }
 
 .back-btn-calendar:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.05);
 }
 
 .back-btn-calendar:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 /* ========== MOBILE NAVIGATION ========== */
 .month-navigation {
-    display: none; /* Hidden by default on desktop */
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 20px 0 20px;
-    flex-shrink: 0;
-    background: transparent;
+  display: none; /* Hidden by default on desktop */
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 0 20px;
+  flex-shrink: 0;
+  background: transparent;
 }
 
 .nav-btn {
-    background-color: transparent;
-    border: none;
-    width: 40px;
-    height: 40px;
-    font-size: 2em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
-    transition: all 0.2s ease;
-    margin-top: 0;
+  background-color: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 2em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  transition: all 0.2s ease;
+  margin-top: 0;
 }
 
 .nav-btn:hover {
-    color: var(--selected-color);
-    transform: scale(1.1);
+  color: var(--selected-color);
+  transform: scale(1.1);
 }
 
 .nav-btn:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 .month-year-title {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: var(--text-color);
-    text-align: center;
-    flex: 1;
-    margin-top: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--text-color);
+  text-align: center;
+  flex: 1;
+  margin-top: 0;
 }
 
 /* ========== MOBILE SWIPE CONTAINER ========== */
 .mobile-calendar-container {
-    flex: 1;
-    overflow: hidden; 
-    position: relative;
-    touch-action: pan-y;
-    padding: 20px 0 0 0;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-y;
+  padding: 20px 0 0 0;
 }
 
 .swipe-wrapper {
-    display: flex;
-    height: 100%;
-    transition: transform 0.3s ease;
-    will-change: transform;
+  display: flex;
+  height: 100%;
+  transition: transform 0.3s ease;
+  will-change: transform;
 }
 
 .swipe-month {
-    min-width: 100%;
-    flex-shrink: 0;
-    padding: 0 20px; /* Padding di desktop untuk desktop view */
-    display: flex;
-    flex-direction: column;
+  min-width: 100%;
+  flex-shrink: 0;
+  padding: 0 20px; /* Padding di desktop untuk desktop view */
+  display: flex;
+  flex-direction: column;
 }
-
 
 /* ========== DESKTOP YEAR SELECTOR & GRID ========== */
 .year-selector {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    padding: 30px 20px 20px 20px;
-    flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 30px 20px 20px 20px;
+  flex-shrink: 0;
 }
 
 .year-btn {
-    background-color: transparent;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.5em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    color: var(--text-color);
+  background-color: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text-color);
 }
 
 .year-btn:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.05);
 }
 
 .year-btn:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 .current-year {
-    font-size: 1.3em;
-    font-weight: 600;
-    color: var(--text-color);
-    min-width: 100px;
-    text-align: center;
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--text-color);
+  min-width: 100px;
+  text-align: center;
 }
 
 .month-list-container {
-    flex: 1;
-    overflow-y: auto; 
-    overflow-x: hidden;
-    padding: 0 20px 20px 20px;
-    
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px; 
-    align-content: start;
-    
-    /* Style scrollbar desktop */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
-}
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 20px 20px 20px;
 
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  align-content: start;
+
+  /* Style scrollbar desktop */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
 
 /* ========== CALENDAR CORE STYLES (SHARED) ========== */
 .month-calendar {
-    padding: 20px 18px;
-    text-align: center;
-    background-color: transparent;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    border: rgba(255, 255, 255, 0.527) solid 1.5px;
+  padding: 20px 18px;
+  text-align: center;
+  background-color: transparent;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  border: rgba(255, 255, 255, 0.527) solid 1.5px;
 }
 
 .month-title {
-    font-weight: 600;
-    margin-bottom: 18px;
-    font-size: 1.15em;
-    color: var(--text-color);
-    letter-spacing: 0.3px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  font-size: 1.15em;
+  color: var(--text-color);
+  letter-spacing: 0.3px;
 }
 
 .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    font-weight: 500;
-    margin-bottom: 10px;
-    font-size: 0.8em;
-    color: var(--weekday-color);
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-weight: 500;
+  margin-bottom: 10px;
+  font-size: 0.8em;
+  color: var(--weekday-color);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .dates {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
 }
 
 .date-box {
-    background-color: var(--date-box-bg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); 
-    min-height: 60px;
-    width: 100%;
+  background-color: var(--date-box-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  min-height: 60px;
+  width: 100%;
 
-    display: flex;
-    flex-direction: column; /* Ubah ke kolom untuk menampung dot indicator */
-    justify-content: center;
-    align-items: center;
-    border-radius: 12px;
-    font-weight: 500;
-    color: var(--text-color);
-    user-select: none;
-    font-size: 0.95em;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    padding-bottom: 25px; /* Tambahkan padding bawah untuk dot */
+  display: flex;
+  flex-direction: column; /* Ubah ke kolom untuk menampung dot indicator */
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  font-weight: 500;
+  color: var(--text-color);
+  user-select: none;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  padding-bottom: 25px; /* Tambahkan padding bawah untuk dot */
 }
 
 .date-box:not(.outside-month):not(.empty):hover {
-    background-color: var(--hover-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  background-color: var(--hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
 /* Kotak tanggal dari bulan lain (Desktop View Only) */
 .date-box.outside-month {
-    opacity: 0.35;
-    color: #7a8a9a;
-    background-color: rgba(255, 255, 255, 0.6); 
-    cursor: default;
-    font-weight: 400;
+  opacity: 0.35;
+  color: #7a8a9a;
+  background-color: rgba(255, 255, 255, 0.6);
+  cursor: default;
+  font-weight: 400;
 }
 
 /* ✅ KOTAK KOSONG (Dipakai untuk menyembunyikan tanggal luar di mobile) */
 .date-box.empty {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    cursor: default !important;
-    pointer-events: none !important;
-    border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+  border: none !important;
 }
 
 .date-box.today {
-    background-color: var(--today-color);
-    color: #333;
-    font-weight: 600;
-    box-shadow: 0 3px 8px rgba(255, 215, 0, 0.4);
+  background-color: var(--today-color);
+  color: #333;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(255, 215, 0, 0.4);
 }
 
 .date-box.selected {
-    background-color: var(--selected-color);
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
+  background-color: var(--selected-color);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
 }
 
 /* ==================================================== */
 /* STYLING DOT INDICATOR DI KALENDER */
 /* ==================================================== */
 .dot-indicator-calendar {
-    position: absolute;
-    bottom: 5px; /* Sesuaikan posisi agar terlihat di bagian bawah */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    background-color: navy; /* Warna kuning/oranye untuk menandakan tugas */
-    border-radius: 50%;
+  position: absolute;
+  bottom: 5px; /* Sesuaikan posisi agar terlihat di bagian bawah */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: navy; /* Warna kuning/oranye untuk menandakan tugas */
+  border-radius: 50%;
 }
 /* Pastikan titik terlihat saat tanggal terpilih */
 .date-box.selected .dot-indicator-calendar {
-    background-color: white; 
+  background-color: white;
 }
-
 
 /* ========== FOOTER ========== */
 .calendar-footer {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    flex-shrink: 0;
-    padding: 12px;
-    background-color: transparent;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 12px;
+  background-color: transparent;
 }
 
 .add-reminder-box {
-    width: 90%; 
-    max-width: 700px;
-    height: 55px;
-    background-color: #FFFFFF;
-    border: 1px solid #d0d0d0;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 500;
-    color: #666;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    font-size: 0.95em;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  width: 90%;
+  max-width: 700px;
+  height: 55px;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  color: #666;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .add-reminder-box:hover {
-    background-color: #f8f8f8;
-    border-color: #b0b0b0;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  background-color: #f8f8f8;
+  border-color: #b0b0b0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .add-reminder-box:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* ==================================================== */
 /* ========== TABLET VIEW (768px - 1200px) ========== */
 /* ==================================================== */
 @media (max-width: 1200px) and (min-width: 768px) {
-    .month-list-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 25px;
-    }
+  .month-list-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
 }
 
 /* ==================================================== */
 /* ========== MOBILE VIEW OVERRIDES (MAX-WIDTH 767px) ========== */
 /* ==================================================== */
 @media (max-width: 767px) {
-    /* 1. Latar Belakang Utama (Full Screen Gradient) */
-    body {
-        background: linear-gradient(180deg, #c8ddf5 0%, #9ec5f0 100%);
-        height: 100vh;
-        width: 100vw;
-        overflow: hidden;
-    }
-    
-    .calendar-wrapper {
-        background: transparent;
-    }
+  /* 1. Latar Belakang Utama (Full Screen Gradient) */
+  body {
+    background: linear-gradient(180deg, #c8ddf5 0%, #9ec5f0 100%);
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
 
-    /* ✅ Visibility Control: Sembunyikan Desktop, Tampilkan Mobile */
-    .mobile-only {
-        display: flex;
-    }
-    
-    .desktop-only {
-        display: none !important;
-    }
+  .calendar-wrapper {
+    background: transparent;
+  }
 
-    /* 2. Mobile Container */
-    .mobile-calendar-container {
-        flex: 1;
-        background: transparent;
-        padding: 0;
-    }
-    
-    /* 3. Swipe Wrapper (Penting untuk menghilangkan overflow) */
-    .swipe-wrapper {
-        display: flex;
-        height: 80%;
-        transition: transform 0.3s ease;
-        will-change: transform;
-        width: 100%; 
-    }
+  /* ✅ Visibility Control: Sembunyikan Desktop, Tampilkan Mobile */
+  .mobile-only {
+    display: flex;
+  }
 
-    /* 4. Navigasi Bulan - Tampilkan di Mobile */
-    .month-navigation {
-        display: flex; 
-        padding: 15px 20px 0 20px; 
-    }
+  .desktop-only {
+    display: none !important;
+  }
 
-    /* 5. Month Swipe Block */
-    .swipe-month {
-        min-width: 100%;
-        flex-shrink: 0;
-        padding: 15px 0 20px 0; 
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-    }
-    
-    /* ✅ Wrapper Biru Muda */
-    .calendar-card-mobile {
-        border: #eaf3ff solid 1.5px; 
-        margin: 0 20px; 
-        padding: 0 0 20px 0; 
-        border-radius: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        flex-grow: 1; 
-    }
+  /* 2. Mobile Container */
+  .mobile-calendar-container {
+    flex: 1;
+    background: transparent;
+    padding: 0;
+  }
 
-    /* 6. Calendar Block - Menambahkan padding horizontal di sini */
-    .month-calendar {
-        background-color: transparent;
-        box-shadow: none;
-        padding: 0 15px; 
-        flex-grow: 1; 
-        height: auto; 
-        border: none;
-    }
+  /* 3. Swipe Wrapper (Penting untuk menghilangkan overflow) */
+  .swipe-wrapper {
+    display: flex;
+    height: 80%;
+    transition: transform 0.3s ease;
+    will-change: transform;
+    width: 100%;
+  }
 
-    .month-title {
-        display: none;
-    }
+  /* 4. Navigasi Bulan - Tampilkan di Mobile */
+  .month-navigation {
+    display: flex;
+    padding: 15px 20px 0 20px;
+  }
 
-    /* 7. Weekdays Header - Menghapus padding horizontal dari sini */
-    .weekdays {
-        font-size: 0.75em;
-        margin-bottom: 12px;
-        border-bottom: none;
-        font-weight: 600; 
-        padding: 15px 0 10px 0;
-    }
+  /* 5. Month Swipe Block */
+  .swipe-month {
+    min-width: 100%;
+    flex-shrink: 0;
+    padding: 15px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
 
-    /* 8. Kotak Tanggal (Date Boxes) */
-    .dates {
-        gap: 8px; 
-        flex-grow: 1; 
-        align-content: flex-start;
-    }
+  /* ✅ Wrapper Biru Muda */
+  .calendar-card-mobile {
+    border: #eaf3ff solid 1.5px;
+    margin: 0 20px;
+    padding: 0 0 20px 0;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+  }
 
-    .date-box {
-        min-height: 50px; 
-        border-radius: 8px; 
-        font-size: 0.9em;
-        font-weight: 600; 
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        padding-bottom: 25px;
-    }
+  /* 6. Calendar Block - Menambahkan padding horizontal di sini */
+  .month-calendar {
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0 15px;
+    flex-grow: 1;
+    height: auto;
+    border: none;
+  }
 
-    .date-box.outside-month {
-        /* Hapus styling ini agar tidak bentrok dengan .empty */
-        background-color: transparent; 
-        opacity: 0; 
-    }
-    
-    .date-box.empty {
-        /* Pastikan gaya ini menang di mobile */
-        background-color: transparent !important;
-    }
+  .month-title {
+    display: none;
+  }
 
-    /* 9. Footer (Add Reminder) */
-    .calendar-footer {
-        /* Sesuaikan dengan warna card */
-        padding: 10px 0 20px 0;
-        flex-shrink: 0;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        margin: 0 0; 
-    }
+  /* 7. Weekdays Header - Menghapus padding horizontal dari sini */
+  .weekdays {
+    font-size: 0.75em;
+    margin-bottom: 12px;
+    border-bottom: none;
+    font-weight: 600;
+    padding: 15px 0 10px 0;
+  }
 
-    .add-reminder-box {
-        width: calc(100% - 20%); 
-        height: 40px; 
-        border-radius: 10px;
-        border: none; 
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+  /* 8. Kotak Tanggal (Date Boxes) */
+  .dates {
+    gap: 8px;
+    flex-grow: 1;
+    align-content: flex-start;
+  }
 
-    /* Penyesuaian Dot Indicator Mobile */
-    .dot-indicator-calendar {
-        bottom: 3px; 
-        width: 5px;
-        height: 5px;
-    }
+  .date-box {
+    min-height: 50px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding-bottom: 25px;
+  }
 
-    .nav-btn {
-        margin-top: 40px;
-    }
+  .date-box.outside-month {
+    /* Hapus styling ini agar tidak bentrok dengan .empty */
+    background-color: transparent;
+    opacity: 0;
+  }
 
-    .month-year-title {
-        margin-top: 40px;
-    }
+  .date-box.empty {
+    /* Pastikan gaya ini menang di mobile */
+    background-color: transparent !important;
+  }
+
+  /* 9. Footer (Add Reminder) */
+  .calendar-footer {
+    /* Sesuaikan dengan warna card */
+    padding: 10px 0 20px 0;
+    flex-shrink: 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    margin: 0 0;
+  }
+
+  .add-reminder-box {
+    width: calc(100% - 20%);
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Penyesuaian Dot Indicator Mobile */
+  .dot-indicator-calendar {
+    bottom: 3px;
+    width: 5px;
+    height: 5px;
+  }
+
+  .nav-btn {
+    margin-top: 40px;
+  }
+
+  .month-year-title {
+    margin-top: 40px;
+  }
 }
 
 /* Mobile Small (penyesuaian untuk layar sangat kecil) */
 @media (max-width: 480px) {
-    .nav-btn {
-        margin-top: 70px;
-    }
+  .nav-btn {
+    margin-top: 70px;
+  }
 
-    .month-year-title {
-        margin-top: 70px;
-    }
+  .month-year-title {
+    margin-top: 70px;
+  }
 
-    .month-navigation {
-        padding: 12px 15px 0 15px;
-    }
+  .month-navigation {
+    padding: 12px 15px 0 15px;
+  }
 
-    .swipe-month {
-        padding: 10px 0 15px 0; 
-    }
-    
-    .calendar-card-mobile {
-        margin: 0 15px;
-    }
-    
-    .month-calendar {
-        padding: 0 10px; 
-    }
+  .swipe-month {
+    padding: 10px 0 15px 0;
+  }
 
-    .dates {
-        gap: 8px; 
-    }
+  .calendar-card-mobile {
+    margin: 0 15px;
+  }
 
-    .date-box {
-        font-size: 0.85em;
-        border-radius: 6px; 
-    }
+  .month-calendar {
+    padding: 0 10px;
+  }
 
-    .calendar-footer {
-        padding: 10px 0 15px 0;
-        margin: 0 12px;
-    }
-    
-    .add-reminder-box {
-        height: 40px;
-        font-size: 0.8em;
-    }
+  .dates {
+    gap: 8px;
+  }
+
+  .date-box {
+    font-size: 0.85em;
+    border-radius: 6px;
+  }
+
+  .calendar-footer {
+    padding: 10px 0 15px 0;
+    margin: 0 12px;
+  }
+
+  .add-reminder-box {
+    height: 40px;
+    font-size: 0.8em;
+  }
 }
 
 /* ==================================================== */
 /* ========== LARGE DESKTOP VIEW (MIN-WIDTH 1440px) ========== */
 /* ==================================================== */
 @media (min-width: 1440px) {
-    /* Gap antar tanggal: Lebih kecil agar kotak bisa lebih tinggi */
-    .dates {
-        gap: 15px; /* Dikurangi dari 6px ke 3px untuk ruang vertikal lebih besar */
-    }
+  /* Gap antar tanggal: Lebih kecil agar kotak bisa lebih tinggi */
+  .dates {
+    gap: 15px; /* Dikurangi dari 6px ke 3px untuk ruang vertikal lebih besar */
+  }
 
-    /* Kotak Tanggal: MEMANJANG KE BAWAH */
-    .date-box {
-        min-height: 80px; /* Diperbesar drastis untuk efek memanjang yang lebih jelas */
-        padding-bottom: 30px; /* Tambah padding bawah untuk ruang dot indicator */
-    }
+  /* Kotak Tanggal: MEMANJANG KE BAWAH */
+  .date-box {
+    min-height: 80px; /* Diperbesar drastis untuk efek memanjang yang lebih jelas */
+    padding-bottom: 30px; /* Tambah padding bawah untuk ruang dot indicator */
+  }
 
-    /* Indikator Titik: Sesuaikan dengan tinggi baru */
-    .dot-indicator-calendar {
-        bottom: 10px; /* Sesuaikan posisi dengan tinggi baru */
-        width: 7px;
-        height: 7px;
-    }
+  /* Indikator Titik: Sesuaikan dengan tinggi baru */
+  .dot-indicator-calendar {
+    bottom: 10px; /* Sesuaikan posisi dengan tinggi baru */
+    width: 7px;
+    height: 7px;
+  }
 }

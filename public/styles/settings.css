@@ -1,487 +1,485 @@
 /* settings.css */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-        body {
-            font-family: 'Lexend', sans-serif;
-            background-color: #F5F7FA;
-            color: #1e2a78;
-            min-height: auto;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 39px;
-        }
+body {
+  font-family: "Lexend", sans-serif;
+  background-color: #f5f7fa;
+  color: #1e2a78;
+  min-height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 39px;
+}
 
-        /* BATASI TINGGI MAKSIMAL KOTAK */
-        .settings-container {
-            width: 100%;
-            max-width: 530px;
-            max-height: 85vh;
-            background: #FFFFFF;
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 0; /* Hilangkan padding bawah */
-        }
+/* BATASI TINGGI MAKSIMAL KOTAK */
+.settings-container {
+  width: 100%;
+  max-width: 530px;
+  max-height: 85vh;
+  background: #ffffff;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0; /* Hilangkan padding bawah */
+}
 
-        /* Header tetap di atas */
-        .settings-header {
-            background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-            padding: 20px 24px 20px 24px; /* padding bawah tetap */
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            color: #14142A;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            flex-shrink: 0;
-            border-radius: 25px;
-        }
+/* Header tetap di atas */
+.settings-header {
+  background: linear-gradient(to bottom, #dde8f8, #b9d4f5, #9ac1f0);
+  padding: 20px 24px 20px 24px; /* padding bawah tetap */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #14142a;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+  border-radius: 25px;
+}
 
 .back-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #14142A;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
-    position: relative;
-    z-index: 101;
-    pointer-events: auto;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #14142a;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 101;
+  pointer-events: auto;
 }
 
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.5);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-        .settings-header h1 {
-            font-size: 20px;
-            font-weight: 600;
-            margin: 0;
-        }
+.settings-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
 
- /* Menu TIDAK bisa scroll (statis) */
+/* Menu TIDAK bisa scroll (statis) */
 .settings-menu {
-    padding: 15px 9px;
-    flex-grow: 1;
-    background: #FFFFFF;
-    /* HAPUS overflow-y: auto; */
-    /* HAPUS -webkit-overflow-scrolling: touch; */
-    /* HAPUS -ms-overflow-style: none; */
-    /* HAPUS scrollbar-width: none; */
+  padding: 15px 9px;
+  flex-grow: 1;
+  background: #ffffff;
+  /* HAPUS overflow-y: auto; */
+  /* HAPUS -webkit-overflow-scrolling: touch; */
+  /* HAPUS -ms-overflow-style: none; */
+  /* HAPUS scrollbar-width: none; */
 }
 
-        /* Wrapper untuk background biru */
-        .menu-content-wrapper {
-            background: #E3EEFB;
-            border-radius: 15px;
-            padding: 24px 24px 20px 24px; /* Tambah 80px di bawah */
-            box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.40);  /* Bayangan merata semua sisi */
-            color: white;
-            flex-shrink: 0;
-            z-index: 1;
-            position: relative;
-            margin-bottom: 60px; /* Jaga jarak dari bawah layar */
-        }
+/* Wrapper untuk background biru */
+.menu-content-wrapper {
+  background: #e3eefb;
+  border-radius: 15px;
+  padding: 24px 24px 20px 24px; /* Tambah 80px di bawah */
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4); /* Bayangan merata semua sisi */
+  color: white;
+  flex-shrink: 0;
+  z-index: 1;
+  position: relative;
+  margin-bottom: 60px; /* Jaga jarak dari bawah layar */
+}
 
-        .menu-section {
-            margin-bottom: 10px;
-        }
+.menu-section {
+  margin-bottom: 10px;
+}
 
-        .menu-section:last-child {
-            margin-bottom: 0;
-        }
+.menu-section:last-child {
+  margin-bottom: 0;
+}
 
-        .menu-section h3 {
-            font-size: 12px;
-            font-weight: 600;
-            color: #14142A;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.menu-section h3 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #14142a;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-        .menu-section ul {
-            list-style: none;
-        }
+.menu-section ul {
+  list-style: none;
+}
 
-        .menu-section li {
-            margin-bottom: 7px;
-        }
+.menu-section li {
+  margin-bottom: 7px;
+}
 
-        .menu-section a {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 9px 16px;
-            background: #FFFFFF;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 400;
-            color: #14142A;
-            text-decoration: none;
-            transition: all 0.3s ease;  /* ← DIUBAH dari 0.2s */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);  /* ← TAMBAHAN INI */
-        }
+.menu-section a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 16px;
+  background: #ffffff;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #14142a;
+  text-decoration: none;
+  transition: all 0.3s ease; /* ← DIUBAH dari 0.2s */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* ← TAMBAHAN INI */
+}
 
+.menu-section a:hover {
+  background: #ffffff; /* ← DIUBAH dari #F0F4F8 */
+  transform: translateY(-3px); /* ← DIUBAH dari translateX(4px) */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* ← TAMBAHAN INI */
+}
 
-        .menu-section a:hover {
-            background: #FFFFFF;  /* ← DIUBAH dari #F0F4F8 */
-            transform: translateY(-3px);  /* ← DIUBAH dari translateX(4px) */
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);  /* ← TAMBAHAN INI */
-        }
+/* ROBOT ILLUSTRATION - Posisi "nempel" di atas kotak biru */
+.robot-illustration {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: auto;
+  z-index: 2;
+  pointer-events: none;
+}
 
-        /* ROBOT ILLUSTRATION - Posisi "nempel" di atas kotak biru */
-        .robot-illustration {
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: auto;
-            z-index: 2;
-            pointer-events: none;
-        }
+.robot-illustration img {
+  width: 100%;
+  height: auto;
+  /* Membuat robot "menutupi" kotak biru dan putih di bawahnya */
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
 
-        .robot-illustration img {
-            width: 100%;
-            height: auto;
-            /* Membuat robot "menutupi" kotak biru dan putih di bawahnya */
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-        }
+/* RESPONSIF: TABLET (≤768px) */
+@media (max-width: 768px) {
+  body {
+    padding: 20px;
+  }
 
-        /* RESPONSIF: TABLET (≤768px) */
-        @media (max-width: 768px) {
-            body {
-                padding: 20px;
-            }
+  .settings-container {
+    max-width: 100%;
+    max-height: 90vh;
+  }
 
-            .settings-container {
-                max-width: 100%;
-                max-height: 90vh;
-            }
+  .settings-header {
+    padding: 18px 20px;
+    gap: 12px;
+  }
 
-            .settings-header {
-                padding: 18px 20px;
-                gap: 12px;
-            }
+  .settings-header h1 {
+    font-size: 18px;
+  }
 
-            .settings-header h1 {
-                font-size: 18px;
-            }
+  .back-btn {
+    font-size: 22px;
+  }
 
-            .back-btn {
-                font-size: 22px;
-            }
+  .settings-menu {
+    padding: 12px 16px 16px;
+    gap: 14px;
+  }
 
-            .settings-menu {
-                padding: 12px 16px 16px;
-                gap: 14px;
-            }
+  .menu-content-wrapper {
+    padding: 16px;
+    border-radius: 16px;
+    gap: 14px;
+    margin-bottom: 70px;
+  }
 
-            .menu-content-wrapper {
-                padding: 16px;
-                border-radius: 16px;
-                gap: 14px;
-                margin-bottom: 70px;
-            }
+  .menu-section h3 {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
 
-            .menu-section h3 {
-                font-size: 12px;
-                margin-bottom: 6px;
-            }
+  .menu-section a {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
 
-            .menu-section a {
-                padding: 10px 14px;
-                font-size: 13px;
-                border-radius: 10px;
-            }
-
-            .robot-illustration {
-                width: 180px;
-                bottom: -5px;
-            }
-        }
+  .robot-illustration {
+    width: 180px;
+    bottom: -5px;
+  }
+}
 
 /* RESPONSIF: MOBILE (≤480px) - FULLSCREEN */
-        @media (max-width: 480px) {
-            body {
-                padding: 0;              /* Hilangkan padding body */
-                background-color: #FFFFFF;  /* Background putih penuh */
-                overflow: hidden
-            }
+@media (max-width: 480px) {
+  body {
+    padding: 0; /* Hilangkan padding body */
+    background-color: #ffffff; /* Background putih penuh */
+    overflow: hidden;
+  }
 
-            .settings-container {
-                max-height: 200vh;       /* Tinggi penuh layar */
-                height: 100vh;           /* Force tinggi 100% */
-                border-radius: 0;        /* Hilangkan border radius */
-                box-shadow: none;        /* Hilangkan shadow */
-                max-width: 100%;         /* Lebar penuh */
-                overflow: hidden
-            }
+  .settings-container {
+    max-height: 200vh; /* Tinggi penuh layar */
+    height: 100vh; /* Force tinggi 100% */
+    border-radius: 0; /* Hilangkan border radius */
+    box-shadow: none; /* Hilangkan shadow */
+    max-width: 100%; /* Lebar penuh */
+    overflow: hidden;
+  }
 
-            .settings-header {
-                padding: 45px 18px 20px;
-                gap: 25px;
-                border-radius: 0 0 25px 25px;  /* Hanya bawah rounded */
-            }
+  .settings-header {
+    padding: 45px 18px 20px;
+    gap: 25px;
+    border-radius: 0 0 25px 25px; /* Hanya bawah rounded */
+  }
 
-            .settings-header h1 {
-                font-size: 22px;
-            }
+  .settings-header h1 {
+    font-size: 22px;
+  }
 
-            .back-btn {
-                font-size: 20px;
-                padding: 6px;
-            }
+  .back-btn {
+    font-size: 20px;
+    padding: 6px;
+  }
 
-            .settings-menu {
-                padding: 20px 14px 14px;
-                gap: 12px;
-                height: calc(100vh - 95px);
-                overflow: hidden;     /* Enable scroll untuk konten */
-                -webkit-overflow-scrolling: touch;
-                flex: 1;
-            }
+  .settings-menu {
+    padding: 20px 14px 14px;
+    gap: 12px;
+    height: calc(100vh - 95px);
+    overflow: hidden; /* Enable scroll untuk konten */
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+  }
 
-             /* Aktifkan scroll saat zoom (browser akan otomatis detect) */
-            @media (min-resolution: 1.6dppx) {
-                .settings-menu {
-                    overflow-y: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-            }
-            
-            /* Sembunyikan scrollbar tapi tetap bisa scroll */
-            .settings-menu::-webkit-scrollbar {
-                display: none;
-            }
+  /* Aktifkan scroll saat zoom (browser akan otomatis detect) */
+  @media (min-resolution: 1.6dppx) {
+    .settings-menu {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
 
-            .settings-menu {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
+  /* Sembunyikan scrollbar tapi tetap bisa scroll */
+  .settings-menu::-webkit-scrollbar {
+    display: none;
+  }
 
-            /* Background biru lebih panjang + gap dengan robot */
-            .menu-content-wrapper {
-                padding: 20px 18px 50px;     /* Padding bawah lebih besar = kotak lebih panjang */
-                border-radius: 14px;
-                gap: 12px;
-                margin-bottom: 80px;         /* Gap antara kotak biru dan robot */
-                box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
-                min-height: min-content;
-            }
+  .settings-menu {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
-            .menu-section {
-                margin-bottom: 10px;         /* Spacing antar section lebih besar */
-            }
+  /* Background biru lebih panjang + gap dengan robot */
+  .menu-content-wrapper {
+    padding: 20px 18px 50px; /* Padding bawah lebih besar = kotak lebih panjang */
+    border-radius: 14px;
+    gap: 12px;
+    margin-bottom: 80px; /* Gap antara kotak biru dan robot */
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+    min-height: min-content;
+  }
 
-            .menu-section h3 {
-                font-size: 12px;             /* Header lebih besar */
-                margin-bottom: 8px;          /* Spacing lebih besar */
-            }
+  .menu-section {
+    margin-bottom: 10px; /* Spacing antar section lebih besar */
+  }
 
-            .menu-section li {
-                margin-bottom: 8px;          /* Spacing antar item lebih besar */
-            }
+  .menu-section h3 {
+    font-size: 12px; /* Header lebih besar */
+    margin-bottom: 8px; /* Spacing lebih besar */
+  }
 
-            .menu-section a {
-                padding: 10px 14px;          /* Padding lebih besar = item lebih tinggi */
-                font-size: 13px;             /* Font lebih besar */
-                border-radius: 18px;
-            }
+  .menu-section li {
+    margin-bottom: 8px; /* Spacing antar item lebih besar */
+  }
 
-            .robot-illustration {
-                width: 200px;
-                bottom: -4px;                /* Naik sedikit dari bawah */
-            }
-        }
+  .menu-section a {
+    padding: 10px 14px; /* Padding lebih besar = item lebih tinggi */
+    font-size: 13px; /* Font lebih besar */
+    border-radius: 18px;
+  }
 
+  .robot-illustration {
+    width: 200px;
+    bottom: -4px; /* Naik sedikit dari bawah */
+  }
+}
 
 /* POPUP LOGOUT - PERSIS SEPERTI GAMBAR */
 .logout-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 }
 
 .logout-popup-overlay.show {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .logout-popup {
-    background: white;
-    width: 90%;
-    max-width: 340px;
-    border-radius: 20px;
-    padding: 28px 20px 0;
-    text-align: center;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-    transform: scale(0.85);
-    transition: transform 0.3s ease;
+  background: white;
+  width: 90%;
+  max-width: 340px;
+  border-radius: 20px;
+  padding: 28px 20px 0;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  transform: scale(0.85);
+  transition: transform 0.3s ease;
 }
 
 .logout-popup-overlay.show .logout-popup {
-    transform: scale(1);
+  transform: scale(1);
 }
 
 .logout-popup h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e2a78;
-    margin: 0 0 20px 0;
-    line-height: 1.4;
-    padding: 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e2a78;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+  padding: 0 10px;
 }
 
 .logout-popup .buttons {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    border-top: 1px solid #e0e0e0;
-    position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  border-top: 1px solid #e0e0e0;
+  position: relative;
 }
 
 .logout-popup .btn {
-    flex: 1;
-    padding: 14px 0;
-    font-size: 16px;
-    font-weight: 500;
-    color: #1e2a78;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    position: relative;
+  flex: 1;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1e2a78;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  position: relative;
 }
 
 .logout-popup .btn:first-child::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1px;
-    height: 100%;
-    background: #e0e0e0;
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: #e0e0e0;
 }
 
 .logout-popup .btn:hover {
-    color: #0d1a5e;
+  color: #0d1a5e;
 }
 
 /* POPUP DELETE ACCOUNT - SAMA DENGAN LOGOUT */
 .delete-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 }
 
 .delete-popup-overlay.show {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .delete-popup {
-    background: white;
-    width: 90%;
-    max-width: 340px;
-    border-radius: 20px;
-    padding: 28px 20px 0;
-    text-align: center;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-    transform: scale(0.85);
-    transition: transform 0.3s ease;
+  background: white;
+  width: 90%;
+  max-width: 340px;
+  border-radius: 20px;
+  padding: 28px 20px 0;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  transform: scale(0.85);
+  transition: transform 0.3s ease;
 }
 
 .delete-popup-overlay.show .delete-popup {
-    transform: scale(1);
+  transform: scale(1);
 }
 
 .delete-popup h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e2a78;
-    margin: 0 0 20px 0;
-    line-height: 1.4;
-    padding: 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e2a78;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+  padding: 0 10px;
 }
 
 .delete-popup .buttons {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    border-top: 1px solid #e0e0e0;
-    position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  border-top: 1px solid #e0e0e0;
+  position: relative;
 }
 
 .delete-popup .btn {
-    flex: 1;
-    padding: 14px 0;
-    font-size: 16px;
-    font-weight: 500;
-    color: #1e2a78;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    position: relative;
+  flex: 1;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1e2a78;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  position: relative;
 }
 
 .delete-popup .btn:first-child::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1px;
-    height: 100%;
-    background: #e0e0e0;
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: #e0e0e0;
 }
 
 .delete-popup .btn:hover {
-    color: #0d1a5e;
+  color: #0d1a5e;
 }
 
 /* Tombol konfirmasi hapus berwarna merah */
 #confirmDelete {
-    color: #d32f2f;
+  color: #d32f2f;
 }
 
 #confirmDelete:hover {
-    color: #b71c1c;
+  color: #b71c1c;
 }

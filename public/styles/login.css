@@ -5,17 +5,21 @@
   --avatar-size: clamp(150px, 35vw, 250px);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0 }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   margin: 0;
   padding: 0;
-  min-height: 100vh; 
+  min-height: 100vh;
   display: flex;
-  justify-content: center;  
-  align-items: center;     
-  background: #f0f0f0;   
-  font-family: 'Lexend', sans-serif;
+  justify-content: center;
+  align-items: center;
+  background: #f0f0f0;
+  font-family: "Lexend", sans-serif;
 }
 
 .page-wrap {
@@ -30,7 +34,7 @@ body {
 }
 
 .top-section {
-  flex: 1;  
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,8 +59,8 @@ body {
   z-index: 2;
 }
 
-.bottom-section { 
-  background: linear-gradient(180deg, #eaf4ff 0%, #CFE2F8 60%, #9AC1F0 100%);
+.bottom-section {
+  background: linear-gradient(180deg, #eaf4ff 0%, #cfe2f8 60%, #9ac1f0 100%);
   border-radius: 20px 20px 20px 20px;
   padding: 40px;
   display: flex;
@@ -67,11 +71,13 @@ body {
   z-index: 3;
 }
 
-.login-card { width: 100%; }
+.login-card {
+  width: 100%;
+}
 
 .title {
   font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 600;  
+  font-weight: 600;
   color: #0f2440;
   margin-bottom: 12px;
   margin-top: -15px;
@@ -83,7 +89,9 @@ body {
   gap: 12px;
 }
 
-.field { position: relative; }
+.field {
+  position: relative;
+}
 
 .field-icon {
   position: absolute;
@@ -99,28 +107,28 @@ body {
   height: 40px;
   padding: 0 10px 0 40px;
   border-radius: 8px;
-  border: 1px solid transparent; 
+  border: 1px solid transparent;
   background: #fff;
   font-size: small;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.05) inset;
-  transition: all 0.25s ease; 
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05) inset;
+  transition: all 0.25s ease;
 }
 
 .input:focus {
   outline: none;
-  border: 1px solid #2b4b78;   
-  box-shadow: 0 0 6px rgba(43,75,120,0.35); 
+  border: 1px solid #2b4b78;
+  box-shadow: 0 0 6px rgba(43, 75, 120, 0.35);
 }
 
-.forgot-wrap { 
-  display: flex; 
-  justify-content: flex-end; 
+.forgot-wrap {
+  display: flex;
+  justify-content: flex-end;
   margin: 4px 0;
 }
 
-.forgot-link { 
-  font-size: 12px; 
-  color: #2b4b78; 
+.forgot-link {
+  font-size: 12px;
+  color: #2b4b78;
   text-decoration: none;
   position: relative;
   transition: all 0.25s ease;
@@ -137,26 +145,36 @@ body {
 }
 .forgot-link:hover {
   color: #0d1f3a;
-  transform: translateY(-2px); 
-  text-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  transform: translateY(-2px);
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
-.forgot-link:hover::after { width: 100%; }
+.forgot-link:hover::after {
+  width: 100%;
+}
 
 .btn-login {
   margin-top: 6px;
-  background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-dark-2) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--primary-dark) 0%,
+    var(--primary-dark-2) 100%
+  );
   border: none;
   color: #fff;
   height: 35px;
   font-size: 14px;
   border-radius: 10px;
-  cursor: pointer;            
-  transition: all 0.3s ease;   
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 .btn-login:hover {
-  background: linear-gradient(180deg, var(--primary-dark-2) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--primary-dark-2) 0%,
+    var(--primary-dark) 100%
+  );
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .or-divider {
@@ -175,8 +193,12 @@ body {
   height: 1px;
   background: #1e3d70;
 }
-.or-divider::before { left: 6% }
-.or-divider::after { right: 6% }
+.or-divider::before {
+  left: 6%;
+}
+.or-divider::after {
+  right: 6%;
+}
 
 .socials {
   display: flex;
@@ -192,18 +214,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(16,32,64,0.06);
-  box-shadow: 0 6px 14px rgba(20,40,60,0.04);
-  transition: all 0.3s ease;  
-  cursor: pointer;             
+  border: 1px solid rgba(16, 32, 64, 0.06);
+  box-shadow: 0 6px 14px rgba(20, 40, 60, 0.04);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 .social-btn:hover {
-  transform: scale(1.08);                         
-  box-shadow: 0 8px 18px rgba(20,40,60,0.15);    
-  border-color: rgba(16,32,64,0.15);             
+  transform: scale(1.08);
+  box-shadow: 0 8px 18px rgba(20, 40, 60, 0.15);
+  border-color: rgba(16, 32, 64, 0.15);
 }
 
-.social-btn img { width: 24px; height: 24px; }
+.social-btn img {
+  width: 24px;
+  height: 24px;
+}
 
 .signup {
   text-align: center;
@@ -213,12 +238,12 @@ body {
 }
 
 .signup a {
-  position: relative;        
-  display: inline-block;    
+  position: relative;
+  display: inline-block;
   color: #1e3d70;
   font-weight: 600;
-  text-decoration: none;     
-  margin-left: 6px;  
+  text-decoration: none;
+  margin-left: 6px;
   transition: all 0.25s ease;
 }
 
@@ -227,7 +252,7 @@ body {
   position: absolute;
   left: 0;
   bottom: -3px;
-  width: 0;                  
+  width: 0;
   height: 2px;
   background: #1e3d70;
   transition: width 0.3s ease;
@@ -235,14 +260,13 @@ body {
 
 .signup a:hover {
   color: #0f2440;
-  transform: scale(1.0);     
-  text-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transform: scale(1);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
-.signup a:hover::after { 
-  width: 100%;               
+.signup a:hover::after {
+  width: 100%;
 }
-
 
 @media (max-width: 480px) {
   .page-wrap {
@@ -256,24 +280,24 @@ body {
     margin-top: 50px;
   }
 
-  .login-card { 
-    padding: 10px 
+  .login-card {
+    padding: 10px;
   }
-  
-  .avatar { 
+
+  .avatar {
     width: clamp(300px, 55vw, 400px);
-    height: clamp(300px, 55vw, 400px); 
-    margin-top: -40px; 
+    height: clamp(300px, 55vw, 400px);
+    margin-top: -40px;
   }
 
-  .btn-login { 
-    height: 40px; 
-    font-size: 13px 
+  .btn-login {
+    height: 40px;
+    font-size: 13px;
   }
 
-  .bottom-section { 
-    height: 70vh; 
-    margin-top: -100px; 
+  .bottom-section {
+    height: 70vh;
+    margin-top: -100px;
   }
 
   .signup {
@@ -293,8 +317,14 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .page-wrap {
@@ -354,4 +384,3 @@ body {
   animation-delay: 0.9s;
   opacity: 0;
 }
-

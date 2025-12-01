@@ -1,255 +1,308 @@
 /* report.css - 100% SESUAI GAMBAR & MUAT DALAM 1 KOTAK */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Lexend', sans-serif;
-    background-color: #F5F7FA;
-    color: #1e2a78;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 39px;
+  font-family: "Lexend", sans-serif;
+  background-color: #f5f7fa;
+  color: #1e2a78;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 39px;
 }
 
 /* KOTAK UTAMA - SAMA DENGAN SETTINGS */
 .settings-container {
-    width: 100%;
-    max-width: 530px;
-    max-height: 85vh;
-    background: #FFFFFF;
-    border-radius: 25px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  max-width: 530px;
+  max-height: 85vh;
+  background: #ffffff;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 /* HEADER - BULAT HANYA DI ATAS */
 .settings-header {
-    background: linear-gradient(to bottom, #DDE8F8, #B9D4F5, #9AC1F0);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    color: #14142A;
-    flex-shrink: 0;
-    border-radius: 25px 25px 0 0; /* Hanya atas yang bulat */
+  background: linear-gradient(to bottom, #dde8f8, #b9d4f5, #9ac1f0);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #14142a;
+  flex-shrink: 0;
+  border-radius: 25px 25px 0 0; /* Hanya atas yang bulat */
 }
 
 .back-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #14142A;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #14142a;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.5);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .settings-header h1 {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
 }
 
 /* MAIN - ISI FORM, RAPAT & MUAT */
 .report-main {
-    padding: 15px 24px 32px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    overflow: hidden;
+  padding: 15px 24px 32px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
 }
 
 .report-form {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 100%;
 }
 
 /* LABEL + BINTANG MERAH */
 .report-form label {
-    font-size: 12px;
-    font-weight: 700;
-    color: #14142A;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #14142a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .report-form label::after {
-    content: "*";
-    color: #e74c3c;
-    font-weight: bold;
+  content: "*";
+  color: #e74c3c;
+  font-weight: bold;
 }
 
 /* INPUT & TEXTAREA */
 .report-form input,
 .report-form textarea {
-    width: 100%;
-    padding: 8px 16px;
-    border: 1.0px solid #8F8F8F;
-    border-radius: 10px;
-    font-family: 'Lexend', sans-serif;
-    font-size: 14px;
-    color: #14142A;
-    background: #FFFFFF;
-    outline: none;
-    transition: border 0.3s ease;
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid #8f8f8f;
+  border-radius: 10px;
+  font-family: "Lexend", sans-serif;
+  font-size: 14px;
+  color: #14142a;
+  background: #ffffff;
+  outline: none;
+  transition: border 0.3s ease;
 }
 
 .report-form input:focus,
 .report-form textarea:focus {
-    border-color: #9AC1F0;
+  border-color: #9ac1f0;
 }
 
 .report-form textarea {
-    min-height: 90px;
-    max-height: 120px;
-    resize: none;
+  min-height: 90px;
+  max-height: 120px;
+  resize: none;
 }
 
 /* SCREENSHOT SECTION */
 .screenshot-section {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .screenshot-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #14142A;
+  font-size: 14px;
+  font-weight: 500;
+  color: #14142a;
 }
 
 .screenshot-info {
-    font-size: 12px;
-    color: #6E7B91;
-    margin-bottom: 8px;
+  font-size: 12px;
+  color: #6e7b91;
+  margin-bottom: 8px;
 }
 
 .upload-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 24px 16px;
-    background: #F8FAFD;
-    border: 1.5px dashed #DDE8F8;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    color: #6E7B91;
-    font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  background: #f8fafd;
+  border: 1.5px dashed #dde8f8;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  color: #6e7b91;
+  font-size: 14px;
 }
 
 .upload-btn:hover {
-    background: #EEF4FC;
-    border-color: #9AC1F0;
+  background: #eef4fc;
+  border-color: #9ac1f0;
 }
 
 .upload-btn i {
-    font-size: 32px;
-    color: #9AC1F0;
+  font-size: 32px;
+  color: #9ac1f0;
 }
 
 .upload-btn input[type="file"] {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0;
-    cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
 /* TOMBOL SUBMIT */
 .submit-btn {
-    margin-top: auto;
-    padding: 9px;
-    background: #283F6D;
-    color: #FFFFFF;
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(30, 42, 120, 0.2);
-    /* Tambahkan ini: lebar otomatis + max-width */
-    width: fit-content;
-    min-width: 140px;           /* Lebar minimum agar tidak terlalu kecil */
-    max-width: 280px;           /* Batasi lebar maksimal */
-    align-self: center;         /* Tengah secara horizontal */
+  margin-top: auto;
+  padding: 9px;
+  background: #283f6d;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(30, 42, 120, 0.2);
+  /* Tambahkan ini: lebar otomatis + max-width */
+  width: fit-content;
+  min-width: 140px; /* Lebar minimum agar tidak terlalu kecil */
+  max-width: 280px; /* Batasi lebar maksimal */
+  align-self: center; /* Tengah secara horizontal */
 }
 
 .submit-btn:hover {
-    background: #0d1a5e;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(30, 42, 120, 0.3);
+  background: #0d1a5e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 42, 120, 0.3);
 }
 
 /* RESPONSIF: TABLET */
 @media (max-width: 768px) {
-    body { padding: 20px; }
-    .settings-container { max-height: 90vh; }
-    .settings-header { padding: 18px 20px; gap: 12px; }
-    .settings-header h1 { font-size: 18px; }
-    .back-btn { font-size: 22px; }
-    .report-main { padding: 20px; gap: 14px; }
-    .report-form input,
-    .report-form textarea { padding: 12px 14px; font-size: 13px; }
-    .upload-btn { padding: 20px 14px; }
-    .upload-btn i { font-size: 28px; }
-    .submit-btn { padding: 10px; font-size: 13px; }
+  body {
+    padding: 20px;
+  }
+  .settings-container {
+    max-height: 90vh;
+  }
+  .settings-header {
+    padding: 18px 20px;
+    gap: 12px;
+  }
+  .settings-header h1 {
+    font-size: 18px;
+  }
+  .back-btn {
+    font-size: 22px;
+  }
+  .report-main {
+    padding: 20px;
+    gap: 14px;
+  }
+  .report-form input,
+  .report-form textarea {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .upload-btn {
+    padding: 20px 14px;
+  }
+  .upload-btn i {
+    font-size: 28px;
+  }
+  .submit-btn {
+    padding: 10px;
+    font-size: 13px;
+  }
 }
 
 /* RESPONSIF: MOBILE */
 @media (max-width: 480px) {
-    body { 
-        padding: 0; 
-        background-color: #FFFFFF;  /* Background putih penuh */
-        overflow: hidden
-    }
+  body {
+    padding: 0;
+    background-color: #ffffff; /* Background putih penuh */
+    overflow: hidden;
+  }
 
-    .settings-container { 
-        max-height: 200vh;       /* Tinggi penuh layar */
-        height: 100vh;           /* Force tinggi 100% */
-        border-radius: 0;        /* Hilangkan border radius */
-        box-shadow: none;        /* Hilangkan shadow */
-        max-width: 100%;         /* Lebar penuh */
-        overflow: hidden
-    }
+  .settings-container {
+    max-height: 200vh; /* Tinggi penuh layar */
+    height: 100vh; /* Force tinggi 100% */
+    border-radius: 0; /* Hilangkan border radius */
+    box-shadow: none; /* Hilangkan shadow */
+    max-width: 100%; /* Lebar penuh */
+    overflow: hidden;
+  }
 
-    .settings-header {
-        padding: 45px 18px 20px;
-        gap: 25px;
-        border-radius: 0 0 25px 25px; 
-    }
+  .settings-header {
+    padding: 45px 18px 20px;
+    gap: 25px;
+    border-radius: 0 0 25px 25px;
+  }
 
-    .settings-header h1 { font-size: 22px; }
-    .back-btn { font-size: 20px; padding: 6px; }
-    .report-main { padding: 20px; gap: 15px; }
-    .report-form label { font-size: 15px; margin-top: 10px; }
-    
-    .report-form input,
-    .report-form textarea { padding: 10px 12px; font-size: 12.5px; border-radius: 13px; }
-    .screenshot-info { font-size: 11px; }
-    .upload-btn { padding: 18px 12px; font-size: 13px; border-radius: 10px; }
-    .upload-btn i { font-size: 26px; }
-    .submit-btn { padding: 8px; font-size: 13px; border-radius: 10px; }
+  .settings-header h1 {
+    font-size: 22px;
+  }
+  .back-btn {
+    font-size: 20px;
+    padding: 6px;
+  }
+  .report-main {
+    padding: 20px;
+    gap: 15px;
+  }
+  .report-form label {
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  .report-form input,
+  .report-form textarea {
+    padding: 10px 12px;
+    font-size: 12.5px;
+    border-radius: 13px;
+  }
+  .screenshot-info {
+    font-size: 11px;
+  }
+  .upload-btn {
+    padding: 18px 12px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+  .upload-btn i {
+    font-size: 26px;
+  }
+  .submit-btn {
+    padding: 8px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
 }

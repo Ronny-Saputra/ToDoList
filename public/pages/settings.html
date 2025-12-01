@@ -1,115 +1,123 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-     <link rel="stylesheet" href="../styles/settings.css">
-</head>
-<body>
-
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/settings.css" />
+  </head>
+  <body>
     <div class="settings-container">
-        <header class="settings-header">
-            <button class="back-btn">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <h1>Settings</h1>
-        </header>
+      <header class="settings-header">
+        <button class="back-btn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <h1>Settings</h1>
+      </header>
 
-        <main class="settings-menu">
-            <div class="menu-content-wrapper">
-                <section class="menu-section">
-                    <h3>General</h3>
-                    <ul>
-                        <!-- Menjadi: -->
-                        <li><a href="streak_badge.html">Streak Badge <i class="fas fa-chevron-right"></i></a></li>
-                    </ul>
-                </section>
+      <main class="settings-menu">
+        <div class="menu-content-wrapper">
+          <section class="menu-section">
+            <h3>General</h3>
+            <ul>
+              <!-- Menjadi: -->
+              <li>
+                <a href="streak_badge.html"
+                  >Streak Badge <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+            </ul>
+          </section>
 
-                <section class="menu-section">
-                    <h3>Account</h3>
-                    <ul>
-                        <li><a href="#" class="danger">Log Out <i class="fas fa-chevron-right"></i></a></li>
-                        <li><a href="#" class="danger">Delete Account <i class="fas fa-chevron-right"></i></a></li>
-                    </ul>
-                </section>
+          <section class="menu-section">
+            <h3>Account</h3>
+            <ul>
+              <li>
+                <a href="#" class="danger"
+                  >Log Out <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+              <li>
+                <a href="#" class="danger"
+                  >Delete Account <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+            </ul>
+          </section>
 
-                <section class="menu-section support">
-                    <h3>Support</h3>
-                    <ul>
-                        <li><a href="report.html">Report a Bug <i class="fas fa-chevron-right"></i></a></li>
-                         <li><a href="feedback.html">Send Feedback <i class="fas fa-chevron-right"></i></a></li>
-                    </ul>
-                </section>
+          <section class="menu-section support">
+            <h3>Support</h3>
+            <ul>
+              <li>
+                <a href="report.html"
+                  >Report a Bug <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+              <li>
+                <a href="feedback.html"
+                  >Send Feedback <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+            </ul>
+          </section>
 
-                <section class="menu-section">
-                        <h3>More</h3>
-                        <ul>
-                            <li><a href="about_us.html">About Us <i class="fas fa-chevron-right"></i></a></li>
-                            <li><a href="privacy_policy.html">Privacy Policy <i class="fas fa-chevron-right"></i></a></li>
-                        </ul>
-                </section>
-            </div>
+          <section class="menu-section">
+            <h3>More</h3>
+            <ul>
+              <li>
+                <a href="about_us.html"
+                  >About Us <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+              <li>
+                <a href="privacy_policy.html"
+                  >Privacy Policy <i class="fas fa-chevron-right"></i
+                ></a>
+              </li>
+            </ul>
+          </section>
+        </div>
 
         <div class="robot-illustration">
-                <img src="../assets/timy_settings.png" alt="Support Robot">
-            </div>
-        </main>
+          <img src="../assets/timy_settings.png" alt="Support Robot" />
+        </div>
+      </main>
     </div>
 
-<!-- POPUP LOGOUT -->
-<div class="logout-popup-overlay" id="logoutPopup">
-    <div class="logout-popup">
+    <!-- POPUP LOGOUT -->
+    <div class="logout-popup-overlay" id="logoutPopup">
+      <div class="logout-popup">
         <h2>Apakah Anda yakin ingin keluar dari akun?</h2>
         <div class="buttons">
-            <button class="btn" id="cancelLogout">Tidak</button>
-            <button class="btn" id="confirmLogout">Ya</button>
+          <button class="btn" id="cancelLogout">Tidak</button>
+          <button class="btn" id="confirmLogout">Ya</button>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- POPUP DELETE ACCOUNT -->
-<div class="delete-popup-overlay" id="deletePopup">
-    <div class="delete-popup">
+    <!-- POPUP DELETE ACCOUNT -->
+    <div class="delete-popup-overlay" id="deletePopup">
+      <div class="delete-popup">
         <h2>Hapus akun permanen? Ini tidak bisa dibatalkan.</h2>
         <div class="buttons">
-            <button class="btn" id="cancelDelete">Tidak</button>
-            <button class="btn" id="confirmDelete">Ya, Hapus</button>
+          <button class="btn" id="cancelDelete">Tidak</button>
+          <button class="btn" id="confirmDelete">Ya, Hapus</button>
         </div>
+      </div>
     </div>
-</div>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCClI3DZCsdkyvmnp8YtcZmq8L4Ut0AmR0",
-            authDomain: "todolist-43.firebaseapp.com",
-            projectId: "todolist-43",
-            storageBucket: "todolist-43.appspot.com",
-            messagingSenderId: "795548747542",
-            appId: "1:795548747542:web:deb1efc52ed1aa247af237",
-            measurementId: "G-67K7H7XXWW" 
-        };
-        
-        // Inisialisasi Firebase jika belum diinisialisasi
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        
-        // Redirect jika pengguna tidak login
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) {
-                // Jika tidak ada pengguna, paksa kembali ke halaman login
-                window.location.href = "../pages/login.html";
-            }
-        });
-    </script>
+    <script src="../firebase-init.js"></script>
     <script src="../settings.js"></script>
-    
-</body>
+  </body>
 </html>
