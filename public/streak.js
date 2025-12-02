@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           // Cek popup: Jika streak bertambah, tampilkan popup
           if (updatedState.currentStreak > oldStreak) {
             window.showCustomDialog(
-              `🎉 YAY, you on fire ${updatedState.currentStreak} streak!`,
+              `🎉 Yay, you're on fire! ${updatedState.currentStreak} streak!`,
               [{ text: "OK", action: () => {}, isPrimary: true }],
             );
           }

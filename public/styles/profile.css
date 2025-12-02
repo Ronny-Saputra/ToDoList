@@ -44,16 +44,18 @@ body,
 /* ==================================================== */
 .profile-header {
   background: linear-gradient(to bottom, #dde8f8, #b9d4f5, #9ac1f0);
-  padding: 11px 40px;
+/* Ubah padding atas-bawah jadi kecil (5px) */
+  padding: 5px clamp(15px, 3vw, 40px);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   width: 100%;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 16px 16px;
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
   z-index: 100;
+  /* Paksa tinggi header jadi pendek (misal 70px - 85px) */
+  min-height: 75px; 
+  height: auto;
 }
 
 .profile-left {
@@ -64,16 +66,15 @@ body,
 }
 
 .profile-avatar {
-  width: 120px;
-  height: 120px;
+  /* Kurangi ukuran avatar dari 120px menjadi 55px-70px */
+  width: clamp(55px, 8vw, 70px) !important;
+  height: clamp(55px, 8vw, 70px) !important;
   flex-shrink: 0;
   border-radius: 50%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  border: 2px solid rgba(106, 106, 106, 0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* HANYA target avatar utama, BUKAN camera icon */
@@ -166,6 +167,7 @@ body,
   transform: translateY(-1px);
 }
 
+/* Cari bagian ini di profile.css */
 .settings-btn {
   display: flex;
   align-items: center;
@@ -175,7 +177,14 @@ body,
   margin-right: 90px;
   cursor: pointer;
   transition: transform 0.3s ease;
-  padding: 50px; /* Biar icon tidak nempel pinggir */
+  padding: 50px; 
+  
+  /* TAMBAHKAN INI UNTUK NAIKIN POSISI */
+  margin-top: -40px; /* Ubah angka ini (misal -10px atau -20px) sesuai selera */
+  
+  /* Opsi Alternatif jika margin tidak ngefek: */
+  /* position: relative; */
+  /* top: -10px; */
 }
 
 .settings-btn:hover {
@@ -194,29 +203,34 @@ body,
 /* ==================================================== */
 .main-content {
   flex-grow: 1;
-  padding: 25px;
-  padding-bottom: 80px;
+  /* PENTING: Gunakan height: 100% agar mengisi sisa ruang setelah header */
+  height: 100%; 
+  padding: 10px clamp(10px, 3%, 40px) 20px;
+  /* Sesuaikan padding-bottom agar tidak menabrak navbar */
+  padding-bottom: 90px; 
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
-  height: calc(100vh - 220px);
+  width: 100%;
 }
-
 /* ---------------------------------------------------- */
 /* WRAPPER UTAMA UNTUK SEMUA KONTEN */
 /* ---------------------------------------------------- */
 .content-wrapper {
   display: flex;
-  gap: 70px;
-  align-items: flex-start;
+  gap: clamp(20px, 3vw, 40px);
+  /* PENTING: Stretch agar tinggi kolom kiri & kanan SAMA */
+  align-items: stretch; 
   justify-content: center;
   width: 100%;
-  max-width: 1400px;
-  padding: 0 40px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 1200px;
   flex-direction: row-reverse;
+  flex-wrap: wrap;
+  /* PENTING: Agar wrapper mengisi tinggi layar */
+  flex-grow: 1; 
+  /* Hapus min-height jika ada, atau set 0 */
+  min-height: 0; 
 }
 
 /* ---------------------------------------------------- */
@@ -286,16 +300,21 @@ body,
 /* ---------------------------------------------------- */
 /* KARTU STATISTIK PRODUKTIVITAS */
 /* ---------------------------------------------------- */
+/* Cari bagian ini di profile.css */
 .stats-card {
   width: 100%;
-  max-width: 650px;
   background: linear-gradient(180deg, #e5effb 0%, #9ac1f0 100%);
   border-radius: 16px;
   padding: 16px;
-  box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.25);
-  min-height: 260px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  /* UBAH INI: Tambah angkanya sesuai keinginan (misal 320px) */
+  min-height: 320px; 
+  
   display: flex;
   flex-direction: column;
+  /* Tambahkan ini agar chart ikut memanjang jika wrapper memanjang */
+  flex-grow: 1; 
 }
 
 .card-header {
@@ -338,13 +357,14 @@ body,
 /* GRAFIK BATANG BARU (DARI statistic.js) */
 /* ---------------------------------------------------- */
 .chart-container {
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-  height: 200px;
   flex-grow: 1;
-  /* Tambahkan ruang atas agar bar tidak menyentuh header */
-  padding-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  /* Kurangi padding-top agar chart naik */
+  padding-top: 5px; 
+  height: 140px; 
 }
 
 /* Container untuk label hari di bawah chart */
@@ -397,10 +417,13 @@ body,
 .task-summary {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  /* Gunakan space-between agar kotak Completed di atas sejajar Tab, dan Deleted di bawah sejajar Chart */
+  justify-content: space-between; 
+  gap: 12px; /* Gap tetap ada sebagai jarak minimal */
   flex: 0 0 auto;
-  width: 135px;
-  margin-left: 40px;
+  width: clamp(140px, 20vw, 180px);
+  /* Hapus height fix jika ada, biarkan dia mengikuti tinggi parent (content-wrapper) */
+  height: auto; 
 }
 
 .task-summary .icon-wrapper i {
@@ -409,23 +432,25 @@ body,
 
 .summary-box {
   width: 100%;
-  height: 104px;
-  flex-shrink: 0;
-  border-radius: 8px;
+  aspect-ratio: unset;
+  flex-grow: 1;
+  
+  /* UBAH INI: Tambah tinggi minimalnya (misal jadi 100px atau 110px) */
+  min-height: 110px; 
+  
+  /* HAPUS atau comment bagian max-height ini agar bisa tumbuh bebas */
+  /* max-height: 100px; */ 
+  
+  border-radius: 12px;
+  padding: 16px; 
   background: #9ac1f0;
-  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-weight: 600;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    z-index 0.3s ease;
-  position: relative;
-  z-index: 1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
   cursor: pointer;
+  margin-bottom: 0; /* Hapus margin bawah jika ada */
 }
 
 .summary-box:hover {
@@ -1283,7 +1308,7 @@ body,
 .drawer-content {
   position: absolute;
   top: 0;
-  right: -100%;
+  right: -110%;
   width: 90%;
   max-width: 400px;
   height: 100%;
@@ -1700,7 +1725,7 @@ body,
 .completed-drawer .drawer-content {
   position: absolute;
   top: 0;
-  right: -100%;
+  right: -110%;
   width: 90%;
   max-width: 400px;
   height: 100%;
@@ -1868,7 +1893,7 @@ body,
 .deleted-drawer .drawer-content {
   position: absolute;
   top: 0;
-  right: -100%;
+  right: -110%;
   width: 90%;
   max-width: 400px;
   height: 100%;
@@ -2054,7 +2079,7 @@ body,
 .missed-drawer .drawer-content {
   position: absolute;
   top: 0;
-  right: -100%;
+  right: -110%;
   width: 90%;
   max-width: 400px;
   height: 100%;
@@ -2256,3 +2281,143 @@ body,
     padding: 16px;
   }
 }
+
+/* ==================================================== */
+/* === FINAL PERFECT: DRAWER SAMPING + SYNCED DROP === */
+/* ==================================================== */
+
+/* 1. RESET DRAWER FRAME (GESER DARI KANAN) */
+.completed-drawer .drawer-content,
+.missed-drawer .drawer-content,
+.deleted-drawer .drawer-content {
+  position: absolute;
+  right: -110% !important;
+  left: auto !important;
+  top: 0;
+  bottom: 0;
+  transform: none !important; 
+  
+  width: 90%;
+  max-width: 450px;
+  height: 100%;
+  border-radius: 20px 0 0 20px;
+  transition: right 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  
+  /* PENTING: Agar Timy yang menggantung di bawah tidak terpotong */
+  overflow: visible !important; 
+}
+
+/* Saat Aktif */
+.completed-drawer.active .drawer-content,
+.missed-drawer.active .drawer-content,
+.deleted-drawer.active .drawer-content {
+  right: 0 !important;
+}
+
+/* 2. DEFINISI ANIMASI JATUH (PAKAI VH BIAR SINKRON) */
+@keyframes syncedHeavyDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-120vh); /* Jatuh dari luar layar atas */
+  }
+  70% {
+    transform: translateY(20px); /* Membal dikit */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0); /* Posisi Normal */
+  }
+}
+
+/* 3. TERAPKAN KE CONTAINER BIRU (.drawer-body) */
+.completed-drawer.active .drawer-body,
+.missed-drawer.active .drawer-body,
+.deleted-drawer.active .drawer-body {
+  opacity: 0;
+  
+  /* --- DURASI DIUBAH JADI 2 DETIK (LEBIH LAMBAT) --- */
+  animation: syncedHeavyDrop 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.2s; 
+  
+  position: relative;
+  z-index: 1;
+  background-color: #e3eefb; 
+}
+
+/* 4. PASTIKAN HEADER DI ATAS BODY */
+.drawer-header {
+  position: relative;
+  z-index: 10; 
+  background: linear-gradient(to bottom, #dde8f8, #b9d4f5, #9ac1f0); 
+}
+
+/* 5. RESET LIST ITEMS (BIAR GAK GOYANG) */
+.task-group, .missed-task-group, .deleted-task-group {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* 6. POSISI TIMY (MENEMPEL DI BAWAH CONTAINER & TENGAH) */
+.completed-drawer .drawer-content::after,
+.missed-drawer .drawer-content::after,
+.deleted-drawer .drawer-content::after {
+  content: "";
+  position: absolute;
+  
+  /* --- LOGIKA POSISI TENGAH --- */
+  bottom: -130px; /* Di luar bawah layar */
+  left: 0;        /* Kiri 0 */
+  right: 0;       /* Kanan 0 */
+  margin: 0 auto; /* Auto margin bikin dia ke tengah */
+  
+  width: 150px;
+  height: 150px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center; /* Gambar juga rata tengah */
+  z-index: 50; 
+  pointer-events: none;
+  
+  /* Default: Opacity 0 */
+  opacity: 0;
+  animation: none; 
+}
+
+/* Jalankan animasi Timy barengan Container */
+.completed-drawer.active .drawer-content::after,
+.missed-drawer.active .drawer-content::after,
+.deleted-drawer.active .drawer-content::after {
+  /* Durasi harus SAMA (2s) biar sinkron */
+  animation: syncedHeavyDrop 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.2s;
+}
+
+/* Asset Gambar Timy */
+.completed-drawer .drawer-content::after { background-image: url('../assets/timy_completed.png'); }
+.missed-drawer .drawer-content::after { background-image: url('../assets/timy_missed.png'); }
+.deleted-drawer .drawer-content::after { background-image: url('../assets/timy_deleted.png'); }
+
+/* 7. LOGIKA EMPTY STATE (MATIKAN ANIMASI JIKA KOSONG) */
+.drawer-body:has(.completed-empty),
+.drawer-body:has(.missed-empty),
+.drawer-body:has(.deleted-empty) {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Sembunyikan Timy jika kosong */
+.drawer-content:has(.completed-empty)::after,
+.drawer-content:has(.missed-empty)::after,
+.drawer-content:has(.deleted-empty)::after {
+  display: none !important;
+}
+
+/* 8. HIDE SCROLLBAR & FIX PADDING */
+.drawer-body {
+  padding-bottom: 50px !important; 
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.drawer-body::-webkit-scrollbar { display: none !important; }

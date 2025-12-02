@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      alert("Feedback telah dikirim. Terima kasih!");
-      // Nanti: kirim ke API dengan rating & komentar
+      alert("Feedback sent. Thank you!");
+      // Later: send to API with rating & comment
     });
   }
 });

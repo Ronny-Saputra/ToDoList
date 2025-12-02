@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
     confirmDeleteBtn.addEventListener("click", function () {
       // Cek apakah firebase sudah dimuat
       if (typeof firebase === "undefined" || !firebase.auth) {
-        alert("Error: Firebase belum dimuat. Cek Langkah 1.");
+        alert("Error: Firebase not loaded. Check Step 1.");
         return;
       }
 
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Sukses delete
             console.log("User account deleted.");
             deletePopup.classList.remove("show");
-            alert("Akun Anda telah berhasil dihapus.");
+            alert("Your account has been successfully deleted.");
             // Arahkan ke login SETELAH sukses delete
             setTimeout(() => {
               window.location.href = "login.html";
@@ -121,15 +121,15 @@ document.addEventListener("DOMContentLoaded", function () {
             if (error.code === "auth/requires-recent-login") {
               // Error paling umum: pengguna harus login ulang
               alert(
-                "Gagal menghapus akun. Sesi Anda sudah terlalu lama.\n\nSilakan Log Out, lalu Log In kembali, dan coba hapus akun lagi.",
+                "Failed to delete account. Your session has expired.\n\nPlease log out, then log in again, and try deleting the account again.",
               );
             } else {
-              alert("Gagal menghapus akun: " + error.message);
+              alert("Failed to delete account: " + error.message);
             }
             deletePopup.classList.remove("show");
           });
       } else {
-        alert("Tidak ada pengguna yang login.");
+        alert("No user is currently logged in.");
         deletePopup.classList.remove("show");
       }
     });

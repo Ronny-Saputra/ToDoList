@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let dialogMessage = `Task marked as ${newDoneStatus ? "done" : "undone"}!`;
 
         if (newDoneStatus && streakIncremented) {
-          dialogMessage = `🎉 YAY, you on fire ${newStreakNumber} streak!`;
+          dialogMessage = `🎉 Yay, you're on fire! ${newStreakNumber} streak!`;
         }
 
         window.showCustomDialog(dialogMessage, [

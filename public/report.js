@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      alert("report telah dikirim. Terima kasih!");
-      // Nanti: Kirim data ke API via fetch()
+      alert("Report sent. Thank you!");
+      // Later: send data to API via fetch()
       // form.reset();
     });
   }

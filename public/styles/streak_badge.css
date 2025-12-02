@@ -106,13 +106,17 @@ body {
   pointer-events: none;
 }
 
+/* --- PERBAIKAN POSISI TEKS (TURUN KE BAWAH) --- */
 .current-badge h2 {
   font-size: 19px;
   font-weight: 700;
   color: #283f6d;
   margin: 0;
-  margin-top: -85px;
+  /* Sebelumnya -85px, kita ubah jadi -40px biar turun dan tidak nabrak */
+  margin-top: -40px; 
   line-height: 1.2;
+  position: relative;
+  z-index: 2; /* Pastikan teks di atas gambar */
 }
 
 /* PREVIOUS BADGES */
@@ -289,4 +293,20 @@ body {
   .badge-list img {
     width: 80px;
   }
+}
+
+/* --- LOGIC VISUAL: LOCKED STATE (SILUET HITAM) --- */
+
+/* Class ini membuat gambar jadi siluet hitam total */
+.locked-badge {
+    /* Brightness 0% = Hitam Total (Siluet) */
+    filter: grayscale(100%) brightness(0%) !important; 
+    /* Opacity rendah biar tidak terlalu tebal hitamnya (kesan bayangan) */
+    opacity: 0.3; 
+}
+
+/* Transisi halus HANYA saat berubah warna (misal pas baru unlock) */
+.current-badge img, 
+.badge-list img {
+    transition: filter 0.5s ease, opacity 0.5s ease;
 }

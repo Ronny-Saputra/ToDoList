@@ -1,11 +1,9 @@
-<!-- streak-badge.html -->
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Streak Badge</title>
-
     <link
       href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap"
       rel="stylesheet"
@@ -27,26 +25,44 @@
 
       <main class="streak-main">
         <div class="current-badge">
-          <img src="../assets/streak_badge1.svg" alt="Streak Badge 100" />
-          <h2>You're on Fire!</h2>
+          <img 
+            id="main-badge-image" 
+            class="locked-badge"
+            src="../assets/star_7.png" 
+            alt="Current Streak Badge" 
+          />
+          
+          <h2 id="badge-title">Loading...</h2>
+          
+          <p id="badge-info" style="color: #ff9800; font-size: 14px; margin-top: 5px; text-align:center; min-height: 20px;"></p>
         </div>
 
         <section class="previous-badges">
-          <h3>Previous Badges</h3>
+          <h3>All Badges</h3>
+          
           <div class="badge-list">
-            <img src="../assets/streak_badge2.svg" alt="Streak Badge 7" />
-            <img src="../assets/streak_badge3.svg" alt="Streak Badge 15" />
-            <img src="../assets/streak_badge4.svg" alt="Streak Badge 30" />
+             <img id="badge-7" class="locked-badge" src="../assets/streak_badge2.svg" alt="7 Days" />
+             <img id="badge-15" class="locked-badge" src="../assets/streak_badge3.svg" alt="15 Days" />
+             <img id="badge-30" class="locked-badge" src="../assets/streak_badge4.svg" alt="30 Days" />
           </div>
 
-          <div class="badge-list">
-            <img src="../assets/streak_badge5.svg" alt="Streak Badge 50" />
-            <img src="../assets/streak_badge6.svg" alt="Streak Badge 100" />
+          <div class="badge-list" style="margin-top: 0;">
+             <img id="badge-50" class="locked-badge" src="../assets/streak_badge5.svg" alt="50 Days" />
+            <img id="badge-100" class="locked-badge" src="../assets/streak_badge6.svg" alt="100 Days" />
           </div>
         </section>
       </main>
     </div>
 
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="../firebase-init.js"></script>
+
+    <script src="../main.js"></script>
+    
     <script src="../streak_badge.js"></script>
   </body>
 </html>
