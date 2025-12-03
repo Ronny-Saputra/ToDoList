@@ -29,6 +29,42 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  // ✅ PERBAIKAN: Tambahkan styling untuk scrollable filter pills
+  if (filterPillsContainer) {
+    // Pastikan container bisa di-scroll horizontal
+    filterPillsContainer.style.overflowX = "auto";
+    filterPillsContainer.style.overflowY = "hidden";
+    filterPillsContainer.style.display = "flex";
+    filterPillsContainer.style.gap = "8px";
+    filterPillsContainer.style.padding = "4px 0";
+    filterPillsContainer.style.scrollbarWidth = "thin"; // Firefox
+    filterPillsContainer.style.webkitOverflowScrolling = "touch"; // Smooth scroll di iOS
+    
+    // Tambahkan custom scrollbar styling untuk Webkit browsers
+    const style = document.createElement('style');
+    style.textContent = `
+      .filter-pills-container::-webkit-scrollbar {
+        height: 6px;
+      }
+      .filter-pills-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+      }
+      .filter-pills-container::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+      .filter-pills-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+      .filter-pill {
+        flex-shrink: 0; /* Mencegah pills menyusut */
+        white-space: nowrap; /* Mencegah text wrapping */
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   // Inisialisasi status tampilan: Sembunyikan daftar, tampilkan status kosong
   if (taskListContainer) taskListContainer.style.display = "none";
   if (emptyState) emptyState.style.display = "flex";
@@ -230,6 +266,30 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     if (targetPill) {
       updateActivePill(targetPill);
+      // ✅ PERBAIKAN: Auto-scroll ke pill yang aktif
+      scrollToPill(targetPill);
+    }
+  }
+
+  // ✅ NEW: Fungsi untuk scroll ke pill yang aktif
+  function scrollToPill(pill) {
+    if (filterPillsContainer && pill) {
+      // Tunggu sedikit untuk memastikan layout sudah selesai
+      setTimeout(() => {
+        const containerRect = filterPillsContainer.getBoundingClientRect();
+        const pillRect = pill.getBoundingClientRect();
+        
+        // Hitung posisi scroll yang dibutuhkan
+        const scrollLeft = filterPillsContainer.scrollLeft;
+        const pillLeft = pillRect.left - containerRect.left + scrollLeft;
+        const pillCenter = pillLeft - (containerRect.width / 2) + (pillRect.width / 2);
+        
+        // Smooth scroll ke posisi pill
+        filterPillsContainer.scrollTo({
+          left: pillCenter,
+          behavior: 'smooth'
+        });
+      }, 100);
     }
   }
 
@@ -262,6 +322,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (pill && !pill.classList.contains("active")) {
         const filterValue = pill.getAttribute("data-filter");
         updateActivePill(pill);
+        // ✅ Auto-scroll ke pill yang diklik
+        scrollToPill(pill);
         // ✅ Panggil performFilter yang akan mengupdate state currentActiveFilter
         performFilter(filterValue);
       }

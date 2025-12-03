@@ -414,7 +414,20 @@ body {
   font-size: 12px;
   font-weight: 500;
   color: #3f67b5;
+  white-space: nowrap;
 }
+
+/* --- PERBAIKAN: Gaya task-meta-right untuk 2 baris --- */
+.task-meta-right {
+  display: flex;
+  flex-direction: column; /* Kunci: Menyusun elemen anak secara vertikal */
+  align-items: flex-end; /* Rata kanan di dalam area ini */
+  justify-content: center;
+  margin-left: auto;
+  flex-shrink: 0;
+  gap: 2px; /* Jarak antara Time dan Location */
+}
+/* --- AKHIR PERBAIKAN --- */
 
 .task-arrow {
   font-size: 14px;
@@ -456,6 +469,7 @@ body {
   width: 100%;
   /* Atur max-width untuk tampilan desktop */
   max-width: 450px;
+  /* Kunci: Tetapkan tinggi 100% dan min-height 100vh untuk perangkat mobile */
   height: 100%;
   min-height: 100vh;
   background-color: #ffffff;
@@ -506,8 +520,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  overflow-y: auto;
-  flex-grow: 1;
+  overflow-y: auto; /* Kunci: Memungkinkan scrolling pada formulir */
+  flex-grow: 1; /* Kunci: Mengambil sisa ruang vertikal */
+  scroll-behavior: smooth;
 }
 /* Hilangkan scrollbar form */
 .reminder-form::-webkit-scrollbar {
@@ -641,6 +656,13 @@ body {
 
 /* Media Queries */
 @media (max-width: 768px) {
+  /* MODIFIKASI DRAWER MOBILE: Hapus batasan max-width agar full width */
+  .drawer-content {
+    max-width: 100%; 
+    min-height: 100vh; /* Kunci: Memastikan tinggi penuh viewport */
+    height: 100vh; /* Menghindari isu di beberapa browser mobile */
+  }
+
   /* MODIFIKASI: Pastikan tidak ada max-width di container */
   .container {
     max-width: 100%;
@@ -1035,8 +1057,8 @@ body {
 }
 
 .priority-dropdown-wrapper.open {
-  visibility: visible;
   opacity: 1;
+  visibility: visible;
   transform: translateY(0);
 }
 

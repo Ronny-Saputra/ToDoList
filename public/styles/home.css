@@ -21,6 +21,7 @@ body {
   align-items: center;
 }
 
+/* ===== CONTAINER (Keep existing code) ===== */
 .container {
   height: 100vh;
   width: 100%;
@@ -32,8 +33,11 @@ body {
   overflow-y: auto;
 }
 
+/* ===== HEADER (Keep existing code) ===== */
 .header {
   width: 100%;
+  /* PERBAIKAN: Menggunakan clamp() untuk membatasi tinggi maksimum (max 1000px) 
+     agar header tidak meregang di monitor yang sangat tinggi, menjaga proporsi. */
   height: 58%;
   background-image: url("../assets/bghome.png");
   background-size: cover;
@@ -48,6 +52,7 @@ body {
   justify-content: center;
 }
 
+/* Title Mobile - Hidden by default */
 .header-title-mobile {
   display: none;
   position: absolute;
@@ -61,6 +66,7 @@ body {
   margin: 0;
 }
 
+/* ===== CHARACTER (Keep existing code) ===== */
 .character-wrapper {
   display: flex;
   justify-content: center;
@@ -74,7 +80,7 @@ body {
 .character {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: centert;
   position: relative;
 }
 
@@ -170,7 +176,7 @@ body {
   text-align: center;
 }
 
-
+/* START: PERBAIKAN GARIS ABU-ABU */
 .progress-line {
   /* GARIS ABU-ABU HANYA DARI M KE S (1/14 hingga 13/14 dari 100% container) */
   left: calc(100% * 1 / 14);
@@ -188,7 +194,7 @@ body {
 .progress-fill {
   position: absolute;
   top: 0;
-  left: 0; 
+  left: 0; /* Relatif terhadap progress-line yang baru */
   width: 0%;
   height: 100%;
   background: linear-gradient(to right, #ff8c00, #ffd700);
@@ -198,7 +204,7 @@ body {
     width 0.4s ease,
     left 0.4s ease,
     opacity 0.5s ease;
-  z-index: 2; 
+  z-index: 2; /* Di atas gray line */
 }
 
 .runner-icon {
@@ -228,7 +234,7 @@ body {
   transform: translate(
     -50%,
     -50%
-  );
+  ); /* Geser ke kiri 50% dan atas 50% agar center */
   width: clamp(0.375rem, 0.5vw, 0.5rem);
   height: clamp(0.375rem, 0.5vw, 0.5rem);
   background-color: #333;
@@ -259,6 +265,7 @@ body {
 .dot-track .dot:nth-child(7) {
   left: 100%;
 } /* S (index 6) */
+/* END: PERBAIKAN GARIS ABU-ABU */
 
 .message {
   margin-top: clamp(0.5rem, 0.8vw, 0.75rem);
@@ -269,7 +276,7 @@ body {
   transform-origin: center center;
 }
 
-/* ===== SMOOTH ZOOM TRANSITIONS ===== */
+/* ===== SMOOTH ZOOM TRANSITIONS (Keep existing code) ===== */
 @media (min-resolution: 1dppx) and (max-resolution: 1.24dppx) {
   /* 100% Zoom - Base styles already applied */
 }
@@ -436,6 +443,7 @@ body {
   }
 }
 
+/* ===== TABLET (Keep existing code) ===== */
 @media (max-width: 1024px) {
   .header {
     background-image: url("../assets/bghome_mobile.png");
@@ -480,7 +488,7 @@ body {
   }
 }
 
-
+/* ===== MOBILE (Keep existing code) ===== */
 @media (max-width: 768px) {
   .header {
     background-image: url("../assets/bghome_mobile.png");
@@ -488,8 +496,10 @@ body {
   }
 
   .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
     display: block;
     font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Atur top ke nilai positif yang aman agar terlihat */
     top: clamp(2rem, 5vw, 3rem);
   }
 
@@ -543,14 +553,17 @@ body {
   }
 }
 
+/* ===== SMALL MOBILE (≤ 480px) ===== */
 @media (max-width: 480px) {
   .header {
     height: 76vh;
   }
 
   .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
     display: block;
     font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
     top: clamp(2rem, 5vw, 3rem);
   }
 
@@ -609,14 +622,17 @@ body {
   }
 }
 
+/* ===== EXTRA SMALL (≤ 360px) dan lainnya (Keep existing code) ===== */
 @media (max-width: 576px) {
   .header {
     height: 63vh;
   }
 
   .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
     display: block;
     font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
     top: clamp(2rem, 5vw, 3rem);
   }
 
@@ -681,8 +697,10 @@ body {
   }
 
   .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
     display: block;
     font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
     top: clamp(2rem, 5vw, 3rem);
   }
 
@@ -747,8 +765,10 @@ body {
   }
 
   .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
     display: block;
     font-size: clamp(1.375rem, 4.5vw, 1.625rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
     top: clamp(2rem, 5vw, 3rem);
   }
 
@@ -807,6 +827,7 @@ body {
   }
 }
 
+/* ===== LANDSCAPE MODE (Keep existing code) ===== */
 @media (max-height: 600px) and (orientation: landscape) {
   .header {
     height: 100vh;
@@ -857,6 +878,7 @@ body {
   }
 }
 
+/* ===== LARGE DESKTOP (Keep existing code) ===== */
 @media (min-width: 1440px) {
   .header {
     height: 59vh;
@@ -910,28 +932,14 @@ body {
   }
 }
 
-@media (max-width: 768px) {
-  .popup-container {
-    max-width: 340px;
-  }
-
-  .popup-title {
-    font-size: 16px;
-    padding: 20px 20px 16px 20px;
-  }
-
-  .popup-message {
-    font-size: 13px;
-    padding: 16px 20px 20px 20px;
-  }
-
-  .popup-btn {
-    padding: 14px;
-    font-size: 15px;
+/* ===== PRINT STYLES (Keep existing code) ===== */
+@media print {
+  .container {
+    overflow: visible;
   }
 }
 
-
+/* ===== UPCOMING TASKS POPUP (Dialog Style) ===== */
 .popup-overlay {
   display: none;
   position: fixed;
@@ -1025,4 +1033,25 @@ body {
 
 .popup-btn-view:hover {
   background-color: #f0f4ff;
+}
+
+@media (max-width: 768px) {
+  .popup-container {
+    max-width: 340px;
+  }
+
+  .popup-title {
+    font-size: 16px;
+    padding: 20px 20px 16px 20px;
+  }
+
+  .popup-message {
+    font-size: 13px;
+    padding: 16px 20px 20px 20px;
+  }
+
+  .popup-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
 }

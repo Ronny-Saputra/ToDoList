@@ -1406,10 +1406,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // === DATA UNTUK DIKIRIM KE BACKEND ===
-      const taskData = {
+       const taskData = {
         title: activity,
         details: details,
-        category: location,
+        location: location, // FIXED: Gunakan "location" bukan "category"
         priority: priority,
         dueDate: finalDueDateObj.toISOString(),
         date: dateToUse, // <--- PENTING: Gunakan dateToUse untuk tanggal task
@@ -1493,30 +1493,32 @@ document.addEventListener("DOMContentLoaded", function () {
               window.TaskApp.closeDrawer();
 
               // REFRESH LOGIC (Penting agar UI Sinkron)
-              if (
-                window.location.pathname.includes("calendar.html") &&
-                window.CalendarApp?.reloadCalendarView
-              ) {
-                // ✅ NEW LOGIC: Call immediate refresh for calendar view
-                await window.CalendarApp.reloadCalendarView();
-
-                // Find and activate the card for the current date to show the list view
-                if (window.findAndActivateDateCard) {
-                  window.findAndActivateDateCard(dateToUse);
-                }
-              } else if (window.location.pathname.includes("task.html")) {
+              if (window.location.pathname.includes("task.html")) {
+                // 1. Muat ulang daftar tugas dan render ulang kalender mini
                 await loadTasksAndRenderCalendar(
                   user,
                   new Date("2025-01-01"),
                   365,
                 );
-                const dateParts = dateToUse.split("-");
-                const newActiveDate = new Date(
-                  dateParts[0],
-                  dateParts[1] - 1,
-                  dateParts[2],
-                );
-                displayTasksForActiveDate(newActiveDate);
+                // 2. Cari dan aktifkan kartu tanggal yang baru diset (dateToUse)
+                if (window.findAndActivateDateCard) {
+                  window.findAndActivateDateCard(dateToUse);
+                } else {
+                   // Fallback manual jika fungsi tidak terdefinisi
+                   const dateParts = dateToUse.split("-");
+                   const newActiveDate = new Date(
+                      dateParts[0],
+                      dateParts[1] - 1,
+                      dateParts[2],
+                    );
+                   displayTasksForActiveDate(newActiveDate);
+                }
+              } else if (window.location.pathname.includes("calendar.html")) {
+                // Pindah ke halaman kalender dan buka list task di tanggal tersebut
+                window.location.href = `calendar.html#date=${dateToUse}&view=list`;
+              } else if (window.location.pathname.includes("search.html")) {
+                if (window.SearchApp?.reloadTasks)
+                  await window.SearchApp.reloadTasks(user);
               } else if (window.location.pathname.includes("profile.html")) {
                 // Jika di halaman profile, refresh drawer yang sedang terbuka
                 if (window.TaskApp.editMode === "restore") {
@@ -1530,12 +1532,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   if (typeof renderMissedTasksInDrawer === "function")
                     await renderMissedTasksInDrawer();
                 }
-              } else if (window.location.pathname.includes("search.html")) {
-                if (window.SearchApp?.reloadTasks)
-                  await window.SearchApp.reloadTasks(user);
-              } else if (window.location.pathname.includes("calendar.html")) {
-                // Fallback/Legacy redirect (should not be hit if new logic works)
-                window.location.href = `calendar.html#date=${dateToUse}&view=list`;
               }
             },
             isPrimary: true,
