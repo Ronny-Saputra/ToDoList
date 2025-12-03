@@ -157,57 +157,45 @@ function calculateNewStreakState(currentState, hasCompletedToday) {
  * Menghitung metrik yang diperlukan untuk progress bar mingguan.
  */
 function calculateWeeklyMetrics(streakDaysStr, currentStreak) {
-  // 1. Pastikan angka streak valid
-  const numStreak = parseInt(currentStreak, 10) || 0;
+    // 1. Pastikan angka streak valid
+    const numStreak = parseInt(currentStreak, 10) || 0;
 
-  if (numStreak === 0) {
-    return {
-      streakStartInWeekIndex: -1,
-      lastStreakDay: -1,
-      streakDaysInWeek: 0,
+    if (numStreak === 0) {
+        return { streakStartInWeekIndex: -1, lastStreakDay: -1, streakDaysInWeek: 0 };
+    }
+
+    // 2. Tentukan Hari Terakhir Selesai (Completed Day)
+    const streakDaysArray = (streakDaysStr || "").split(",").map(s => parseInt(s)).filter(n => !isNaN(n));
+    
+    let lastCompletedDay = -1;
+    if (streakDaysArray.length > 0) {
+        const sortedDays = Array.from(new Set(streakDaysArray)).sort((a, b) => a - b);
+        lastCompletedDay = sortedDays[sortedDays.length - 1];
+    } else {
+        lastCompletedDay = getCurrentDayOfWeek();
+    }
+    
+    // --- LOGIKA BARU: VISUAL MAJU 1 LANGKAH (TARGET BESOK) ---
+    
+    // Posisi Akhir Visual (Runner) = Hari Selesai + 1
+    // Contoh: Selesai Rabu (2) -> Runner di Kamis (3)
+    let visualEndDay = lastCompletedDay + 1;
+
+    // Posisi Awal Visual = Akhir Visual - Jumlah Streak
+    // Contoh 1: Streak 1 di Rabu. End=3(Kamis). Start = 3 - 1 = 2(Rabu). Garis R-K.
+    // Contoh 2: Streak 2 di Rabu. End=3(Kamis). Start = 3 - 2 = 1(Selasa). Garis S-R-K.
+    let calculatedStart = visualEndDay - numStreak;
+
+    // Biarkan calculatedStart bernilai negatif (misal -1 untuk Minggu lalu)
+    // agar garis terlihat masuk dari kiri layar ("terhubung dari minggu lalu")
+    const streakStartInWeekIndex = calculatedStart;
+    
+    // Update lastStreakDay ke visualEndDay agar runner dirender di posisi baru
+    return { 
+        streakStartInWeekIndex: streakStartInWeekIndex, 
+        lastStreakDay: visualEndDay, 
+        streakDaysInWeek: numStreak
     };
-  }
-
-  // 2. Tentukan Posisi Runner (Hari Terakhir / Ujung Kanan)
-  const streakDaysArray = (streakDaysStr || "")
-    .split(",")
-    .map((s) => parseInt(s))
-    .filter((n) => !isNaN(n));
-
-  let lastStreakDay = -1;
-  if (streakDaysArray.length > 0) {
-    const sortedDays = Array.from(new Set(streakDaysArray)).sort(
-      (a, b) => a - b,
-    );
-    lastStreakDay = sortedDays[sortedDays.length - 1];
-  } else {
-    lastStreakDay = getCurrentDayOfWeek();
-  }
-
-  // --- PERBAIKAN LOGIKA (BERBASIS SEGMEN) ---
-  // Rumus Lama (Hitung Titik): Akhir - (Jumlah - 1) -> Hasilnya Selasa
-  // Rumus Baru (Hitung Segmen): Akhir - Jumlah
-
-  // Contoh Kasus Anda:
-  // Hari ini Rabu (Index 2), Streak 2.
-  // Start = 2 - 2 = 0 (Senin).
-  // Hasil visual: Garis dari Senin (0) sampai Rabu (2).
-
-  let calculatedStart = lastStreakDay - numStreak;
-
-  // Khusus jika Streak 1, kita tetap paksa mundur 1 hari agar ada ekornya
-  if (numStreak === 1) {
-    calculatedStart = lastStreakDay - 1;
-  }
-
-  // Batasi agar tidak minus (tidak tembus ke minggu lalu)
-  const streakStartInWeekIndex = Math.max(0, calculatedStart);
-
-  return {
-    streakStartInWeekIndex,
-    lastStreakDay,
-    streakDaysInWeek: numStreak,
-  };
 }
 
 function updateStreakUI(weeklyMetrics, currentStreak, streakDaysStr) {
