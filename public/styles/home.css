@@ -938,3 +938,120 @@ body {
     overflow: visible;
   }
 }
+
+/* ===== UPCOMING TASKS POPUP (Dialog Style) ===== */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-overlay.show {
+  display: flex;
+}
+
+.popup-container {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: popupFadeIn 0.2s ease-out;
+  overflow: hidden;
+}
+
+@keyframes popupFadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.popup-icon {
+  display: none;
+}
+
+.popup-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e3a8a;
+  padding: 24px 24px 20px 24px;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.popup-message {
+  font-size: 14px;
+  color: #666;
+  padding: 20px 24px 24px 24px;
+  line-height: 1.5;
+  text-align: center;
+  display: none;
+}
+
+.popup-buttons {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+}
+
+.popup-btn {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Lexend', sans-serif;
+}
+
+.popup-btn-ignore {
+  color: #666;
+  border-right: 1px solid #e5e7eb;
+}
+
+.popup-btn-ignore:hover {
+  background-color: #f9fafb;
+}
+
+.popup-btn-view {
+  color: #1e3a8a;
+}
+
+.popup-btn-view:hover {
+  background-color: #f0f4ff;
+}
+
+@media (max-width: 768px) {
+  .popup-container {
+    max-width: 340px;
+  }
+
+  .popup-title {
+    font-size: 16px;
+    padding: 20px 20px 16px 20px;
+  }
+
+  .popup-message {
+    font-size: 13px;
+    padding: 16px 20px 20px 20px;
+  }
+
+  .popup-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+}

@@ -73,6 +73,7 @@
       </div>
     </div>
 
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -80,5 +81,31 @@
     <script src="../streak.js"></script>
     <script src="../navbar.js"></script>
     <script src="../main.js"></script>
+
+        <!-- Upcoming Tasks Popup -->
+    <div id="upcoming-tasks-popup" class="popup-overlay">
+      <div class="popup-container">
+        <div class="popup-icon">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h2 class="popup-title">Upcoming Tasks!</h2>
+        <p class="popup-message">
+          You have tasks due within 24 hours.<br />
+          Don't forget to complete them!
+        </p>
+        <div class="popup-buttons">
+          <button class="popup-btn popup-btn-ignore" onclick="closeUpcomingTasksPopup()">
+            Ignore
+          </button>
+          <button class="popup-btn popup-btn-view" onclick="viewUpcomingTasks()">
+            View Tasks
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Tasks Script -->
+    <script src="../upcoming-tasks.js"></script>
+
   </body>
 </html>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forget Password</title>
+    <title>Forget Password - Timy</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap"
       rel="stylesheet"
@@ -13,6 +13,14 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <!-- Firebase Config (GUNAKAN firebase-config.js, BUKAN firebase-init.js) -->
+    <!-- firebase-init.js punya redirect yang akan ganggu halaman ini -->
+    <script src="../firebase-init.js"></script>
+
     <link rel="stylesheet" href="../styles/signup.css" />
   </head>
   <body>
@@ -21,19 +29,19 @@
       <div class="bottom-section">
         <img src="../assets/timy2.png" alt="Clock" class="avatar" />
 
-        <a href="login.html" class="back"
-          ><i class="fa fa-arrow-left"></i> Back to login</a
-        >
+        <a href="login.html" class="back">
+          <i class="fa fa-arrow-left"></i> Back to login
+        </a>
         <h2 class="title">Forget Password</h2>
 
         <form class="login-form" onsubmit="return forgetPasswordSubmit(event);">
           <div class="field">
             <i class="fa fa-envelope field-icon"></i>
             <input
-              type="text"
+              type="email"
               id="email-username-forget"
               class="input"
-              placeholder="Email / Username"
+              placeholder="Email"
               required
             />
           </div>
@@ -43,6 +51,7 @@
       </div>
     </div>
 
+    <!-- Custom Dialog -->
     <div id="custom-dialog-overlay" class="custom-dialog-overlay">
       <div class="custom-dialog">
         <div id="custom-dialog-message" class="custom-dialog-message"></div>
@@ -50,6 +59,10 @@
       </div>
     </div>
 
+    <!-- Main JS (untuk showCustomDialog) -->
     <script src="../main.js"></script>
+    
+    <!-- Forgot Password Logic (Separated) -->
+    <script src="../forgotpass.js"></script>
   </body>
 </html>

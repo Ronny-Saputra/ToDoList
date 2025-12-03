@@ -179,26 +179,197 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- DIALOG CHAIN LOGIC (Mimics FlowTimerActivity.kt) ---
 
   function showCompletionDialog() {
-    // ⬅️ TRANSLATION HERE
     window.showCustomDialog("Time's up! Are you done with your task?", [
       {
-        text: "No", // ⬅️ TRANSLATION HERE
+        text: "No",
         action: () => {
           showRescheduleDialog();
         },
         isPrimary: false,
       },
       {
-        text: "Yes", // ⬅️ TRANSLATION HERE
-        action: () => {
+        text: "Yes",
+        action: async () => {
           alarmAudio.pause(); // Stop Alarm
           alarmAudio.currentTime = 0;
-          window.location.href = "../pages/task.html"; // Finish Activity
+          
+          // ✅ MARK TASK AS COMPLETED (SAMA DENGAN LOGIC CHECKBOX)
+          await markTaskAsCompleted();
         },
         isPrimary: true,
       },
     ]);
   }
+  
+  // ✅ FUNCTION OPTIMIZED - PARALLEL API CALLS
+async function markTaskAsCompleted() {
+
+  // Tambahkan di awal function markTaskAsCompleted()
+const loadingOverlay = document.getElementById('loading-overlay');
+if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
+// Tambahkan sebelum showCustomDialog (sukses atau error)
+if (loadingOverlay) loadingOverlay.style.display = 'none';
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      window.showCustomDialog("Please log in first.", [
+        { text: "OK", action: () => window.location.href = "../pages/login.html", isPrimary: true }
+      ]);
+      return;
+    }
+
+    // Get task ID from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get("taskId");
+    
+    if (!taskId) {
+      console.warn("No task ID found. Redirecting to task page.");
+      window.location.href = "../pages/task.html";
+      return;
+    }
+
+    console.log("🔍 Debug: Starting markTaskAsCompleted for taskId:", taskId);
+
+    // ✅ CEK APAKAH window.fetchData ADA
+    if (typeof window.fetchData !== 'function') {
+      console.error("❌ window.fetchData is not available!");
+      window.showCustomDialog("System error: fetchData not available.", [
+        { text: "OK", action: () => window.location.href = "../pages/task.html", isPrimary: true }
+      ]);
+      return;
+    }
+
+    // Format date helper (sama dengan task.js)
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    // ✅ OPTIMASI: Jalankan fetch original task dan streak state SECARA PARALEL
+    console.log("📡 Fetching data in parallel...");
+    
+    const [allTasksResult, initialStreakResult] = await Promise.allSettled([
+      window.fetchData("/tasks?status=pending"),
+      window.fetchData("/stats/streak")
+    ]);
+
+    // Process original task
+    let originalTask = null;
+    if (allTasksResult.status === 'fulfilled') {
+      const allTasks = allTasksResult.value;
+      originalTask = Array.isArray(allTasks) ? allTasks.find(t => t.id === taskId) : null;
+      console.log("✅ Original task fetched:", originalTask);
+    } else {
+      console.error("❌ Failed to fetch original task:", allTasksResult.reason);
+    }
+
+    // Process streak state
+    let initialStreakState = { currentStreak: 0 };
+    if (initialStreakResult.status === 'fulfilled') {
+      initialStreakState = initialStreakResult.value || {};
+      initialStreakState.currentStreak = initialStreakState.currentStreak || 0;
+      console.log("✅ Streak state fetched:", initialStreakState);
+    } else {
+      console.error("❌ Failed to fetch streak state:", initialStreakResult.reason);
+    }
+
+    // 3. Update task status dan streak SECARA PARALEL
+    const updateData = {
+      done: true,
+      status: "completed",
+      date: formatDate(new Date())
+    };
+
+    console.log("📡 Updating task and streak in parallel...");
+    
+    const [updateTaskResult, updateStreakResult] = await Promise.allSettled([
+      window.fetchData(`/tasks/${taskId}`, {
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      }),
+      window.fetchData("/stats/streak/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      })
+    ]);
+
+    // Check task update result
+    if (updateTaskResult.status === 'rejected') {
+      throw new Error("Failed to update task: " + updateTaskResult.reason);
+    }
+    console.log("✅ Task updated successfully");
+
+    // Process streak update result
+    let newStreakNumber = 0;
+    let streakIncremented = false;
+
+    if (updateStreakResult.status === 'fulfilled') {
+      const updatedState = updateStreakResult.value;
+      newStreakNumber = updatedState.currentStreak || 0;
+      console.log("✅ Streak updated:", newStreakNumber);
+
+      if (newStreakNumber > initialStreakState.currentStreak) {
+        streakIncremented = true;
+      }
+    } else {
+      console.error("❌ Error updating streak:", updateStreakResult.reason);
+    }
+
+    // 4. Save to localStorage (SYNC - cepat)
+    const taskData = {
+      id: taskId,
+      title: activityName,
+      completedAt: new Date().toISOString(),
+      date: formatDate(new Date()),
+      time: originalTask?.time || "",
+      location: originalTask?.location || ""
+    };
+    
+    const completedTasks = JSON.parse(localStorage.getItem("completedTasks") || "[]");
+    const existingIndex = completedTasks.findIndex((t) => t.id === taskId);
+    if (existingIndex === -1) {
+      completedTasks.push(taskData);
+      localStorage.setItem("completedTasks", JSON.stringify(completedTasks));
+      console.log("✅ Saved to completedTasks localStorage");
+    }
+
+    // 5. Trigger profile update (SYNC - cepat)
+    localStorage.setItem("profileUpdateTrigger", new Date().getTime().toString());
+
+    // 6. Show dialog
+    let dialogMessage = "Task marked as done!";
+
+    if (streakIncremented) {
+      dialogMessage = `🎉 Yay, you're on fire! ${newStreakNumber} streak!`;
+    }
+
+    console.log("✅ All operations completed successfully");
+
+    window.showCustomDialog(dialogMessage, [
+      { 
+        text: "OK", 
+        action: () => window.location.href = "../pages/task.html", 
+        isPrimary: true 
+      }
+    ]);
+
+  } catch (err) {
+    console.error("❌ Error marking task as completed:", err);
+    console.error("Error details:", err.message, err.stack);
+    
+    window.showCustomDialog("Failed to update task status. Please try again.", [
+      { 
+        text: "OK", 
+        action: () => window.location.href = "../pages/task.html", 
+        isPrimary: true 
+      }
+    ]);
+  }
+}
 
   function showRescheduleDialog() {
     // ⬅️ TRANSLATION HERE

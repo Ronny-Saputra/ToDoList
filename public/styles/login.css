@@ -120,19 +120,21 @@ body {
   box-shadow: 0 0 6px rgba(43, 75, 120, 0.35);
 }
 
+/* FORGOT PASSWORD LINK - DIPINDAH KE BAWAH PASSWORD */
 .forgot-wrap {
   display: flex;
   justify-content: flex-end;
-  margin: 4px 0;
+  margin: -8px 0 8px 0; /* Spacing antara password dan login button */
 }
 
 .forgot-link {
-  font-size: 12px;
+  font-size: clamp(11px, 1.8vw, 13px);
   color: #2b4b78;
   text-decoration: none;
   position: relative;
   transition: all 0.25s ease;
 }
+
 .forgot-link::after {
   content: "";
   position: absolute;
@@ -143,17 +145,19 @@ body {
   background: #2b4b78;
   transition: width 0.3s ease;
 }
+
 .forgot-link:hover {
   color: #0d1f3a;
   transform: translateY(-2px);
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
+
 .forgot-link:hover::after {
   width: 100%;
 }
 
 .btn-login {
-  margin-top: 6px;
+  margin-top: 0; /* Hapus margin top karena sudah ada spacing dari forgot-wrap */
   background: linear-gradient(
     180deg,
     var(--primary-dark) 0%,
@@ -167,6 +171,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 .btn-login:hover {
   background: linear-gradient(
     180deg,
@@ -180,10 +185,11 @@ body {
 .or-divider {
   text-align: center;
   margin: 18px 0 14px;
-  font-size: 13px;
+  font-size: clamp(12px, 2vw, 13px);
   color: #000;
   position: relative;
 }
+
 .or-divider::before,
 .or-divider::after {
   content: "";
@@ -193,9 +199,11 @@ body {
   height: 1px;
   background: #1e3d70;
 }
+
 .or-divider::before {
   left: 6%;
 }
+
 .or-divider::after {
   right: 6%;
 }
@@ -206,9 +214,10 @@ body {
   justify-content: center;
   margin-bottom: 14px;
 }
+
 .social-btn {
-  width: 46px;
-  height: 46px;
+  width: clamp(42px, 8vw, 46px);
+  height: clamp(42px, 8vw, 46px);
   background: #fff;
   border-radius: 10px;
   display: flex;
@@ -219,6 +228,7 @@ body {
   transition: all 0.3s ease;
   cursor: pointer;
 }
+
 .social-btn:hover {
   transform: scale(1.08);
   box-shadow: 0 8px 18px rgba(20, 40, 60, 0.15);
@@ -226,13 +236,13 @@ body {
 }
 
 .social-btn img {
-  width: 24px;
-  height: 24px;
+  width: clamp(20px, 4vw, 24px);
+  height: clamp(20px, 4vw, 24px);
 }
 
 .signup {
   text-align: center;
-  font-size: 13px;
+  font-size: clamp(12px, 2vw, 13px);
   color: #233447;
   margin-bottom: -25px;
 }
@@ -302,6 +312,10 @@ body {
 
   .signup {
     margin-bottom: 0px;
+  }
+  
+  .forgot-wrap {
+    margin: -6px 0 6px 0;
   }
 }
 

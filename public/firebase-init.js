@@ -16,9 +16,15 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-// Redirect jika user tidak login
-firebase.auth().onAuthStateChanged((user) => {
-  if (!user) {
-    window.location.href = "../pages/login.html";
-  }
-});
+// Redirect HANYA jika BUKAN di halaman login, signup, atau forgot password
+const currentPage = window.location.pathname;
+const publicPages = ['/login.html', '/signup.html', '/forgotpass.html'];
+const isPublicPage = publicPages.some(page => currentPage.includes(page));
+
+if (!isPublicPage) {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "../pages/login.html";
+    }
+  });
+}

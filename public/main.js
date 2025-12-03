@@ -100,9 +100,16 @@ function googleLogin() {
   firebase
     .auth()
     .signInWithPopup(provider)
-    .then((result) =>
-      window.showCustomDialog(`Welcome, ${result.user.displayName}!`),
-    )
+    .then((result) => {
+      // ⭐ TAMBAHKAN INI:
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
+      window.showCustomDialog(`Welcome, ${result.user.displayName}!`);
+      // Redirect ke home
+      setTimeout(() => {
+        window.location.href = "../pages/home.html";
+      }, 500);
+    })
     .catch((error) => window.showCustomDialog(`Error: ${error.message}`));
 }
 
@@ -111,9 +118,16 @@ function facebookLogin() {
   firebase
     .auth()
     .signInWithPopup(provider)
-    .then((result) =>
-      window.showCustomDialog(`Welcome, ${result.user.displayName}!`),
-    )
+    .then((result) => {
+      // ⭐ TAMBAHKAN INI:
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
+      window.showCustomDialog(`Welcome, ${result.user.displayName}!`);
+      // Redirect ke home
+      setTimeout(() => {
+        window.location.href = "../pages/home.html";
+      }, 500);
+    })
     .catch((error) => window.showCustomDialog(`Error: ${error.message}`));
 }
 
@@ -128,6 +142,10 @@ function emailLogin(event) {
     .signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
       const user = userCredential.user;
+      
+      // ⭐ TAMBAHKAN INI:
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
       window.showCustomDialog(`Welcome, ${user.email}!`);
       // ✅ Redirect to home after login
       setTimeout(() => {

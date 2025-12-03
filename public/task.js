@@ -541,8 +541,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </button>
             </div>
             `;
-
-    // Handle Tombol Flow Timer (NEW)
+// Handle Tombol Flow Timer (NEW)
     const flowTimerBtn = card.querySelector(".flow-timer-btn");
     flowTimerBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -555,9 +554,9 @@ document.addEventListener("DOMContentLoaded", function () {
         (flowDurationMillis || 30 * 60 * 1000) / 1000,
       );
 
-      // Arahkan ke halaman flowtimer dengan parameter
+      // ✅ TAMBAHKAN taskId SEBAGAI PARAMETER
       const encodedActivity = encodeURIComponent(taskObject.title);
-      window.location.href = `flowtimer.html?activity=${encodedActivity}&duration=${durationInSeconds}`;
+      window.location.href = `flowtimer.html?activity=${encodedActivity}&duration=${durationInSeconds}&taskId=${taskId}`;
     });
 
     // Handle Tombol Edit
