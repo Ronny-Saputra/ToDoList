@@ -1,8 +1,5 @@
-// File: public/statistic.js
-
 window.TaskApp = window.TaskApp || {};
-window.TaskApp.LOCALE = "en-US"; // Menggunakan English untuk konsistensi key (Mon, Tue, Jan, Feb)
-
+window.TaskApp.LOCALE = "en-US"; 
 // === STATISTIC UTILITY FUNCTIONS ===
 
 /**

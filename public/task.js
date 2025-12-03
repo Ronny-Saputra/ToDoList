@@ -169,6 +169,10 @@ document.addEventListener("DOMContentLoaded", function () {
   window.TaskApp.dateInputEdit = document.getElementById("date-input-edit");
   window.TaskApp.timeInput = document.getElementById("time-input");
   window.TaskApp.locationInput = document.getElementById("location-input");
+  
+  // NEW: Tambahkan referensi global untuk Detail/Description
+  window.TaskApp.descriptionInput = window.TaskApp.reminderForm.querySelector(".description-field");
+  window.TaskApp.addDetailsBtn = window.TaskApp.reminderForm.querySelector(".add-details-btn");
 
   window.TaskApp.timePickerOverlay = document.getElementById(
     "time-picker-overlay",
@@ -283,6 +287,15 @@ document.addEventListener("DOMContentLoaded", function () {
       if (window.TaskApp.saveBtn) window.TaskApp.saveBtn.textContent = "Save";
       if (window.TaskApp.reminderForm) window.TaskApp.reminderForm.reset();
 
+      // NEW: Reset Details input visibility and value
+      if (window.TaskApp.descriptionInput) {
+        window.TaskApp.descriptionInput.value = "";
+        window.TaskApp.descriptionInput.style.display = "none";
+      }
+      if (window.TaskApp.addDetailsBtn) {
+        window.TaskApp.addDetailsBtn.style.display = "block";
+      }
+
       // Sembunyikan task list
       const taskListForDrawer = document.getElementById("taskListForDrawer");
       if (taskListForDrawer) {
@@ -330,6 +343,22 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.TaskApp.locationInput)
       window.TaskApp.locationInput.value = task.location || "";
 
+    // NEW LOGIC: Load Description/Details and manage visibility
+    if (window.TaskApp.descriptionInput) {
+      window.TaskApp.descriptionInput.value = task.details || ""; // Load the details value
+
+      // Show the input field and hide the 'Add Details' button if details exist
+      if (task.details && task.details.trim() !== "") {
+        window.TaskApp.descriptionInput.style.display = "block";
+        if(window.TaskApp.addDetailsBtn) window.TaskApp.addDetailsBtn.style.display = "none";
+      } else {
+        // If empty, hide input and show button (default 'New Reminder' state)
+        window.TaskApp.descriptionInput.style.display = "none";
+        if(window.TaskApp.addDetailsBtn) window.TaskApp.addDetailsBtn.style.display = "block";
+      }
+    }
+    // ----------------------------------------------------
+    
     // ----------------------------------------------------
     // LOGIC TANGGAL: SAMA PERSIS DENGAN TASK DAN CALENDAR
     // ----------------------------------------------------
@@ -941,7 +970,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const scrollPos =
         todayCard.offsetLeft -
         container.offsetWidth / 2 +
-        container.offsetWidth / 2;
+        todayCard.offsetWidth / 2;
       container.scrollTo({
         left: scrollPos,
         behavior: "smooth",
@@ -1330,14 +1359,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const timeInput = window.TaskApp.timeInput;
     const locationInput = window.TaskApp.locationInput;
     const dateInput = window.TaskApp.dateInputEdit;
-    const detailsInput =
-      window.TaskApp.reminderForm.querySelector(".description-field");
+    
+    // Menggunakan referensi global yang baru
+    const detailsInput = window.TaskApp.descriptionInput; 
+    
     const prioritySelector = window.TaskApp.prioritySelector;
 
     // 2. Ambil Nilai (Value)
     const activity = activityInput ? activityInput.value.trim() : "";
     const location = locationInput ? locationInput.value.trim() : "";
-    const details = detailsInput ? detailsInput.value.trim() : "";
+    const details = detailsInput ? detailsInput.value.trim() : ""; // Menggunakan referensi global
     const dateToUse = dateInput ? dateInput.value : ""; // Format YYYY-MM-DD
     const priority = prioritySelector
       ? prioritySelector.querySelector("span").textContent
@@ -1408,7 +1439,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // === DATA UNTUK DIKIRIM KE BACKEND ===
        const taskData = {
         title: activity,
-        details: details,
+        details: details, // DITAMBAHKAN
         location: location, // FIXED: Gunakan "location" bukan "category"
         priority: priority,
         dueDate: finalDueDateObj.toISOString(),
@@ -1447,6 +1478,15 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window.TaskApp.dateInputEdit)
           window.TaskApp.dateInputEdit.removeAttribute("min");
         window.TaskApp.flowDurationMillis = 30 * 60 * 1000;
+        
+        // NEW: Reset Details input visibility and value
+        if (window.TaskApp.descriptionInput) {
+            window.TaskApp.descriptionInput.value = "";
+            window.TaskApp.descriptionInput.style.display = "none";
+        }
+        if (window.TaskApp.addDetailsBtn) {
+            window.TaskApp.addDetailsBtn.style.display = "block";
+        }
 
         // Pesan Sukses
         let successMessage = isEditing
@@ -1575,6 +1615,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (taskListForDrawer) taskListForDrawer.style.display = "none";
     if (window.TaskApp.reminderForm)
       window.TaskApp.reminderForm.style.display = "flex";
+      
+    // NEW: Reset Details input visibility and value
+    if (window.TaskApp.descriptionInput) {
+        window.TaskApp.descriptionInput.value = "";
+        window.TaskApp.descriptionInput.style.display = "none";
+    }
+    if (window.TaskApp.addDetailsBtn) {
+        window.TaskApp.addDetailsBtn.style.display = "block";
+    }
+
 
     if (window.TaskApp.dateInputEdit) {
       // ✅ MENGISI INPUT TANGGAL DENGAN TANGGAL AKTIF
@@ -1657,4 +1707,18 @@ document.addEventListener("DOMContentLoaded", function () {
       );
     }
   });
+
+  // NEW: Initialize description visibility and add listener
+  if (window.TaskApp.descriptionInput) {
+    window.TaskApp.descriptionInput.style.display = "none";
+  }
+
+  if (window.TaskApp.addDetailsBtn && window.TaskApp.descriptionInput) {
+    window.TaskApp.addDetailsBtn.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        window.TaskApp.descriptionInput.style.display = 'block';
+        window.TaskApp.addDetailsBtn.style.display = 'none';
+        window.TaskApp.descriptionInput.focus();
+    });
+  }
 });

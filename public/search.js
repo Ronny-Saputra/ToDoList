@@ -1,5 +1,3 @@
-// public/search.js
-
 document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("searchInput");
   const clearSearchBtn = document.getElementById("clearSearchBtn");
@@ -11,7 +9,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let allTasksData = []; // Variabel untuk menyimpan semua data tugas
 
-  // ✅ NEW: Gunakan sessionStorage untuk state yang persisten
   const STORAGE_KEY_FILTER = "search_active_filter";
   const STORAGE_KEY_QUERY = "search_query";
 
@@ -29,16 +26,15 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  // ✅ PERBAIKAN: Tambahkan styling untuk scrollable filter pills
+  // styling untuk scrollable filter pills
   if (filterPillsContainer) {
-    // Pastikan container bisa di-scroll horizontal
     filterPillsContainer.style.overflowX = "auto";
     filterPillsContainer.style.overflowY = "hidden";
     filterPillsContainer.style.display = "flex";
     filterPillsContainer.style.gap = "8px";
     filterPillsContainer.style.padding = "4px 0";
-    filterPillsContainer.style.scrollbarWidth = "thin"; // Firefox
-    filterPillsContainer.style.webkitOverflowScrolling = "touch"; // Smooth scroll di iOS
+    filterPillsContainer.style.scrollbarWidth = "thin"; 
+    filterPillsContainer.style.webkitOverflowScrolling = "touch"; 
     
     // Tambahkan custom scrollbar styling untuk Webkit browsers
     const style = document.createElement('style');
@@ -83,7 +79,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Urutkan berdasarkan tanggal (paling dekat duluan)
       tasksToRender.sort((a, b) => {
-        // [FIX TYPERROR] Handle missing 'date' property
         if (!a.date && !b.date) return 0;
         if (!a.date) return 1; // Push 'a' (missing date) to the end
         if (!b.date) return -1; // Keep 'a' (has date) in place, push 'b' (missing date) to the end
@@ -104,10 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Hapus kelas .active secara eksplisit pada saat rendering
         card.classList.remove("active");
-
-        // TIDAK PERLU LISTENER LOKAL. Event delegation di main.js akan menangani
-        // klik pada kartu dan tombol aksi di dalamnya ditangani oleh task.js.
-
         taskListContainer.appendChild(card);
       });
     }
@@ -116,7 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- LOGIKA PENCARIAN & FILTER (Kombinasi Keywords dan Bulan) ---
   function performSearchAndFilter(query, filter) {
     let filteredTasks = allTasksData;
-
     // 1. Filter berdasarkan filter pill (bulan)
     // Jika filter adalah 'all', blok ini dilewati, dan filteredTasks tetap berisi semua tugas.
     if (filter !== "all") {
@@ -157,7 +147,6 @@ document.addEventListener("DOMContentLoaded", function () {
             task.location.toLowerCase().includes(lowerCaseQuery)),
       );
     }
-
     renderTasks(filteredTasks);
   }
 
@@ -178,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fungsi untuk dipanggil oleh listener filter pill
   const performFilter = (filter) => {
-    // ✅ UPDATE STATE FILTER DAN SIMPAN KE sessionStorage
+    //  STATE FILTER DAN SIMPAN KE sessionStorage
     currentActiveFilter = filter;
     sessionStorage.setItem(STORAGE_KEY_FILTER, filter);
 
@@ -220,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
       allTasksData = Array.isArray(tasks)
         ? tasks.map((task) => ({
             ...task,
-            // ✅ PENTING: Pastikan task.date sesuai dengan task.dueDate dari Firebase
+            //  Pastikan task.date sesuai dengan task.dueDate dari Firebase
             date: window.TaskApp.formatIsoToYyyyMmDd(task.dueDate), // Menggunakan dueDate dari server
           }))
         : [];
@@ -232,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function () {
       currentSearchQuery = "";
       sessionStorage.removeItem(STORAGE_KEY_QUERY);
 
-      // 2. Update UI Search Input (FIX: Input Selalu Kosong)
+      // 2.  UI Search Input Selalu Kosong
       if (searchInput) {
         searchInput.value = "";
         if (clearSearchBtn) {
@@ -246,12 +235,12 @@ document.addEventListener("DOMContentLoaded", function () {
       // 4. Filter & Render (dengan query kosong dan filter ALL)
       performSearchAndFilter(currentSearchQuery, currentActiveFilter);
     } catch (err) {
-      console.error("❌ Error loading tasks:", err);
+      console.error("Error loading tasks:", err);
       renderTasks([]);
     }
   }
 
-  // ✅ NEW: Fungsi untuk restore active pill berdasarkan filter
+  // Fungsi untuk restore active pill berdasarkan filter
   function restoreActivePill(filter) {
     // Hapus class 'active' dan ikon centang dari semua pill
     document.querySelectorAll(".filter-pill.active").forEach((pill) => {
@@ -266,12 +255,12 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     if (targetPill) {
       updateActivePill(targetPill);
-      // ✅ PERBAIKAN: Auto-scroll ke pill yang aktif
+      // Auto-scroll ke pill yang aktif
       scrollToPill(targetPill);
     }
   }
 
-  // ✅ NEW: Fungsi untuk scroll ke pill yang aktif
+  // Fungsi untuk scroll ke pill yang aktif
   function scrollToPill(pill) {
     if (filterPillsContainer && pill) {
       // Tunggu sedikit untuk memastikan layout sudah selesai
@@ -322,9 +311,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (pill && !pill.classList.contains("active")) {
         const filterValue = pill.getAttribute("data-filter");
         updateActivePill(pill);
-        // ✅ Auto-scroll ke pill yang diklik
         scrollToPill(pill);
-        // ✅ Panggil performFilter yang akan mengupdate state currentActiveFilter
+        // Panggil performFilter yang akan mengupdate state currentActiveFilter
         performFilter(filterValue);
       }
     });
@@ -341,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     clearSearchBtn.addEventListener("click", () => {
       searchInput.value = "";
-      // ✅ UPDATE: Reset state dan sessionStorage
+      // Reset state dan sessionStorage
       currentSearchQuery = "";
       sessionStorage.removeItem(STORAGE_KEY_QUERY);
       toggleClearButton();
@@ -378,7 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // INISIALISASI: Atur centang pada pill berdasarkan filter 'all'
+  // Atur centang pada pill berdasarkan filter 'all'
   const initialActivePill = document.querySelector(
     `.filter-pill[data-filter="all"]`,
   );
