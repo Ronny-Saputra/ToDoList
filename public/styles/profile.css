@@ -2421,3 +2421,163 @@ body,
   -ms-overflow-style: none !important;
 }
 .drawer-body::-webkit-scrollbar { display: none !important; }
+
+/* ==================================================== */
+/* RESPONSIVE UNTUK PIXELBOOK GO (1643 x 924) - FLUID UNITS */
+/* ==================================================== */
+@media (min-width: 100rem) and (max-width: 106.25rem) and (min-height: 56.25rem) and (max-height: 59.375rem) {
+  
+  /* ========================================== */
+  /* 1. HEADER - TURUN SEDIKIT & LEBIH BESAR */
+  /* ========================================== */
+  .profile-header {
+    min-height: 5.3125rem; /* 85px → 5.3125rem (85/16) */
+    padding: 0.5rem clamp(0.9375rem, 3vw, 2.5rem); /* 8px, 15-40px */
+  }
+
+  .profile-avatar {
+    width: clamp(4.0625rem, 8vw, 5rem) !important; /* 65-80px → 4.0625-5rem */
+    height: clamp(4.0625rem, 8vw, 5rem) !important;
+  }
+
+  .username {
+    font-size: 2rem; /* 32px → 2rem */
+  }
+
+  .streak {
+    font-size: 1.375rem; /* 22px → 1.375rem */
+  }
+
+  .streak .fa-fire {
+    font-size: 1.875rem; /* 30px → 1.875rem */
+  }
+
+  .edit-profile-btn {
+    padding: 0.5rem 1rem; /* 8px 16px → 0.5rem 1rem */
+    font-size: 0.9375rem; /* 15px → 0.9375rem */
+  }
+
+  .settings-icon {
+    width: 2rem; /* 32px → 2rem */
+    height: 2rem;
+  }
+
+  /* ========================================== */
+  /* 2. MAIN CONTENT - LEBIH LEGA */
+  /* ========================================== */
+  .main-content {
+    padding: 0.9375rem clamp(0.9375rem, 3%, 3.125rem) 1.5625rem; 
+    /* 15px, 15-50px, 25px */
+    padding-bottom: 5.9375rem; /* 95px → 5.9375rem */
+  }
+
+  .content-wrapper {
+    gap: clamp(1.875rem, 4vw, 3.125rem); /* 30-50px → 1.875-3.125rem */
+    max-width: 87.5rem; /* 1400px → 87.5rem */
+  }
+
+  /* ========================================== */
+  /* 3. STATS SECTION - MELEBAR */
+  /* ========================================== */
+  .stats-section {
+    max-width: 46.875rem; /* 750px → 46.875rem */
+    margin-left: 5rem; /* 80px → 5rem */
+  }
+
+  /* TAB BUTTONS - LEBIH BESAR */
+  .tabs {
+    max-width: 46.875rem; /* 750px → 46.875rem */
+    padding: 0.3125rem; /* 5px → 0.3125rem */
+  }
+
+  .tab-btn {
+    padding: 0.625rem 1.5rem; /* 10px 24px → 0.625rem 1.5rem */
+    font-size: 0.9375rem; /* 15px → 0.9375rem */
+  }
+
+  /* STATS CARD - LEBIH TINGGI & LEBAR */
+  .stats-card {
+    min-height: 21.875rem; /* 350px → 21.875rem */
+    padding: 1.25rem; /* 20px → 1.25rem */
+  }
+
+  .card-header h3 {
+    font-size: 1.125rem; /* 18px → 1.125rem */
+  }
+
+  .productivity-score {
+    font-size: 1.25rem; /* 20px → 1.25rem */
+  }
+
+  .productivity-score .fa-fire {
+    font-size: 2rem; /* 32px → 2rem */
+  }
+
+  .productivity-score .score-value {
+    font-size: 1.375rem; /* 22px → 1.375rem */
+  }
+
+  /* CHART CONTAINER - LEBIH TINGGI */
+  .chart-container {
+    height: 10rem; /* 160px → 10rem */
+    padding-top: 0.5rem; /* 8px → 0.5rem */
+  }
+
+  .bar {
+    max-width: 2.8125rem; /* 45px → 2.8125rem */
+  }
+
+  .label {
+    font-size: 0.8125rem; /* 13px → 0.8125rem */
+  }
+
+  /* ========================================== */
+  /* 4. TASK SUMMARY - LEBIH LEBAR & TINGGI */
+  /* ========================================== */
+  .task-summary {
+    width: clamp(10rem, 22vw, 12.5rem); /* 160-200px → 10-12.5rem */
+  }
+
+  .summary-box {
+    min-height: 7.8125rem; /* 125px → 7.8125rem */
+    padding: 1.125rem; /* 18px → 1.125rem */
+  }
+
+  .summary-box span {
+    font-size: 0.8125rem; /* 13px → 0.8125rem */
+  }
+
+  .icon-wrapper {
+    font-size: 1.375rem; /* 22px → 1.375rem */
+  }
+
+  .icon-outline {
+    width: 1.5rem; /* 24px → 1.5rem */
+    height: 1.5rem;
+  }
+}
+
+/* ==================================================== */
+/* FALLBACK: LAYAR LEBAR LAIN (90rem - 120rem / 1440px - 1920px) */
+/* ==================================================== */
+@media (min-width: 87.5rem) and (max-width: 120rem) {
+  .content-wrapper {
+    max-width: 81.25rem; /* 1300px → 81.25rem */
+  }
+
+  .stats-section {
+    max-width: 43.75rem; /* 700px → 43.75rem */
+  }
+
+  .tabs {
+    max-width: 43.75rem; /* 700px → 43.75rem */
+  }
+
+  .stats-card {
+    min-height: 21.25rem; /* 340px → 21.25rem */
+  }
+
+  .task-summary {
+    width: clamp(9.375rem, 20vw, 11.875rem); /* 150-190px → 9.375-11.875rem */
+  }
+}
