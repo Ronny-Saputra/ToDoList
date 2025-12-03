@@ -19,12 +19,10 @@
       <div class="top-section"></div>
       <div class="bottom-section">
         <img src="../assets/timy2.png" alt="Clock" class="avatar" />
-
         <a href="forgotpass.html" class="back"
           ><i class="fa fa-arrow-left"></i> Back to forget password</a
         >
         <h2 class="title">New Password</h2>
-
         <form class="login-form" onsubmit="return newPasswordSubmit(event);">
           <div class="field">
             <i class="fa fa-lock field-icon"></i>
@@ -46,19 +44,20 @@
               required
             />
           </div>
-
           <button type="submit" class="btn-login">Confirm</button>
         </form>
       </div>
     </div>
-
     <div id="custom-dialog-overlay" class="custom-dialog-overlay">
       <div class="custom-dialog">
         <div id="custom-dialog-message" class="custom-dialog-message"></div>
         <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
       </div>
     </div>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="../firebase-init.js"></script>
     <script src="../main.js"></script>
+    <script src="../newpass.js"></script> 
   </body>
 </html>

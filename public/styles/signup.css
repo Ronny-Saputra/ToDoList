@@ -159,17 +159,27 @@ body {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* === PERBAIKAN KRITIS: CUSTOM DIALOG OVERLAY === */
 .custom-dialog-overlay {
+  /* POSISI FIX DAN FULL SCREEN OVERLAY */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 4000;
+  
+  /* BACKGROUND TRANSPARAN */
+  background-color: rgba(0, 0, 0, 0.5); /* Ubah dari 0.4 ke 0.5 */
+  
+  /* Z-INDEX TINGGI AGAR MENG-OVERLAY SEMUA KONTEN */
+  z-index: 9999; /* Pastikan di atas semua konten */
+  
+  /* DISPLAY FLEX UNTUK PEMUSATAN */
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  /* DEFAULT: TERSEMBUNYI */
   visibility: hidden;
   opacity: 0;
   transition:
@@ -184,17 +194,23 @@ body {
 
 .custom-dialog {
   background-color: #ffffff;
-  border-radius: 12px;
+  border-radius: 15px; /* Sedikit lebih besar */
   width: 90%;
-  max-width: 350px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 340px; /* Lebar yang lebih konsisten */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Bayangan yang lebih jelas */
   overflow: hidden;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.custom-dialog-overlay.open .custom-dialog {
+    transform: scale(1);
 }
 
 .custom-dialog-message {
   padding: 30px 20px;
   text-align: center;
-  font-size: 18px;
+  font-size: 16px; /* Font size yang lebih konsisten */
   font-weight: 600;
   color: #1e2a78;
 }
@@ -206,14 +222,26 @@ body {
 
 .dialog-btn {
   flex-grow: 1;
-  padding: 15px 10px;
+  padding: 14px 10px; /* Padding yang lebih baik */
   border: none;
   background: none;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   color: #555;
   transition: background-color 0.2s;
+  /* Tambahkan pemisah vertikal */
+  position: relative;
+}
+
+.dialog-btn:first-child:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 10%;
+    height: 80%;
+    width: 1px;
+    background: #ddd;
 }
 
 .dialog-btn.primary {

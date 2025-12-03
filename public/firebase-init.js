@@ -1,3 +1,4 @@
+// File: public/firebase-init.js
 // Import Firebase SDK (gunakan <script> di HTML, bukan di JS file)
 
 // Konfigurasi Firebase
@@ -16,15 +17,37 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-// Redirect HANYA jika BUKAN di halaman login, signup, atau forgot password
+// 1. Definisikan halaman publik (ditambahkan 'newpass.html')
 const currentPage = window.location.pathname;
-const publicPages = ['/login.html', '/signup.html', '/forgotpass.html'];
+const publicPages = [
+  '/login.html', 
+  '/signup.html', 
+  '/forgotpass.html', 
+  '/newpass.html' // ✅ Ditambahkan
+];
 const isPublicPage = publicPages.some(page => currentPage.includes(page));
 
-if (!isPublicPage) {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (!user) {
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    // 2. LOGIKA RESTRIKSI: Jika sudah login, redirect ke home (kecuali newpass.html yang mungkin butuh action code)
+    if (isPublicPage) {
+        let shouldRedirect = true;
+        // Pengecualian newpass.html hanya jika ada oobCode (untuk konfirmasi reset)
+        if (currentPage.includes('/newpass.html')) {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('oobCode')) {
+                shouldRedirect = false; // Biarkan di halaman newpass jika ada oobCode
+            }
+        }
+        
+        if (shouldRedirect) {
+             window.location.href = "../pages/home.html";
+        }
+    }
+  } else {
+    // 3. LOGIKA PROTEKSI: Jika belum login, redirect ke login page (kecuali sedang di halaman publik)
+    if (!isPublicPage) {
       window.location.href = "../pages/login.html";
     }
-  });
-}
+  }
+});

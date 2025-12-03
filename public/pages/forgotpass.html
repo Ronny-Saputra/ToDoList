@@ -4,23 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forget Password - Timy</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-    <!-- Firebase Config (GUNAKAN firebase-config.js, BUKAN firebase-init.js) -->
-    <!-- firebase-init.js punya redirect yang akan ganggu halaman ini -->
-    <script src="../firebase-init.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="../styles/signup.css" />
   </head>
   <body>
@@ -58,11 +43,12 @@
         <div id="custom-dialog-actions" class="custom-dialog-actions"></div>
       </div>
     </div>
-
-    <!-- Main JS (untuk showCustomDialog) -->
-    <script src="../main.js"></script>
     
-    <!-- Forgot Password Logic (Separated) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../firebase-init.js"></script>
+    <script src="../main.js"></script>
     <script src="../forgotpass.js"></script>
   </body>
 </html>
