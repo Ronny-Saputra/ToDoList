@@ -1,35 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // 1. Logic Back Button
+  
+  // =========================================================
+  // 1. LOGIC TOMBOL BACK (Ke settings.html)
+  // =========================================================
   const backBtn = document.querySelector(".back-btn");
+
   if (backBtn) {
     backBtn.addEventListener("click", function (e) {
       e.preventDefault();
+      // Redirect ke settings.html
       window.location.href = "settings.html";
     });
   }
-  
-  // PENTING: Jangan panggil initStreakPage() disini. Biarkan kosong.
-});
 
-// 2. Logic Deteksi User (Anti-Balapan)
-// Kita pasang "Satpam" yang menunggu Firebase siap
-firebase.auth().onAuthStateChanged((user) => {
-  if (user) {
-    // HORE! Firebase sudah siap dan User ada.
-    console.log("User detected:", user.email);
-    
-    // Baru kita jalankan fungsi utama
-    initStreakPage(); 
-  } else {
-    // Firebase sudah siap, TAPI tidak ada user yang login.
-    console.log("No user detected.");
-    
-    // Opsi A: Redirect paksa (jika halaman ini wajib login)
-    // window.location.href = "../pages/login.html"; 
-
-    // Opsi B: Tampilkan data kosong (agar tidak mental)
-    initStreakPage(); // Nanti di dalam fungsi ini dia akan baca streak = 0
-  }
+  // Jalankan logika badge
+  initStreakPage();
 });
 
 // =========================================================
