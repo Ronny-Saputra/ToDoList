@@ -117,7 +117,7 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: clamp(24rem, 32vw, 32rem);
-  z-index: 1100;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -908,12 +908,10 @@ body {
 }
 
 
-
-/* ===== LANDSCAPE MODE (Keep existing code) ===== */
 @media (max-height: 600px) and (orientation: landscape) {
   .header {
     height: 100vh;
-    margin-top: -45vh;
+    margin-top: -41vh;
   }
 
   .character-wrapper {
@@ -932,13 +930,13 @@ body {
   }
 
   .streak {
-    top: 50vh;
-    padding-bottom: 2rem;
+    top: 53vh;
+    padding-bottom: 4rem;
   }
 
   .flame {
     font-size: 2rem;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.35rem;
   }
 
   .streak-number {
