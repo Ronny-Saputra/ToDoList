@@ -284,11 +284,11 @@ body {
 @media (min-resolution: 1.25dppx) and (max-resolution: 1.49dppx) {
   /* 125% Zoom */
   .character-img {
-    transform: scale(0.95);
+    transform: scale(0.75);
   }
 
   .speech-bubble {
-    transform: scale(0.95);
+    transform: scale(0.75);
   }
 
   .flame,
@@ -296,22 +296,22 @@ body {
   .streak-title,
   .progress-box,
   .message {
-    transform: scale(0.95);
+    transform: scale(0.75);
   }
 
   .runner-icon {
-    transform: translateX(-50%) scale(0.95);
+    transform: translateX(-50%) scale(0.75);
   }
 }
 
 @media (min-resolution: 1.5dppx) and (max-resolution: 1.74dppx) {
   /* 150% Zoom */
   .character-img {
-    transform: scale(0.9);
+    transform: scale(0.75);
   }
 
   .speech-bubble {
-    transform: scale(0.9);
+    transform: scale(0.75);
   }
 
   .flame,
@@ -319,22 +319,22 @@ body {
   .streak-title,
   .progress-box,
   .message {
-    transform: scale(0.9);
+    transform: scale(0.7);
   }
 
   .runner-icon {
-    transform: translateX(-50%) scale(0.9);
+    transform: translateX(-50%) scale(0.7);
   }
 }
 
 @media (min-resolution: 1.75dppx) and (max-resolution: 1.99dppx) {
   /* 175% Zoom */
   .character-img {
-    transform: scale(0.85);
+    transform: scale(0.65);
   }
 
   .speech-bubble {
-    transform: scale(0.85);
+    transform: scale(0.65);
   }
 
   .flame,
@@ -342,22 +342,22 @@ body {
   .streak-title,
   .progress-box,
   .message {
-    transform: scale(0.85);
+    transform: scale(0.65);
   }
 
   .runner-icon {
-    transform: translateX(-50%) scale(0.85);
+    transform: translateX(-50%) scale(0.65);
   }
 }
 
 @media (min-resolution: 2dppx) {
   /* 200%+ Zoom */
   .character-img {
-    transform: scale(0.8);
+    transform: scale(0.6);
   }
 
   .speech-bubble {
-    transform: scale(0.8);
+    transform: scale(0.6);
   }
 
   .flame,
@@ -365,35 +365,47 @@ body {
   .streak-title,
   .progress-box,
   .message {
-    transform: scale(0.8);
+    transform: scale(0.6);
   }
 
   .runner-icon {
-    transform: translateX(-50%) scale(0.8);
+    transform: translateX(-50%) scale(0.6);
   }
 }
 
 /* Zoom Out */
 @media (max-resolution: 0.9dppx) {
-  /* 90% Zoom */
   .character-img {
-    transform: scale(1.05);
+    transform: scale(0.85);
   }
 
-  .speech-bubble {
-    transform: scale(1.05);
+  .streak {
+    top: 49vh;
+    transform: translateX(-50%) scale(0.9)
   }
 
-  .flame,
-  .streak-number,
-  .streak-title,
-  .progress-box,
+  .flame {
+     transform: scale(0.95);
+    font-size: 2rem;
+    margin-bottom: 0.05rem;
+  }
+
+  .streak-number {
+    font-size: 1.25rem;
+  }
+
+  .streak-title {
+    font-size: 0.75rem;
+  }
+
+  .progress-box {
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+  }
+
   .message {
-    transform: scale(1.05);
-  }
-
-  .runner-icon {
-    transform: translateX(-50%) scale(1.05);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
   }
 }
 
