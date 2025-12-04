@@ -551,25 +551,6 @@ body {
   .message {
     font-size: clamp(0.8125rem, 1vw, 0.9375rem);
   }
-
-  .popup-container {
-    max-width: 340px;
-  }
-
-  .popup-title {
-    font-size: 16px;
-    padding: 20px 20px 16px 20px;
-  }
-
-  .popup-message {
-    font-size: 13px;
-    padding: 16px 20px 20px 20px;
-  }
-
-  .popup-btn {
-    padding: 14px;
-    font-size: 15px;
-  }
 }
 
 /* ===== SMALL MOBILE (≤ 480px) ===== */
@@ -712,7 +693,7 @@ body {
 
 @media (max-width: 592px) {
   .header {
-    height: 67vh;
+    height: 63vh;
   }
 
   .header-title-mobile {
@@ -728,19 +709,18 @@ body {
   }
 
   .character-img {
-    width: clamp(17rem, 30vw, 15rem);
-    margin-top: 3rem;
+    width: clamp(15rem, 30vw, 15rem);
   }
 
   .speech-bubble {
-    top: clamp(4rem, 20vw, -10rem);
+    top: clamp(1.5rem, 20vw, -10rem);
     left: calc(2% + clamp(2rem, 5vw, 2.5rem));
-    font-size: clamp(0.8rem, 2.2vw, 0.875rem);
+    font-size: clamp(0.6875rem, 2.2vw, 0.875rem);
     padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
 
   .streak {
-    top: 62vh;
+    top: 57vh;
   }
 
   .flame {
@@ -781,7 +761,7 @@ body {
 
 @media (max-width: 360px) {
   .header {
-    height: 67vh;
+    height: 60vh;
   }
 
   .header-title-mobile {
@@ -793,22 +773,22 @@ body {
   }
 
   .character-wrapper {
-    margin-top: 4rem;
+    margin-top: 6rem;
   }
 
   .character-img {
-    width: clamp(17rem, 30vw, 14rem);
+    width: clamp(14rem, 30vw, 14rem);
   }
 
   .speech-bubble {
-    top: clamp(4rem, 20vw, -10rem);
-    left: calc(0% + clamp(3rem, 5vw, 1.2rem));
-    font-size: clamp(0.7rem, 2.2vw, 0.6rem);
+    top: clamp(1rem, 20vw, -10rem);
+    left: calc(0% + clamp(1rem, 5vw, 1.2rem));
+    font-size: clamp(0.6875rem, 2.2vw, 0.6rem);
     padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
 
   .streak {
-    top: 63vh;
+    top: 57vh;
   }
 
   .flame {
@@ -861,7 +841,7 @@ body {
   }
 
   .character-wrapper {
-    margin-top: 0rem;
+    margin-top: 3rem;
   }
 
   .character-img {
@@ -869,7 +849,7 @@ body {
   }
 
   .speech-bubble {
-    top: clamp(4rem, 20vw, -10rem);
+    top: clamp(1rem, 20vw, -10rem);
     left: calc(1% + clamp(2rem, 5vw, 0rem));
     font-size: clamp(0.4rem, 2.2vw, 0.4rem);
     padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
@@ -915,11 +895,13 @@ body {
   }
 }
 
+
+
 /* ===== LANDSCAPE MODE (Keep existing code) ===== */
 @media (max-height: 600px) and (orientation: landscape) {
   .header {
     height: 100vh;
-    margin-top: -41vh;
+    margin-top: -45vh;
   }
 
   .character-wrapper {
@@ -938,13 +920,13 @@ body {
   }
 
   .streak {
-    top: 53vh;
-    padding-bottom: 4rem;
+    top: 50vh;
+    padding-bottom: 2rem;
   }
 
   .flame {
     font-size: 2rem;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.15rem;
   }
 
   .streak-number {
@@ -1121,4 +1103,25 @@ body {
 
 .popup-btn-view:hover {
   background-color: #f0f4ff;
+}
+
+@media (max-width: 768px) {
+  .popup-container {
+    max-width: 340px;
+  }
+
+  .popup-title {
+    font-size: 16px;
+    padding: 20px 20px 16px 20px;
+  }
+
+  .popup-message {
+    font-size: 13px;
+    padding: 16px 20px 20px 20px;
+  }
+
+  .popup-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
 }
