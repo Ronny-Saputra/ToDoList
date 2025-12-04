@@ -5,22 +5,36 @@
   box-sizing: border-box;
 }
 
+/* 1. UPDATE BODY AGAR CENTER DI SEMUA LAPTOP */
 body {
   font-family: "Lexend", sans-serif;
   background-color: #f5f7fa;
   color: #1e2a78;
-  min-height: auto;
+  
+  /* UBAH INI: Tinggi 100% layar agar bisa di-center vertikal */
+  min-height: 100vh; 
+  
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 39px;
+  
+  /* UBAH INI: Center Vertikal */
+  align-items: center; 
+  
+  /* Padding secukupnya */
+  padding: 20px; 
+  
+  /* Cegah scroll pada body utama (biar fokus ke container) */
+  overflow: hidden; 
 }
 
-/* BATASI TINGGI MAKSIMAL KOTAK */
+/* CONTAINER UTAMA */
 .settings-container {
   width: 100%;
   max-width: 530px;
-  max-height: 85vh;
+  
+  /* Batasi tinggi agar tidak melebihi layar */
+  max-height: 85vh; 
+  
   background: #ffffff;
   border-radius: 25px;
   overflow: hidden;
@@ -28,19 +42,20 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding-bottom: 0; /* Hilangkan padding bawah */
+  padding-bottom: 0;
 }
 
-/* Header tetap di atas */
+/* Header tetap di atas (Tidak ikut scroll) */
 .settings-header {
   background: linear-gradient(to bottom, #dde8f8, #b9d4f5, #9ac1f0);
-  padding: 20px 24px 20px 24px; /* padding bawah tetap */
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   gap: 16px;
   color: #14142a;
-  position: sticky;
-  top: 0;
+  
+  /* Tidak perlu sticky karena menu yang akan scroll sendiri */
+  position: relative; 
   z-index: 10;
   flex-shrink: 0;
   border-radius: 25px;
@@ -73,28 +88,42 @@ body {
   margin: 0;
 }
 
-/* Menu TIDAK bisa scroll (statis) */
+/* 2. MENU CONTENT (SCROLLABLE & HIDDEN SCROLLBAR) */
 .settings-menu {
   padding: 15px 9px;
-  flex-grow: 1;
+  flex-grow: 1; /* Mengisi sisa ruang container */
   background: #ffffff;
-  /* HAPUS overflow-y: auto; */
-  /* HAPUS -webkit-overflow-scrolling: touch; */
-  /* HAPUS -ms-overflow-style: none; */
-  /* HAPUS scrollbar-width: none; */
+  
+  /* AKTIFKAN SCROLL DI SINI */
+  overflow-y: auto; 
+  
+  /* Smooth scroll untuk mobile */
+  -webkit-overflow-scrolling: touch; 
+
+  /* SEMBUNYIKAN SCROLLBAR (Firefox) */
+  scrollbar-width: none; 
+  /* SEMBUNYIKAN SCROLLBAR (IE/Edge) */
+  -ms-overflow-style: none; 
 }
 
-/* Wrapper untuk background biru */
+/* SEMBUNYIKAN SCROLLBAR (Chrome/Safari/Opera) */
+.settings-menu::-webkit-scrollbar {
+  display: none;
+}
+
+/* Wrapper background biru */
 .menu-content-wrapper {
   background: #e3eefb;
   border-radius: 15px;
-  padding: 24px 24px 20px 24px; /* Tambah 80px di bawah */
-  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4); /* Bayangan merata semua sisi */
+  padding: 24px 24px 20px 24px;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
   color: white;
   flex-shrink: 0;
   z-index: 1;
   position: relative;
-  margin-bottom: 60px; /* Jaga jarak dari bawah layar */
+  
+  /* Margin bawah agar robot tidak terpotong saat di-scroll */
+  margin-bottom: 30px; 
 }
 
 .menu-section {
@@ -133,17 +162,17 @@ body {
   font-weight: 400;
   color: #14142a;
   text-decoration: none;
-  transition: all 0.3s ease; /* ← DIUBAH dari 0.2s */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* ← TAMBAHAN INI */
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .menu-section a:hover {
-  background: #ffffff; /* ← DIUBAH dari #F0F4F8 */
-  transform: translateY(-3px); /* ← DIUBAH dari translateX(4px) */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* ← TAMBAHAN INI */
+  background: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* ROBOT ILLUSTRATION - Posisi "nempel" di atas kotak biru */
+/* Robot Illustration */
 .robot-illustration {
   position: absolute;
   bottom: -4px;
@@ -158,11 +187,12 @@ body {
 .robot-illustration img {
   width: 100%;
   height: auto;
-  /* Membuat robot "menutupi" kotak biru dan putih di bawahnya */
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
 }
 
-/* RESPONSIF: TABLET (≤768px) */
+/* --- MEDIA QUERIES --- */
+
+/* TABLET (≤768px) */
 @media (max-width: 768px) {
   body {
     padding: 20px;
@@ -170,147 +200,133 @@ body {
 
   .settings-container {
     max-width: 100%;
+    /* Di tablet beri ruang sedikit lebih */
     max-height: 90vh;
-  }
-
-  .settings-header {
-    padding: 18px 20px;
-    gap: 12px;
-  }
-
-  .settings-header h1 {
-    font-size: 18px;
-  }
-
-  .back-btn {
-    font-size: 22px;
-  }
-
-  .settings-menu {
-    padding: 12px 16px 16px;
-    gap: 14px;
-  }
-
-  .menu-content-wrapper {
-    padding: 16px;
-    border-radius: 16px;
-    gap: 14px;
-    margin-bottom: 70px;
-  }
-
-  .menu-section h3 {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-
-  .menu-section a {
-    padding: 10px 14px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
-
-  .robot-illustration {
-    width: 180px;
-    bottom: -5px;
   }
 }
 
-/* RESPONSIF: MOBILE (≤480px) - FULLSCREEN */
+/* ========================================= */
+/* RESPONSIF: MOBILE (≤480px) - FULL SCREEN */
+/* ========================================= */
 @media (max-width: 480px) {
+  
+  /* 1. BODY & CONTAINER */
   body {
-    padding: 0; /* Hilangkan padding body */
-    background-color: #ffffff; /* Background putih penuh */
+    padding: 0;
     overflow: hidden;
+    background-color: #ffffff;
+    align-items: flex-start; /* Mulai dari atas */
   }
 
   .settings-container {
-    max-height: 200vh; /* Tinggi penuh layar */
-    height: 100vh; /* Force tinggi 100% */
-    border-radius: 0; /* Hilangkan border radius */
-    box-shadow: none; /* Hilangkan shadow */
-    max-width: 100%; /* Lebar penuh */
-    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    
+    /* Gunakan dvh (Dynamic Viewport Height) agar pas dengan browser HP */
+    height: 100dvh; 
+    max-height: 100dvh;
+    
+    border-radius: 0; /* Hilangkan lengkungan sudut container */
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
   }
 
+  /* 2. HEADER */
   .settings-header {
-    padding: 45px 18px 20px;
-    gap: 25px;
-    border-radius: 0 0 25px 25px; /* Hanya bawah rounded */
+    /* Padding atas lebih besar untuk status bar HP */
+    padding: 45px 20px 20px; 
+    gap: 20px;
+    border-radius: 0 0 25px 25px;
+    flex-shrink: 0; /* Header tidak boleh mengecil */
+    z-index: 20;
   }
 
   .settings-header h1 {
-    font-size: 22px;
+    font-size: 22px; /* Font judul lebih besar di HP */
   }
 
   .back-btn {
     font-size: 20px;
-    padding: 6px;
+    padding: 8px;
   }
 
+  /* 3. MENU AREA (SCROLLABLE) */
   .settings-menu {
-    padding: 20px 14px 14px;
-    gap: 12px;
-    height: calc(100vh - 95px);
-    overflow: hidden; /* Enable scroll untuk konten */
+    padding: 15px 15px 0 15px; /* Kiri-kanan 15px */
+    
+    /* Flex grow agar mengisi sisa layar */
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    
+    /* Scroll settings */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    flex: 1;
+    
+    /* Sembunyikan Scrollbar */
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
   }
 
-  /* Aktifkan scroll saat zoom (browser akan otomatis detect) */
-  @media (min-resolution: 1.6dppx) {
-    .settings-menu {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-  }
-
-  /* Sembunyikan scrollbar tapi tetap bisa scroll */
   .settings-menu::-webkit-scrollbar {
     display: none;
   }
 
-  .settings-menu {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Background biru lebih panjang + gap dengan robot */
+  /* 4. WRAPPER BIRU (Menu Content) */
   .menu-content-wrapper {
-    padding: 20px 18px 50px; /* Padding bawah lebih besar = kotak lebih panjang */
-    border-radius: 14px;
-    gap: 12px;
-    margin-bottom: 80px; /* Gap antara kotak biru dan robot */
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
-    min-height: min-content;
+    /* Flex grow agar kotak biru memanjang ke bawah sampai mentok */
+    flex-grow: 1; 
+    
+    border-radius: 20px 20px 0 0; /* Lengkung atas saja, bawah lurus */
+    
+    /* Padding bawah besar (100px) agar menu terakhir tidak ketutup robot */
+    padding: 25px 20px 100px 20px; 
+    
+    margin-bottom: 0; /* Nempel ke bawah */
+    box-shadow: none; /* Hilangkan shadow di mobile biar flat */
+    
+    /* Gap antar section */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
   }
 
+  /* 5. PENYESUAIAN GAP ITEM MENU */
   .menu-section {
-    margin-bottom: 10px; /* Spacing antar section lebih besar */
+    margin-bottom: 0; /* Reset margin, kita pakai gap di parent */
   }
 
   .menu-section h3 {
-    font-size: 12px; /* Header lebih besar */
-    margin-bottom: 8px; /* Spacing lebih besar */
+    font-size: 13px;
+    margin-bottom: 10px;
+    opacity: 0.8;
   }
 
   .menu-section li {
-    margin-bottom: 8px; /* Spacing antar item lebih besar */
+    margin-bottom: 10px; /* Jarak antar tombol */
   }
 
   .menu-section a {
-    padding: 10px 14px; /* Padding lebih besar = item lebih tinggi */
-    font-size: 13px; /* Font lebih besar */
-    border-radius: 18px;
+    padding: 14px 18px; /* Tombol lebih tebal (enak dipencet jari) */
+    font-size: 14px;
+    border-radius: 12px;
   }
 
+  /* 6. ROBOT ILLUSTRATION */
   .robot-illustration {
-    width: 200px;
-    bottom: -4px; /* Naik sedikit dari bawah */
+    width: 180px; /* Ukuran robot pas */
+    bottom: 0; /* Nempel paling bawah */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    /* Pastikan robot tidak menghalangi klik area kosong (opsional) */
+    pointer-events: none; 
   }
 }
 
-/* POPUP LOGOUT - PERSIS SEPERTI GAMBAR */
-.logout-popup-overlay {
+/* POPUP CSS (TETAP SAMA SEPERTI FILE ANDA) */
+.logout-popup-overlay, .delete-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -327,12 +343,12 @@ body {
   backdrop-filter: blur(4px);
 }
 
-.logout-popup-overlay.show {
+.logout-popup-overlay.show, .delete-popup-overlay.show {
   opacity: 1;
   visibility: visible;
 }
 
-.logout-popup {
+.logout-popup, .delete-popup {
   background: white;
   width: 90%;
   max-width: 340px;
@@ -344,94 +360,12 @@ body {
   transition: transform 0.3s ease;
 }
 
-.logout-popup-overlay.show .logout-popup {
-  transform: scale(1);
-}
-
-.logout-popup h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e2a78;
-  margin: 0 0 20px 0;
-  line-height: 1.4;
-  padding: 0 10px;
-}
-
-.logout-popup .buttons {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  border-top: 1px solid #e0e0e0;
-  position: relative;
-}
-
-.logout-popup .btn {
-  flex: 1;
-  padding: 14px 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #1e2a78;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  position: relative;
-}
-
-.logout-popup .btn:first-child::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 1px;
-  height: 100%;
-  background: #e0e0e0;
-}
-
-.logout-popup .btn:hover {
-  color: #0d1a5e;
-}
-
-/* POPUP DELETE ACCOUNT - SAMA DENGAN LOGOUT */
-.delete-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-}
-
-.delete-popup-overlay.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.delete-popup {
-  background: white;
-  width: 90%;
-  max-width: 340px;
-  border-radius: 20px;
-  padding: 28px 20px 0;
-  text-align: center;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-  transform: scale(0.85);
-  transition: transform 0.3s ease;
-}
-
+.logout-popup-overlay.show .logout-popup, 
 .delete-popup-overlay.show .delete-popup {
   transform: scale(1);
 }
 
-.delete-popup h2 {
+.logout-popup h2, .delete-popup h2 {
   font-size: 18px;
   font-weight: 600;
   color: #1e2a78;
@@ -440,7 +374,7 @@ body {
   padding: 0 10px;
 }
 
-.delete-popup .buttons {
+.logout-popup .buttons, .delete-popup .buttons {
   display: flex;
   justify-content: center;
   gap: 0;
@@ -448,7 +382,7 @@ body {
   position: relative;
 }
 
-.delete-popup .btn {
+.logout-popup .btn, .delete-popup .btn {
   flex: 1;
   padding: 14px 0;
   font-size: 16px;
@@ -461,6 +395,7 @@ body {
   position: relative;
 }
 
+.logout-popup .btn:first-child::after, 
 .delete-popup .btn:first-child::after {
   content: "";
   position: absolute;
@@ -471,11 +406,10 @@ body {
   background: #e0e0e0;
 }
 
-.delete-popup .btn:hover {
+.logout-popup .btn:hover, .delete-popup .btn:hover {
   color: #0d1a5e;
 }
 
-/* Tombol konfirmasi hapus berwarna merah */
 #confirmDelete {
   color: #d32f2f;
 }
