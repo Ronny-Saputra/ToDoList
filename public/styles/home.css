@@ -551,6 +551,25 @@ body {
   .message {
     font-size: clamp(0.8125rem, 1vw, 0.9375rem);
   }
+
+  .popup-container {
+    max-width: 340px;
+  }
+
+  .popup-title {
+    font-size: 16px;
+    padding: 20px 20px 16px 20px;
+  }
+
+  .popup-message {
+    font-size: 13px;
+    padding: 16px 20px 20px 20px;
+  }
+
+  .popup-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
 }
 
 /* ===== SMALL MOBILE (≤ 480px) ===== */
@@ -693,7 +712,7 @@ body {
 
 @media (max-width: 592px) {
   .header {
-    height: 63vh;
+    height: 67vh;
   }
 
   .header-title-mobile {
@@ -709,18 +728,19 @@ body {
   }
 
   .character-img {
-    width: clamp(15rem, 30vw, 15rem);
+    width: clamp(17rem, 30vw, 15rem);
+    margin-top: 3rem;
   }
 
   .speech-bubble {
-    top: clamp(1.5rem, 20vw, -10rem);
+    top: clamp(4rem, 20vw, -10rem);
     left: calc(2% + clamp(2rem, 5vw, 2.5rem));
-    font-size: clamp(0.6875rem, 2.2vw, 0.875rem);
+    font-size: clamp(0.8rem, 2.2vw, 0.875rem);
     padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
 
   .streak {
-    top: 57vh;
+    top: 62vh;
   }
 
   .flame {
@@ -761,7 +781,7 @@ body {
 
 @media (max-width: 360px) {
   .header {
-    height: 80vh;
+    height: 67vh;
   }
 
   .header-title-mobile {
@@ -773,22 +793,22 @@ body {
   }
 
   .character-wrapper {
-    margin-top: -4rem;
+    margin-top: 4rem;
   }
 
   .character-img {
-    width: clamp(14rem, 30vw, 14rem);
+    width: clamp(17rem, 30vw, 14rem);
   }
 
   .speech-bubble {
-    top: clamp(1.5rem, 20vw, -10rem);
-    left: calc(0% + clamp(1.2rem, 5vw, 1.2rem));
-    font-size: clamp(0.6875rem, 2.2vw, 0.6rem);
+    top: clamp(4rem, 20vw, -10rem);
+    left: calc(0% + clamp(3rem, 5vw, 1.2rem));
+    font-size: clamp(0.7rem, 2.2vw, 0.6rem);
     padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
   }
 
   .streak {
-    top: 55vh;
+    top: 63vh;
   }
 
   .flame {
@@ -824,6 +844,74 @@ body {
   .message {
     font-size: clamp(0.6875rem, 1vw, 0.6875rem);
     margin-bottom: clamp(0.2rem, 2vw, 0.2rem);
+  }
+}
+
+@media (max-width: 320px) {
+  .header {
+    height: 59vh;
+  }
+
+  .header-title-mobile {
+    /* Perbaikan 1: Pastikan elemen muncul */
+    display: block;
+    font-size: clamp(1rem, 4.5vw, 1rem);
+    /* Perbaikan 2: Ganti top agar tidak negatif (mendorong keluar) */
+    top: clamp(2rem, 5vw, 3rem);
+  }
+
+  .character-wrapper {
+    margin-top: 0rem;
+  }
+
+  .character-img {
+    width: clamp(10rem, 30vw, 14rem);
+  }
+
+  .speech-bubble {
+    top: clamp(4rem, 20vw, -10rem);
+    left: calc(1% + clamp(2rem, 5vw, 0rem));
+    font-size: clamp(0.4rem, 2.2vw, 0.4rem);
+    padding: clamp(0.375rem, 1.2vw, 0.5rem) clamp(0.625rem, 1.8vw, 0.875rem);
+  }
+
+  .streak {
+    top: 55vh;
+  }
+
+  .flame {
+    font-size: clamp(1rem, 1vw, 4rem);
+    margin-bottom: clamp(0.1rem, 2vw, 0.1rem);
+  }
+
+  .streak-number {
+    font-size: clamp(0.7rem, 1vw, 1rem);
+    margin-bottom: clamp(0rem, 0vw, 0rem);
+  }
+
+  .streak-title {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0rem, 0vw, 0rem);
+  }
+
+  .progress-box {
+    padding: clamp(0.425rem, 1vw, 0.875rem) clamp(0.875rem, 2vw, 1.125rem);
+    max-width: clamp(12rem, 70vw, 20rem);
+    margin-bottom: clamp(0rem, 0vw, 0rem);
+  }
+
+  .days {
+    font-size: clamp(0.6875rem, 1vw, 0.875rem);
+    margin-bottom: clamp(0.625rem, 2vw, 0.875rem);
+  }
+
+  .runner-icon {
+    font-size: clamp(0.9375rem, 1vw, 1.25rem);
+  }
+
+  .message {
+    font-size: clamp(0.6875rem, 1vw, 0.6875rem);
+    margin-bottom: clamp(0rem, 0vw, 0rem);
   }
 }
 
@@ -1033,25 +1121,4 @@ body {
 
 .popup-btn-view:hover {
   background-color: #f0f4ff;
-}
-
-@media (max-width: 768px) {
-  .popup-container {
-    max-width: 340px;
-  }
-
-  .popup-title {
-    font-size: 16px;
-    padding: 20px 20px 16px 20px;
-  }
-
-  .popup-message {
-    font-size: 13px;
-    padding: 16px 20px 20px 20px;
-  }
-
-  .popup-btn {
-    padding: 14px;
-    font-size: 15px;
-  }
 }
