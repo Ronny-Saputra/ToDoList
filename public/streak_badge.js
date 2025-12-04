@@ -8,23 +8,52 @@ document.addEventListener("DOMContentLoaded", function () {
   if (backBtn) {
     backBtn.addEventListener("click", function (e) {
       e.preventDefault();
-      // Redirect ke settings.html sesuai permintaan
+      // Redirect ke settings.html
       window.location.href = "settings.html";
     });
   }
 
-  // Jalankan logika badge setelah halaman siap
+  // Jalankan logika badge
   initStreakPage();
 });
 
+// =========================================================
+// PENGGANTI FETCHDATA (Karena main.js dihapus)
+// =========================================================
+// Fungsi ini mengambil data langsung dari Firestore tanpa lewat API Backend
+async function getStreakDataManual() {
+  return new Promise((resolve) => {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // Ambil data dari koleksi 'users' dokumen ID user
+        firebase.firestore().collection("users").doc(user.uid).get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              // Kembalikan streak (default 0 jika tidak ada)
+              resolve({ currentStreak: data.streak || 0 });
+            } else {
+              console.log("User doc not found");
+              resolve({ currentStreak: 0 });
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting streak:", error);
+            resolve({ currentStreak: 0 });
+          });
+      } else {
+        // User belum login / session habis
+        console.log("User not logged in");
+        resolve({ currentStreak: 0 });
+      }
+    });
+  });
+}
 
 // =========================================================
 // 2. LOGIC STREAK BADGE SYSTEM
 // =========================================================
 
-// Konfigurasi: 
-// 'mainSrc' = Gambar Bintang untuk tampilan ATAS (star_*.png)
-// 'gridId'  = ID gambar icon kecil di BAWAH (sesuai HTML)
 const BADGE_TIERS = [
   { days: 7,   gridId: "badge-7",   mainSrc: "../assets/star_7.png",   title: "7-Day Warrior" },
   { days: 15,  gridId: "badge-15",  mainSrc: "../assets/star_15.png",  title: "15-Day Champion" },
@@ -33,7 +62,6 @@ const BADGE_TIERS = [
   { days: 100, gridId: "badge-100", mainSrc: "../assets/star_100.png", title: "Century Icon" }
 ];
 
-// Gambar placeholder default (jika streak < 7 hari)
 const DEFAULT_MAIN_IMAGE = "../assets/star_7.png"; 
 
 async function initStreakPage() {
@@ -41,49 +69,41 @@ async function initStreakPage() {
   const mainTitle = document.getElementById("badge-title");
   const infoText = document.getElementById("badge-info");
 
-  // Safety check: Pastikan elemen HTML ada (ID harus sudah ditambahkan di HTML)
-  if (!mainImage || !mainTitle || !infoText) {
-      console.warn("Elemen badge tidak ditemukan. Pastikan ID (main-badge-image, dll) sudah ada di HTML.");
-      return;
-  }
+  if (!mainImage || !mainTitle || !infoText) return;
 
-  // --- A. Ambil Data Streak ---
+  // --- A. Ambil Data Streak (GUNAKAN FUNGSI MANUAL BARU) ---
   let currentStreak = 0;
   
-  if (typeof window.fetchData === "function") {
-    try {
-      const data = await window.fetchData("/stats/streak");
-      currentStreak = data.currentStreak || 0;
-    } catch (e) {
-      console.error("Error fetching streak:", e);
-    }
-  } else {
-    // Fallback jika tidak ada backend / testing
-    console.log("Mode Offline: Menggunakan Streak 0");
-    currentStreak = 0; 
+  try {
+    // Kita panggil fungsi manual yang kita buat di atas
+    const data = await getStreakDataManual();
+    currentStreak = data.currentStreak || 0;
+    console.log("Streak loaded:", currentStreak);
+  } catch (e) {
+    console.error("Error fetching streak:", e);
+    currentStreak = 0;
   }
 
   // --- B. Logika Penentuan Badge ---
   let highestBadge = null; 
   let nextBadge = null;    
 
-  // Langkah 1: Reset semua grid visual ke "Locked" (Hitam/Abu) dulu
+  // Reset visual ke Locked
   BADGE_TIERS.forEach(tier => {
     const el = document.getElementById(tier.gridId);
     if(el) {
-        el.classList.add("locked-badge"); // Tambah class biar hitam putih
-        el.style.filter = ""; // Reset inline style
+        el.classList.add("locked-badge");
+        el.style.filter = "";
         el.style.opacity = "";
     }
   });
 
-  // Langkah 2: Cek setiap tier berdasarkan streak user
+  // Cek Tier
   for (let i = 0; i < BADGE_TIERS.length; i++) {
     const tier = BADGE_TIERS[i];
     const el = document.getElementById(tier.gridId);
 
     if (currentStreak >= tier.days) {
-      // UNLOCKED: Hapus class locked, buat berwarna
       if(el) {
         el.classList.remove("locked-badge");
         el.style.filter = "none"; 
@@ -91,40 +111,34 @@ async function initStreakPage() {
       }
       highestBadge = tier;
     } else {
-      // LOCKED: Tetap hitam (sudah direset di atas)
-      // Jika ini badge pertama yang gagal didapat, berarti ini target berikutnya
       if (!nextBadge) {
         nextBadge = tier;
       }
     }
   }
 
-  // --- C. Update Tampilan Utama (Gambar Besar di Atas) ---
+  // --- C. Update Tampilan Utama ---
   if (highestBadge) {
-    // KASUS 1: User punya badge (Minimal 7 hari)
-    mainImage.src = highestBadge.mainSrc; // Ganti gambar (star_XX.png)
-    mainImage.classList.remove("locked-badge"); // Warnanya normal (Full Color)
+    mainImage.src = highestBadge.mainSrc;
+    mainImage.classList.remove("locked-badge");
     
-    // Set Title Text
     if (currentStreak >= 100) mainTitle.innerText = "Century Icon";
     else if (currentStreak >= 50) mainTitle.innerText = "You're a Legend";
     else if (currentStreak >= 30) mainTitle.innerText = "Great Streak";
     else if (currentStreak >= 15) mainTitle.innerText = "Keep Going Strong";
     else mainTitle.innerText = "You're Doing Great";
 
-    // Info Text
     if (nextBadge) {
       const diff = nextBadge.days - currentStreak;
       infoText.innerText = `Next: ${nextBadge.title} in ${diff} days`;
     } else {
-      infoText.innerText = "All badges unlocked! well done!";
+      infoText.innerText = "All badges unlocked! Well done!";
     }
 
   } else {
-    // KASUS 2: Streak < 7 (Belum dapat badge apapun atau Reset)
-    mainImage.src = DEFAULT_MAIN_IMAGE; // Pakai gambar default (misal star_7)
-    mainImage.classList.add("locked-badge"); // TAPI gelapkan (Hitam/Abu)
-    
+    // Belum dapat badge
+    mainImage.src = DEFAULT_MAIN_IMAGE;
+    mainImage.classList.add("locked-badge");
     mainTitle.innerText = "Start Your Journey";
     
     const firstTier = BADGE_TIERS[0];

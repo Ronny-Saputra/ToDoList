@@ -27,9 +27,14 @@ body,
   scrollbar-width: none;
 }
 
+/* Cari class .container dan ganti dengan ini */
 .container {
   width: 100%;
-  min-height: 100vh;
+  /* UBAH DARI min-height JADI height */
+  height: 100vh; 
+  /* Pastikan overflow hidden agar body tidak ikut scroll */
+  overflow: hidden; 
+  
   box-shadow: none;
   border-radius: 0;
   display: flex;
@@ -201,18 +206,30 @@ body,
 /* ==================================================== */
 /* KONTEN UTAMA */
 /* ==================================================== */
+/* Cari class .main-content dan ganti dengan ini */
 .main-content {
-  flex-grow: 1;
-  /* PENTING: Gunakan height: 100% agar mengisi sisa ruang setelah header */
+  /* Mengambil sisa ruang setelah header */
+  flex: 1; 
+  /* Paksa tinggi mengikuti parent, jangan auto */
   height: 100%; 
+  /* Reset min-height agar flex berfungsi benar */
+  min-height: 0; 
+  
+  /* AKTIFKAN SCROLL DISINI */
+  overflow-y: auto; 
+  
+  /* Styling padding */
   padding: 10px clamp(10px, 3%, 40px) 20px;
-  /* Sesuaikan padding-bottom agar tidak menabrak navbar */
-  padding-bottom: 90px; 
+  /* Padding bawah agar konten paling bawah tidak tertutup navbar/timy */
+  padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
+  
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: auto;
   width: 100%;
+  
+  /* Smooth scrolling untuk iOS */
+  -webkit-overflow-scrolling: touch; 
 }
 /* ---------------------------------------------------- */
 /* WRAPPER UTAMA UNTUK SEMUA KONTEN */
@@ -231,6 +248,9 @@ body,
   flex-grow: 1; 
   /* Hapus min-height jika ada, atau set 0 */
   min-height: 0; 
+
+  /* Pastikan flex-shrink 0 agar browser tidak memadatkan konten */
+  flex-shrink: 0;
 }
 
 /* ---------------------------------------------------- */
@@ -2424,4 +2444,3 @@ body,
     height: 1.75rem;
   }
 }
-
